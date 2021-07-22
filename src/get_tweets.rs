@@ -24,14 +24,14 @@ async fn get_tweets_from_endpoint(start_time_string: &str, next_token: Option<St
 }
 
 pub async fn get_recent_tweets() -> Vec<String> {
-    let start_time_string: &str = get_one_hour_ago_iso_string().as_str();
+    let start_time_string: String = get_one_hour_ago_iso_string();
     let mut tweets: Vec<String> = Vec::new();
 
-    let mut res = get_tweets_from_endpoint(start_time_string, None).await;
+    let mut res = get_tweets_from_endpoint(start_time_string.as_str(), None).await;
 
     while res.0 != None {
         tweets.append(&mut res.1);
-        res = get_tweets_from_endpoint(start_time_string, res.0).await;
+        res = get_tweets_from_endpoint(start_time_string.as_str(), res.0).await;
     }
 
     tweets
