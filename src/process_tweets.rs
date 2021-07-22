@@ -1,8 +1,7 @@
 use dashmap::DashMap;
-
+use dashmap::mapref::multiple::RefMulti;
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
-use dashmap::mapref::multiple::RefMulti;
 
 pub fn process_tweets(tweets: Vec<String>) -> PriorityQueue<String, i128> {
     processed_tweets_to_priority_queue(
@@ -18,7 +17,7 @@ pub fn process_tweets(tweets: Vec<String>) -> PriorityQueue<String, i128> {
 
 fn process_tweet(tweet: &String) -> DashMap<String, i128> {
     let words: Vec<String> = tweet.clone().split_whitespace().into_iter().map(|val: &str| String::from(val)).collect();
-    let mut res: DashMap<String, i128> = DashMap::new();
+    let res: DashMap<String, i128> = DashMap::new();
 
     for word in words.clone() {
         let count: i128 = words.clone().into_iter().filter(|s: &String| s.clone() == word).count() as i128;
@@ -36,7 +35,7 @@ fn get_dashmap_keys(a: &DashMap<String, i128>) -> Vec<String> {
 
 fn combine_processed_tweets(a: &DashMap<String, i128>, b: &DashMap<String, i128>) -> DashMap<String, i128> {
     let keys: Vec<String> = get_dashmap_keys(a).into_iter().chain(get_dashmap_keys(b).into_iter()).collect();
-    let mut res: DashMap<String, i128> = DashMap::new();
+    let res: DashMap<String, i128> = DashMap::new();
 
     keys.into_par_iter().for_each(|key: String| {
         let key_str = key.as_str();
@@ -56,7 +55,7 @@ fn combine_processed_tweets(a: &DashMap<String, i128>, b: &DashMap<String, i128>
                 match a.get(key_str) {
                     Some(val) => {
                         res.insert(key, val.clone());
-                    },
+                    }
                     _ => {}
                 };
             }

@@ -44,7 +44,7 @@ fn top_word_list_to_string(list: Vec<(String, i128)>) -> String {
 
     vec.into_par_iter().map(|val: (String, i128)| format!("{} {}", val.0, val.1))
         .reduce(|| String::new(),
-                |mut a: String, b: String| {
+                |a: String, b: String| {
                     format!("{}\r\n{}", a, b);
                     a
                 })
