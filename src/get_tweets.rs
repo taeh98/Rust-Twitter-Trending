@@ -1,39 +1,35 @@
 use chrono::{DateTime, Duration, Utc};
-use reqwest::{RequestBuilder, Client};
+use reqwest::{get};
+use std::ops::Sub;
 
 const GET_TWEETS_API_ENDPOINT: &str = "https://api.twitter.com/2/tweets/search/recent";
-const TIME_PERIOD: Duration = Duration::hours(1);
-const REQWEST_CLIENT: Client = Client::new();
-
-#[derive(Deserialize)]
-struct EndpointResponse {
-    origin: String,
-}
 
 fn get_one_hour_ago_iso_string() -> String {
+    let time_period: Duration = Duration::hours(1);
     let now: DateTime<Utc> = Utc::now();
-    now.sub(TIME_PERIOD);
-    now.to_rfc3339()
+    now.sub(time_period).to_rfc3339()
 }
 
-fn get_tweets_from_endpoint() {
-    const START_TIME_STRING: String = get_one_hour_ago_iso_string();
+async fn get_tweets_from_endpoint(start_time_string: String) {
+    println!("get_tweets_from_endpoint()");
 
-    let rb = REQWEST_CLIENT.get(GET_TWEETS_API_ENDPOINT);
-    rb.query(&["start_time", START_TIME_STRING]);
+    let body = get("https://news.ycombinator.com")
+        .await
+        .unwrap()
+        .text()
+        .await
+        .unwrap();
 
-    reqwest::get(GET_TWEETS_API_ENDPOINT).json::<EndpointResponse>()
-        .await?;
+    println!("body = {:?}", body);
 }
 
-fn parse_tweets() -> Vec<String> {
+pub async fn get_recent_tweets() -> Vec<String> {
+    println!("get_recent_tweets()");
 
-}
+    let start_time_string: String = get_one_hour_ago_iso_string();
+    let tweets: Vec<String> = Vec::new();
 
-fn parse_tweet() -> Option<String> {
+    get_tweets_from_endpoint(start_time_string).await;
 
-}
-
-fn get_recent_tweets() -> Vec<String> {
-    parse_tweets(get_tweets_from_endpoint())
+    tweets
 }
