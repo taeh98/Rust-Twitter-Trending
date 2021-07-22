@@ -9,12 +9,9 @@ const NUMBER_TO_SHOW: usize = 10;
 fn main() {
     match get_tweets::get_tweets() {
         Some(tweets) => {
-            println!("tweets = {:#?}", tweets);
-
             let counts: PriorityQueue<String, i128> = process_tweets::process_tweets(tweets);
             let top_hashtags: Vec<(String, i128)> = get_top_words(&counts, true);
             let top_words: Vec<(String, i128)> = get_top_words(&counts, false);
-
             print_top_words(top_words, top_hashtags);
         }
         _ => println!("Couldn't get tweets data.")
