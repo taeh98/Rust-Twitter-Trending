@@ -8,13 +8,18 @@ use polars::series::Series;
 fn process_dataframe(df: DataFrame) -> Vec<String> {
     println!("process_dataframe()");
     let column: &Series = df.column("text").unwrap();
-    let first = column.chunks().first().unwrap();
 
-    println!("first = {:#?}", &first);
+    let mut res: Vec<String> = Vec::new();
 
-    println!("first.deref().deref().data() = {:#?}", first.deref().deref().data());
+    for i in 0..column.len() {
+        let cow = column.str_value(i);
+        let string = cow.to_string();
+        res.push(string);
+    }
 
-    Vec::new()
+    println!("process_dataframe(), res = {:#?}", res);
+
+    res
 }
 
 pub fn get_tweets() -> Option<Vec<String>> {
