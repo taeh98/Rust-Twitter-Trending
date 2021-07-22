@@ -2,6 +2,7 @@ use tokio;
 use priority_queue::PriorityQueue;
 mod get_tweets;
 mod process_tweets;
+use rayon::prelude::*;
 
 const NUMBER_TO_SHOW: usize = 10;
 
@@ -9,25 +10,37 @@ const NUMBER_TO_SHOW: usize = 10;
 async fn main() {
     println!("Hello, world!");
     let tweets: Vec<String> = get_tweets::get_recent_tweets().await;
-    const COUNTS: PriorityQueue<process_tweets::WordAndCount> = process_tweets::process_tweets(tweets);
-    const TOP_HASHTAGS: Vec<process_tweets::WordAndCount> = get_top_words(COUNTS, true);
-    const TOP_WORDS: Vec<process_tweets::WordAndCount> = get_top_words(COUNTS, false);
+    let counts: PriorityQueue<String, i128> = process_tweets::process_tweets(tweets).await;
+    let top_hashtags: Vec<(String, i128)> = get_top_words(counts, true);
+    let top_words: Vec<(String, i128)> = get_top_words(counts, false);
 
-    print_top_words(TOP_WORDS, TOP_HASHTAGS)
+    print_top_words(top_words, top_hashtags)
 }
 
-fn get_top_words(counts: PriorityQueue<process_tweets::WordAndCount>, hashtag_not_word: bool) -> Vec<process_tweets::WordAndCount> {
-    let res: Vec<process_tweets::WordAndCount> = Vec::new();
+fn get_top_words(counts: PriorityQueue<String, i128>, hashtag_not_word: bool) -> Vec<(String, i128)> {
+    let mut res: Vec<(String, i128)> = Vec::new();
 
-    for (let i = 0; i < counts.len() && res.len() < NUMBER_TO_SHOW; i += 1) {
-        const current_tc: process_tweets::WordAndCount = counts[i];
-        if current_tc["tweet"].startsWith("#") == hashtag_not_word:
+    for current_tc in counts {
+        if current_tc.0.starts_with("#") == hashtag_not_word {
             res.push(current_tc);
+        }
+
+        if res.len() >= NUMBER_TO_SHOW {
+            break;
+        }
     }
 
     res
 }
 
-fn print_top_words(top_words: Vec<process_tweets::WordAndCount>, top_hashtags: Vec<process_tweets::WordAndCount>) {
+fn print_top_words(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i128)>) {
+    println!("Top words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
+             top_word_list_to_string(top_words), top_word_list_to_string(top_hashtags));
+}
 
+fn top_word_list_to_string(list: Vec<(String, i128)>) -> String {
+    let vec: Vec<(String, i128)> = (&list[0..(NUMBER_TO_SHOW - 1)]).to_vec();
+
+    vec.into_par_iter().map(|val: (String, i128)| format!("{} {}", val.0, val.1))
+        .reduce(|a: String, b: String| format!("{}\r\n{}", a, b))
 }

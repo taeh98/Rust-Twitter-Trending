@@ -29,9 +29,9 @@ pub async fn get_recent_tweets() -> Vec<String> {
 
     let mut res = get_tweets_from_endpoint(start_time_string, None).await;
 
-    while res[0] != None {
-        tweets.append(res[1]);
-        res = get_tweets_from_endpoint(start_time_string, res[0]).await;
+    while res.0 != None {
+        tweets.append(&mut res.1);
+        res = get_tweets_from_endpoint(start_time_string, res.0).await;
     }
 
     tweets
