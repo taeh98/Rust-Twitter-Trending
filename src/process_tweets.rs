@@ -1,23 +1,24 @@
-use std::collections::hash_map::{HashMap, RandomState};
+use dashmap::DashMap;
 
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
+use dashmap::mapref::multiple::RefMulti;
 
 pub fn process_tweets(tweets: Vec<String>) -> PriorityQueue<String, i128> {
     processed_tweets_to_priority_queue(
         tweets.par_iter()
             .map(|tweet: &String| process_tweet(tweet))
-            .reduce(|| HashMap::new(),
-                    |a: HashMap<String, i128, RandomState>, b: HashMap<String, i128, RandomState>| {
+            .reduce(|| DashMap::new(),
+                    |a: DashMap<String, i128>, b: DashMap<String, i128>| {
                         combine_processed_tweets(&a, &b);
                         a
                     })
     )
 }
 
-fn process_tweet(tweet: &String) -> HashMap<String, i128, RandomState> {
+fn process_tweet(tweet: &String) -> DashMap<String, i128> {
     let words: Vec<String> = tweet.clone().split_whitespace().into_iter().map(|val: &str| String::from(val)).collect();
-    let mut res: HashMap<String, i128> = HashMap::new();
+    let mut res: DashMap<String, i128> = DashMap::new();
 
     for word in words.clone() {
         let count: i128 = words.clone().into_iter().filter(|s: &String| s.clone() == word).count() as i128;
@@ -29,31 +30,43 @@ fn process_tweet(tweet: &String) -> HashMap<String, i128, RandomState> {
     res
 }
 
-fn combine_processed_tweets(a: &HashMap<String, i128, RandomState>, b: &HashMap<String, i128, RandomState>) -> HashMap<String, i128, RandomState> {
-    let keys: Vec<String> = a.keys().chain(b.keys()).map(|s: &String| s.clone()).collect();
-    let mut res: HashMap<String, i128, RandomState> = HashMap::new();
+fn get_dashmap_keys(a: &DashMap<String, i128>) -> Vec<String> {
+    a.into_par_iter().map(|a: RefMulti<String, i128>| a.key().clone()).collect()
+}
 
-    for key in keys {
+fn combine_processed_tweets(a: &DashMap<String, i128>, b: &DashMap<String, i128>) -> DashMap<String, i128> {
+    let keys: Vec<String> = get_dashmap_keys(a).into_iter().chain(get_dashmap_keys(b).into_iter()).collect();
+    let mut res: DashMap<String, i128> = DashMap::new();
+
+    keys.into_par_iter().for_each(|key: String| {
         let key_str = key.as_str();
 
-        if b.contains_key(key_str) {
-            let b_count: i128 = b.get(key_str).unwrap().clone();
-            if a.contains_key(key_str) {
-                let a_count: i128 = a.get(key_str).unwrap().clone();
-                res.insert(key, a_count + b_count);
+        match b.get(key_str) {
+            Some(b_count) => {
+                match a.get(key_str) {
+                    Some(a_count) => {
+                        res.insert(key, a_count.clone() + b_count.clone());
+                    }
+                    _ => {
+                        res.insert(key, b_count.clone());
+                    }
+                }
             }
-        } else {
-            match a.get(key_str) {
-                Some(val) => res.insert(key, val.clone()),
-                _ => continue
-            };
+            _ => {
+                match a.get(key_str) {
+                    Some(val) => {
+                        res.insert(key, val.clone());
+                    },
+                    _ => {}
+                };
+            }
         }
-    }
+    });
 
     res
 }
 
-fn processed_tweets_to_priority_queue(pt: HashMap<String, i128>) -> PriorityQueue<String, i128> {
+fn processed_tweets_to_priority_queue(pt: DashMap<String, i128>) -> PriorityQueue<String, i128> {
     let mut res: PriorityQueue<String, i128> = PriorityQueue::new();
 
     pt.into_par_iter().for_each(|tuple_val: (String, i128)| {res.push(tuple_val.0, tuple_val.1);});
