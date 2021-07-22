@@ -10,7 +10,7 @@ fn get_one_hour_ago_iso_string() -> String {
     now.sub(time_period).to_rfc3339()
 }
 
-async fn get_tweets_from_endpoint(start_time_string: String) {
+async fn get_tweets_from_endpoint(start_time_string: &str, next_token: Option<String>) -> (Option<String>, Vec<String>) {
     println!("get_tweets_from_endpoint()");
 
     let body = get("https://news.ycombinator.com")
@@ -20,16 +20,19 @@ async fn get_tweets_from_endpoint(start_time_string: String) {
         .await
         .unwrap();
 
-    println!("body = {:?}", body);
+    (None, Vec::new())
 }
 
 pub async fn get_recent_tweets() -> Vec<String> {
-    println!("get_recent_tweets()");
+    let start_time_string: &str = get_one_hour_ago_iso_string().as_str();
+    let mut tweets: Vec<String> = Vec::new();
 
-    let start_time_string: String = get_one_hour_ago_iso_string();
-    let tweets: Vec<String> = Vec::new();
+    let mut res = get_tweets_from_endpoint(start_time_string, None).await;
 
-    get_tweets_from_endpoint(start_time_string).await;
+    while res[0] != None {
+        tweets.append(res[1]);
+        res = get_tweets_from_endpoint(start_time_string, res[0]).await;
+    }
 
     tweets
 }
