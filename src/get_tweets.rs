@@ -1,6 +1,7 @@
-use chrono::{DateTime, Duration, Utc};
-use reqwest::{get};
 use std::ops::Sub;
+
+use chrono::{DateTime, Duration, Utc};
+use reqwest::get;
 
 const GET_TWEETS_API_ENDPOINT: &str = "https://api.twitter.com/2/tweets/search/recent";
 
