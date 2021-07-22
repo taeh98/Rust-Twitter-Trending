@@ -54,5 +54,8 @@ fn combine_processed_tweets(a: HashMap<String, i128, RandomState>, b: HashMap<St
 
 fn processed_tweets_to_priority_queue(pt: HashMap<String, i128>) -> PriorityQueue<WordAndCount> {
     let res: PriorityQueue<WordAndCount> = PriorityQueue::new();
-    pt.into_par_iter()
+    pt.into_par_iter().for_each(|word: String, count: i128| {
+        res.insert({word: word; count: count});
+    });
+    res
 }
