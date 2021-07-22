@@ -21,16 +21,14 @@ fn main() {
     }
 }
 
-fn get_top_words(counts: &PriorityQueue<String, i128>, hashtag_not_word: bool) -> Vec<(String, i128)> {
+fn get_top_words(counts_in: &PriorityQueue<String, i128>, hashtag_not_word: bool) -> Vec<(String, i128)> {
     let mut res: Vec<(String, i128)> = Vec::new();
+    let mut counts: PriorityQueue<String, i128> = counts_in.clone();
 
-    for current_tc in counts.into_iter() {
+    while res.len() < NUMBER_TO_SHOW && (!counts.is_empty()) {
+        let current_tc = counts.pop().unwrap();
         if current_tc.0.starts_with("#") == hashtag_not_word {
             res.push((current_tc.0.clone(), current_tc.1.clone()));
-        }
-
-        if res.len() >= NUMBER_TO_SHOW {
-            break;
         }
     }
 
