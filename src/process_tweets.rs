@@ -1,3 +1,5 @@
+use std::sync::Mutex;
+
 use dashmap::DashMap;
 use dashmap::mapref::multiple::RefMulti;
 use priority_queue::PriorityQueue;
@@ -66,9 +68,12 @@ fn combine_processed_tweets(a: &DashMap<String, i128>, b: &DashMap<String, i128>
 }
 
 fn processed_tweets_to_priority_queue(pt: DashMap<String, i128>) -> PriorityQueue<String, i128> {
-    let mut res: PriorityQueue<String, i128> = PriorityQueue::new();
+    let res: Mutex<PriorityQueue<String, i128>> = Mutex::new(PriorityQueue::new());
 
-    pt.into_par_iter().for_each(|tuple_val: (String, i128)| {res.push(tuple_val.0, tuple_val.1);});
+    pt.into_par_iter().for_each(|tuple_val: (String, i128)| {
+        let mut q = res.lock().unwrap();
+        q.push(tuple_val.0, tuple_val.1);
+    });
 
-    res
+    res.into_inner().unwrap()
 }
