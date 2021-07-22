@@ -1,8 +1,9 @@
 use chrono::{DateTime, Duration, Utc};
-use std::ops::Sub;
+use reqwest::{RequestBuilder, Client};
 
 const GET_TWEETS_API_ENDPOINT: &str = "https://api.twitter.com/2/tweets/search/recent";
 const TIME_PERIOD: Duration = Duration::hours(1);
+const REQWEST_CLIENT: Client = Client::new();
 
 #[derive(Deserialize)]
 struct EndpointResponse {
@@ -17,6 +18,9 @@ fn get_one_hour_ago_iso_string() -> String {
 
 fn get_tweets_from_endpoint() {
     const START_TIME_STRING: String = get_one_hour_ago_iso_string();
+
+    let rb = REQWEST_CLIENT.get(GET_TWEETS_API_ENDPOINT);
+    rb.query(&["start_time", START_TIME_STRING]);
 
     reqwest::get(GET_TWEETS_API_ENDPOINT).json::<EndpointResponse>()
         .await?;
