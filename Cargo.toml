@@ -9,3 +9,5 @@ edition = "2018"
 reqwest = "0.11.4"
 chrono = "0.4.19"
 tokio = { version = "1", features = ["full"] }
+priority-queue = "1.1.1"
+rayon = "1.5.1"
