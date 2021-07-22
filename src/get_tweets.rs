@@ -1,25 +1,29 @@
-use std::ops::Deref;
+use std::sync::Mutex;
 
 use polars::frame::DataFrame;
 use polars::io::SerReader;
 use polars::prelude::CsvReader;
 use polars::series::Series;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 fn process_dataframe(df: DataFrame) -> Vec<String> {
     println!("process_dataframe()");
     let column: &Series = df.column("text").unwrap();
 
-    let mut res: Vec<String> = Vec::new();
+    let res: Mutex<Vec<String>> = Mutex::new(Vec::new());
 
-    for i in 0..column.len() {
-        let cow = column.str_value(i);
-        let string = cow.to_string();
-        res.push(string);
-    }
+    let indices: Vec<usize> = vec![0, 1, 2];
+
+    indices.into_par_iter()
+        .map(|val: usize| column.str_value(val).to_string())
+        .for_each(|str: String| {
+            let mut v = res.lock().unwrap();
+            v.push(str);
+        });
 
     println!("process_dataframe(), res = {:#?}", res);
 
-    res
+    res.into_inner().unwrap()
 }
 
 pub fn get_tweets() -> Option<Vec<String>> {
