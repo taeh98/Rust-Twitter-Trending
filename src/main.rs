@@ -1,21 +1,22 @@
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
-use tokio;
 
 mod get_tweets;
 mod process_tweets;
 
 const NUMBER_TO_SHOW: usize = 10;
 
-#[tokio::main]
-async fn main() {
-    println!("Hello, world!");
-    let tweets: Vec<String> = get_tweets::get_recent_tweets().await;
-    let counts: PriorityQueue<String, i128> = process_tweets::process_tweets(tweets);
-    let top_hashtags: Vec<(String, i128)> = get_top_words(&counts, true);
-    let top_words: Vec<(String, i128)> = get_top_words(&counts, false);
+fn main() {
+    match get_tweets::get_tweets() {
+        Some(tweets) => {
+            let counts: PriorityQueue<String, i128> = process_tweets::process_tweets(tweets);
+            let top_hashtags: Vec<(String, i128)> = get_top_words(&counts, true);
+            let top_words: Vec<(String, i128)> = get_top_words(&counts, false);
 
-    print_top_words(top_words, top_hashtags)
+            print_top_words(top_words, top_hashtags);
+        }
+        _ => println!("Couldn't get tweets data.")
+    }
 }
 
 fn get_top_words(counts: &PriorityQueue<String, i128>, hashtag_not_word: bool) -> Vec<(String, i128)> {

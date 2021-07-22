@@ -1,39 +1,38 @@
-use std::ops::Sub;
+use std::ops::Deref;
 
-use chrono::{DateTime, Duration, Utc};
-use reqwest::get;
+use polars::frame::DataFrame;
+use polars::io::SerReader;
+use polars::prelude::CsvReader;
+use polars::series::Series;
 
-const GET_TWEETS_API_ENDPOINT: &str = "https://api.twitter.com/2/tweets/search/recent";
+fn process_dataframe(df: DataFrame) -> Vec<String> {
+    println!("process_dataframe()");
+    let column: &Series = df.column("text").unwrap();
+    let first = column.chunks().first().unwrap();
 
-fn get_one_hour_ago_iso_string() -> String {
-    let time_period: Duration = Duration::hours(1);
-    let now: DateTime<Utc> = Utc::now();
-    now.sub(time_period).to_rfc3339()
+    println!("first = {:#?}", &first);
+
+    println!("first.deref().deref().data() = {:#?}", first.deref().deref().data());
+
+    Vec::new()
 }
 
-async fn get_tweets_from_endpoint(start_time_string: &str, next_token: Option<String>) -> (Option<String>, Vec<String>) {
-    println!("get_tweets_from_endpoint()");
-
-    let body = get("https://news.ycombinator.com")
-        .await
-        .unwrap()
-        .text()
-        .await
-        .unwrap();
-
-    (None, Vec::new())
-}
-
-pub async fn get_recent_tweets() -> Vec<String> {
-    let start_time_string: String = get_one_hour_ago_iso_string();
-    let mut tweets: Vec<String> = Vec::new();
-
-    let mut res = get_tweets_from_endpoint(start_time_string.as_str(), None).await;
-
-    while res.0 != None {
-        tweets.append(&mut res.1);
-        res = get_tweets_from_endpoint(start_time_string.as_str(), res.0).await;
-    }
-
-    tweets
+pub fn get_tweets() -> Option<Vec<String>> {
+    println!("get_tweets()");
+    return match CsvReader::from_path("data/covid19_tweets.csv") {
+        Ok(file_data) => {
+            match file_data.infer_schema(None)
+                .has_header(true)
+                .finish() {
+                Ok(df) => {
+                    println!("get_tweets(), going to process_dataframe()");
+                    Some(process_dataframe(df))
+                }
+                _ => {
+                    None
+                }
+            }
+        }
+        _ => None
+    };
 }
