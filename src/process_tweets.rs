@@ -56,9 +56,7 @@ fn combine_processed_tweets(a: &HashMap<String, i128, RandomState>, b: &HashMap<
 fn processed_tweets_to_priority_queue(pt: HashMap<String, i128>) -> PriorityQueue<String, i128> {
     let mut res: PriorityQueue<String, i128> = PriorityQueue::new();
 
-    for tuple_val in pt.into_iter() {
-        res.push(tuple_val.0, tuple_val.1);
-    }
+    pt.into_par_iter().for_each(|tuple_val: (String, i128)| {res.push(tuple_val.0, tuple_val.1);});
 
     res
 }
