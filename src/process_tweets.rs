@@ -9,11 +9,10 @@ pub fn process_tweets(tweets: Vec<String>) -> PriorityQueue<String, i128> {
     processed_tweets_to_priority_queue(
         tweets.par_iter()
             .map(|tweet: &String| process_tweet(tweet))
-            .reduce(|| DashMap::new(),
-                    |a: DashMap<String, i128>, b: DashMap<String, i128>| {
-                        combine_processed_tweets(&a, &b);
-                        a
-                    })
+            .reduce_with(|a: DashMap<String, i128>, b: DashMap<String, i128>|
+                combine_processed_tweets(&a, &b)
+            ).unwrap()
+        //TODO: fix this map reduce function - seems like some entries are missing
     )
 }
 
