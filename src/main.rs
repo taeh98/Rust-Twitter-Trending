@@ -1,8 +1,9 @@
-use priority_queue::PriorityQueue;
-use rayon::prelude::*;
-use std::path::Path;
 use std::fs::File;
 use std::io::Write;
+use std::path::Path;
+
+use priority_queue::PriorityQueue;
+use rayon::prelude::*;
 
 mod get_tweets;
 mod process_tweets;
@@ -37,7 +38,7 @@ fn get_top_words(counts_in: &PriorityQueue<String, i128>, hashtag_not_word: bool
 
 fn print_top_words(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i128)>) {
     let res = format!("Top words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
-             top_word_list_to_string(top_words), top_word_list_to_string(top_hashtags));
+                      top_word_list_to_string(top_words), top_word_list_to_string(top_hashtags));
 
     let path = Path::new("out.txt");
     let mut file = File::create(&path).unwrap();
