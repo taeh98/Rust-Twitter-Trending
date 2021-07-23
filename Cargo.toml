@@ -12,9 +12,6 @@ opt-level = 3
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = "0.11.4"
-chrono = "0.4.19"
-tokio = { version = "1", features = ["full"] }
 priority-queue = "1.1.1"
 rayon = "1.5.1"
 dashmap = { version = "4.0.2", features = ["rayon"] }
