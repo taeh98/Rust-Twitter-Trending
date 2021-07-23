@@ -47,9 +47,5 @@ fn print_top_words(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i1
 
 fn top_word_list_to_string(list: Vec<(String, i128)>) -> String {
     list.into_par_iter().map(|val: (String, i128)| format!("{} {}", val.0, val.1))
-        .reduce(|| String::new(),
-                |a: String, b: String| {
-                    format!("{}\r\n{}", a, b);
-                    a
-                })
+        .reduce_with(|a: String, b: String| format!("{}\r\n{}", a, b)).unwrap()
 }
