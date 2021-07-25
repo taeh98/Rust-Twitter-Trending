@@ -18,11 +18,14 @@ fn main() {
             let top_words: Vec<(String, i128)> = get_top_words(&counts, false);
             print_top_words(top_words, top_hashtags);
         }
-        _ => println!("Couldn't get tweets data.")
+        _ => println!("Couldn't get tweets data."),
     }
 }
 
-fn get_top_words(counts_in: &PriorityQueue<String, i128>, hashtag_not_word: bool) -> Vec<(String, i128)> {
+fn get_top_words(
+    counts_in: &PriorityQueue<String, i128>,
+    hashtag_not_word: bool,
+) -> Vec<(String, i128)> {
     let mut res: Vec<(String, i128)> = Vec::new();
     let mut counts: PriorityQueue<String, i128> = counts_in.clone();
 
@@ -37,8 +40,11 @@ fn get_top_words(counts_in: &PriorityQueue<String, i128>, hashtag_not_word: bool
 }
 
 fn print_top_words(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i128)>) {
-    let res = format!("Top words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
-                      top_word_list_to_string(top_words), top_word_list_to_string(top_hashtags));
+    let res = format!(
+        "Top words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
+        top_word_list_to_string(top_words),
+        top_word_list_to_string(top_hashtags)
+    );
 
     let path = Path::new("out.txt");
     let mut file = File::create(&path).unwrap();
@@ -46,6 +52,8 @@ fn print_top_words(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i1
 }
 
 fn top_word_list_to_string(list: Vec<(String, i128)>) -> String {
-    list.into_par_iter().map(|val: (String, i128)| format!("{} {}", val.0, val.1))
-        .reduce_with(|a: String, b: String| format!("{}\r\n{}", a, b)).unwrap()
+    list.into_par_iter()
+        .map(|val: (String, i128)| format!("{} {}", val.0, val.1))
+        .reduce_with(|a: String, b: String| format!("{}\r\n{}", a, b))
+        .unwrap()
 }

@@ -13,7 +13,8 @@ fn process_dataframe(df: DataFrame) -> Vec<String> {
 
     let indices: Vec<usize> = (0..column.len()).collect();
 
-    indices.into_par_iter()
+    indices
+        .into_par_iter()
         .map(|val: usize| column.str_value(val).to_string())
         .for_each(|str: String| {
             let mut v = res.lock().unwrap();
@@ -25,18 +26,10 @@ fn process_dataframe(df: DataFrame) -> Vec<String> {
 
 pub fn get_tweets() -> Option<Vec<String>> {
     return match CsvReader::from_path("data/covid19_tweets.csv") {
-        Ok(file_data) => {
-            match file_data.infer_schema(None)
-                .has_header(true)
-                .finish() {
-                Ok(df) => {
-                    Some(process_dataframe(df))
-                }
-                _ => {
-                    None
-                }
-            }
-        }
-        _ => None
+        Ok(file_data) => match file_data.infer_schema(None).has_header(true).finish() {
+            Ok(df) => Some(process_dataframe(df)),
+            _ => None,
+        },
+        _ => None,
     };
 }
