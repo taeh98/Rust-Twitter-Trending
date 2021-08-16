@@ -13,10 +13,12 @@ const NUMBER_TO_SHOW: usize = 10;
 fn main() {
     match get_tweets::get_tweets() {
         Some(tweets) => {
+            let num_tweets = tweets.len();
+
             let counts: PriorityQueue<String, i128> = process_tweets::process_tweets(tweets);
             let top_hashtags: Vec<(String, i128)> = get_top_words(&counts, true);
             let top_words: Vec<(String, i128)> = get_top_words(&counts, false);
-            print_top_words(top_words, top_hashtags);
+            print_top_words(top_words, top_hashtags, num_tweets);
         }
         _ => println!("Couldn't get tweets data."),
     }
@@ -39,9 +41,14 @@ fn get_top_words(
     res
 }
 
-fn print_top_words(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i128)>) {
+fn print_top_words(
+    top_words: Vec<(String, i128)>,
+    top_hashtags: Vec<(String, i128)>,
+    num_tweets: usize,
+) {
     let res = format!(
-        "Top words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
+        "Processed {} tweets.\r\n\r\nTop words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
+        num_tweets,
         top_word_list_to_string(top_words),
         top_word_list_to_string(top_hashtags)
     );
