@@ -46,6 +46,8 @@ fn print_top_words(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i1
         top_word_list_to_string(top_hashtags)
     );
 
+    println!("{}", res);
+
     let path = Path::new("out.txt");
     let mut file = File::create(&path).unwrap();
     file.write_all(res.as_bytes()).unwrap();
