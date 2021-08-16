@@ -4,6 +4,7 @@ use std::path::Path;
 
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
+use std::time::Instant;
 
 mod get_tweets;
 mod process_tweets;
@@ -13,12 +14,16 @@ const NUMBER_TO_SHOW: usize = 10;
 fn main() {
     match get_tweets::get_tweets() {
         Some(tweets) => {
-            let num_tweets = tweets.len();
+            let num_tweets: usize = tweets.len();
+            let start_time: Instant = Instant::now();
 
             let counts: PriorityQueue<String, i128> = process_tweets::process_tweets(tweets);
             let top_hashtags: Vec<(String, i128)> = get_top_words(&counts, true);
             let top_words: Vec<(String, i128)> = get_top_words(&counts, false);
-            print_top_words(top_words, top_hashtags, num_tweets);
+
+            let time_taken_ms: u128 = start_time.elapsed().as_millis();
+
+            print_top_words(top_words, top_hashtags, num_tweets, time_taken_ms);
         }
         _ => println!("Couldn't get tweets data."),
     }
@@ -45,10 +50,12 @@ fn print_top_words(
     top_words: Vec<(String, i128)>,
     top_hashtags: Vec<(String, i128)>,
     num_tweets: usize,
+    time_taken_ms: u128,
 ) {
     let res = format!(
-        "Processed {} tweets.\r\n\r\nTop words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
+        "Processed {} tweets in {} ms.\r\n\r\nTop words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
         num_tweets,
+        time_taken_ms,
         top_word_list_to_string(top_words),
         top_word_list_to_string(top_hashtags)
     );
