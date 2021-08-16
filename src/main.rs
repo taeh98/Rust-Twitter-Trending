@@ -6,12 +6,14 @@ use priority_queue::PriorityQueue;
 use rayon::prelude::*;
 use std::time::Instant;
 
+mod get_data;
 mod get_tweets;
 mod process_tweets;
 
 const NUMBER_TO_SHOW: usize = 10;
 
 fn main() {
+    get_data::check_or_get_tweets_data();
     match get_tweets::get_tweets() {
         Some(tweets) => {
             let num_tweets: usize = tweets.len();

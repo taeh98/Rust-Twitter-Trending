@@ -16,3 +16,4 @@ priority-queue = "1.1.1"
 rayon = "1.5.1"
 dashmap = { version = "4.0.2", features = ["rayon"] }
 polars = "0.14.7"
+reqwest = "0.11.4"
