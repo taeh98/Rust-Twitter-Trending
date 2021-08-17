@@ -89,14 +89,20 @@ fn find_small_md5_element_from_dataset_link_element(dataset_link_element: Elemen
     }
 }
 
+fn find_md5_digest_from_small_element(small_md5_element: ElementRef) -> Option<String> {
+    println!("small_md5_element = {:#?}", small_md5_element);
+    None
+}
+
 fn find_dataset_md5_digest_from_dataset_link_element(
     dataset_link_element: ElementRef,
 ) -> Option<String> {
-    let small_md5_element = find_small_md5_element_from_dataset_link_element(dataset_link_element).unwrap();
-
-    println!("small_md5_element = {:#?}", small_md5_element);
-
-    None
+    match find_small_md5_element_from_dataset_link_element(dataset_link_element) {
+        Some (small_md5_element) => {
+            find_md5_digest_from_small_element(small_md5_element)
+        }
+        _ => None
+    }
 }
 
 fn current_dataset_page_to_dataset_file_link_and_md5_digest(
