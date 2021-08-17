@@ -74,26 +74,29 @@ fn find_dataset_link_element(document: &Html) -> Option<ElementRef> {
     None
 }
 
-fn find_dataset_md5_digest_from_dataset_link_element(
-    dataset_link_element: ElementRef,
-) -> Option<String> {
+fn find_small_md5_element_from_dataset_link_element(dataset_link_element: ElementRef,
+) -> Option<ElementRef> {
     match dataset_link_element.parent() {
         Some(parent_table_cell_node_ref) => {
             let small_element_selector: Selector = Selector::parse(r#"small"#).unwrap();
             let parent_element: ElementRef = ElementRef::wrap(parent_table_cell_node_ref).unwrap();
 
-            let small_elements = parent_element.select(&small_element_selector);
+            let mut small_elements = parent_element.select(&small_element_selector);
 
-            println!("small_elements = {:#?}", small_elements);
-
-            for small_element in small_elements {
-                println!("small_element = {:#?}", small_element);
-            }
-
-            None
+            small_elements.next()
         }
         _ => None,
     }
+}
+
+fn find_dataset_md5_digest_from_dataset_link_element(
+    dataset_link_element: ElementRef,
+) -> Option<String> {
+    let small_md5_element = find_small_md5_element_from_dataset_link_element(dataset_link_element).unwrap();
+
+    println!("small_md5_element = {:#?}", small_md5_element);
+
+    None
 }
 
 fn current_dataset_page_to_dataset_file_link_and_md5_digest(
