@@ -13,7 +13,10 @@ mod process_tweets;
 const NUMBER_TO_SHOW: usize = 10;
 
 fn main() {
+    println!("Getting the tweets data or checking they are already saved.");
     get_data::check_or_get_tweets_data();
+    println!("The tweets data are present, proceeding to process them.");
+
     match get_tweets::get_tweets() {
         Some(tweets) => {
             let num_tweets: usize = tweets.len();
