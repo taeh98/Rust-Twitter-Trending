@@ -33,8 +33,8 @@ pub async fn check_or_get_tweets_data() {
         Some(link_digest_pair) => {
             match link_digest_pair {
                 (current_dataset_file_link, current_dataset_file_md5_digest) => {
-                    println!("current_dataset_file_link = {}", current_dataset_file_link);
-                    println!("current_dataset_file_md5_digest = {}", current_dataset_file_md5_digest);
+                    println!("current_dataset_file_link = \"{}\"", current_dataset_file_link);
+                    println!("current_dataset_file_md5_digest = \"{}\"", current_dataset_file_md5_digest);
 
                     let current_dataset_file_response: Response = get(current_dataset_file_link).await.unwrap();
 
@@ -100,16 +100,24 @@ fn find_small_md5_element_from_dataset_link_element(dataset_link_element: Elemen
     }
 }
 
-fn process_digest_string(start_string: String) -> String {
-    println!("start_string = \"{}\"", start_string);
-    start_string
+fn process_digest_string(start_string: String) -> Option<String> {
+    assert!(start_string.starts_with("md5:"));
+    let split_string_md5 = start_string.split("md5:");
+
+    for md5_split_string in split_string_md5 {
+        for whitespace_split_string in md5_split_string.split_whitespace() {
+            return Some(String::from(whitespace_split_string));
+        }
+    }
+
+    None
 }
 
 fn find_md5_digest_from_small_element(small_md5_element: ElementRef) -> Option<String> {
     for child in small_md5_element.children() {
         if let Some(text) = child.value().as_text() {
             let string = text.to_string();
-            return Some(process_digest_string(string));
+            return process_digest_string(string);
         }
     }
 
@@ -132,11 +140,9 @@ fn current_dataset_page_to_dataset_file_link_and_md5_digest(
 ) -> Option<(String, String)> {
     match find_dataset_link_element(&document) {
         Some(dataset_link_element) => {
-            let link = get_href_from_a_element(dataset_link_element).unwrap();
+            let link: String = format!("https://zenodo.org{}", get_href_from_a_element(dataset_link_element).unwrap());
             let digest =
                 find_dataset_md5_digest_from_dataset_link_element(dataset_link_element).unwrap();
-
-            println!("digest = \"{}\"", digest);
 
             return Some((link, digest));
         }
