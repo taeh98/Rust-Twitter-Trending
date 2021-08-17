@@ -12,9 +12,8 @@ mod process_tweets;
 
 const NUMBER_TO_SHOW: usize = 10;
 
-#[tokio::main]
-async fn main() {
-    get_data::check_or_get_tweets_data().await;
+fn main() {
+    get_data::check_or_get_tweets_data();
     match get_tweets::get_tweets() {
         Some(tweets) => {
             let num_tweets: usize = tweets.len();

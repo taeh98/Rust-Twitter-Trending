@@ -13,20 +13,15 @@
 use std::fs::File;
 use std::io;
 
-use reqwest::{get, Response};
+use reqwest::blocking::{get, Response};
 use scraper::html::Select;
 use scraper::node::{Attrs, Element};
 use scraper::{ElementRef, Html, Node, Selector};
 
 const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
 
-pub async fn check_or_get_tweets_data() {
-    let current_dataset_page: String = get(CURRENT_VERSION_URL)
-        .await
-        .unwrap()
-        .text()
-        .await
-        .unwrap();
+pub fn check_or_get_tweets_data() {
+    let current_dataset_page: String = get(CURRENT_VERSION_URL).unwrap().text().unwrap();
 
     let document = Html::parse_document(current_dataset_page.as_str());
 
@@ -162,14 +157,10 @@ fn check_or_download_dataset_file(
         current_dataset_file_md5_digest
     );
 
-    let current_dataset_file_response: Response = get(current_dataset_file_link).await.unwrap();
-
-    save_downloaded_file(
-        "/data/tweets.tar.gz",
-        current_dataset_file_response
-            .text()
-            .await
-            .unwrap()
-            .as_bytes(),
-    )
+    // let current_dataset_file_response: Response = get(current_dataset_file_link).unwrap();
+    //
+    // save_downloaded_file(
+    //     "/data/tweets.tar.gz",
+    //     current_dataset_file_response.text().unwrap().as_bytes(),
+    // )
 }
