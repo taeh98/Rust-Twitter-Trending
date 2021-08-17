@@ -1,7 +1,3 @@
-use reqwest::{get, Response};
-use scraper::html::Select;
-use scraper::node::{Attrs, Element};
-use scraper::{ElementRef, Html, Node, Selector};
 /**
 
 1. go to https://doi.org/10.5281/zenodo.3723939 for latest version of https://github.com/thepanacealab/covid19_twitter
@@ -17,6 +13,11 @@ use scraper::{ElementRef, Html, Node, Selector};
 use std::fs::File;
 use std::io;
 
+use reqwest::{get, Response};
+use scraper::html::Select;
+use scraper::node::{Attrs, Element};
+use scraper::{ElementRef, Html, Node, Selector};
+
 const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
 
 pub async fn check_or_get_tweets_data() {
@@ -30,25 +31,14 @@ pub async fn check_or_get_tweets_data() {
     let document = Html::parse_document(current_dataset_page.as_str());
 
     match current_dataset_page_to_dataset_file_link_and_md5_digest(document) {
-        Some(link_digest_pair) => {
-            match link_digest_pair {
-                (current_dataset_file_link, current_dataset_file_md5_digest) => {
-                    println!("current_dataset_file_link = \"{}\"", current_dataset_file_link);
-                    println!("current_dataset_file_md5_digest = \"{}\"", current_dataset_file_md5_digest);
-
-                    let current_dataset_file_response: Response = get(current_dataset_file_link).await.unwrap();
-
-                    save_downloaded_file(
-                        "/data/tweets.tar.gz",
-                        current_dataset_file_response
-                            .text()
-                            .await
-                            .unwrap()
-                            .as_bytes(),
-                    )
-                }
+        Some(link_digest_pair) => match link_digest_pair {
+            (current_dataset_file_link, current_dataset_file_md5_digest) => {
+                check_or_download_dataset_file(
+                    current_dataset_file_link,
+                    current_dataset_file_md5_digest,
+                );
             }
-        }
+        },
         _ => {
             eprintln!("Failed to get the database file link and MD5 digest.");
         }
@@ -85,7 +75,8 @@ fn find_dataset_link_element(document: &Html) -> Option<ElementRef> {
     None
 }
 
-fn find_small_md5_element_from_dataset_link_element(dataset_link_element: ElementRef,
+fn find_small_md5_element_from_dataset_link_element(
+    dataset_link_element: ElementRef,
 ) -> Option<ElementRef> {
     match dataset_link_element.parent() {
         Some(parent_table_cell_node_ref) => {
@@ -128,10 +119,8 @@ fn find_dataset_md5_digest_from_dataset_link_element(
     dataset_link_element: ElementRef,
 ) -> Option<String> {
     match find_small_md5_element_from_dataset_link_element(dataset_link_element) {
-        Some (small_md5_element) => {
-            find_md5_digest_from_small_element(small_md5_element)
-        }
-        _ => None
+        Some(small_md5_element) => find_md5_digest_from_small_element(small_md5_element),
+        _ => None,
     }
 }
 
@@ -140,7 +129,10 @@ fn current_dataset_page_to_dataset_file_link_and_md5_digest(
 ) -> Option<(String, String)> {
     match find_dataset_link_element(&document) {
         Some(dataset_link_element) => {
-            let link: String = format!("https://zenodo.org{}", get_href_from_a_element(dataset_link_element).unwrap());
+            let link: String = format!(
+                "https://zenodo.org{}",
+                get_href_from_a_element(dataset_link_element).unwrap()
+            );
             let digest =
                 find_dataset_md5_digest_from_dataset_link_element(dataset_link_element).unwrap();
 
@@ -155,4 +147,29 @@ fn save_downloaded_file(file_path: &str, mut current_dataset_file_contents: &[u8
         .expect(format!("Failed to create the data file \"{}\".", file_path).as_str());
     io::copy(&mut current_dataset_file_contents, &mut out)
         .expect(format!("Failed to copy content to the data file \"{}\".", file_path).as_str());
+}
+
+fn check_or_download_dataset_file(
+    current_dataset_file_link: String,
+    current_dataset_file_md5_digest: String,
+) {
+    println!(
+        "current_dataset_file_link = \"{}\"",
+        current_dataset_file_link
+    );
+    println!(
+        "current_dataset_file_md5_digest = \"{}\"",
+        current_dataset_file_md5_digest
+    );
+
+    let current_dataset_file_response: Response = get(current_dataset_file_link).await.unwrap();
+
+    save_downloaded_file(
+        "/data/tweets.tar.gz",
+        current_dataset_file_response
+            .text()
+            .await
+            .unwrap()
+            .as_bytes(),
+    )
 }
