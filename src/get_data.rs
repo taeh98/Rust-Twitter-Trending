@@ -29,19 +29,30 @@ pub async fn check_or_get_tweets_data() {
 
     let document = Html::parse_document(current_dataset_page.as_str());
 
-    let (current_dataset_file_link, current_dataset_file_md5_digest) =
-        current_dataset_page_to_dataset_file_link_and_md5_digest(document).unwrap();
+    match current_dataset_page_to_dataset_file_link_and_md5_digest(document) {
+        Some(link_digest_pair) => {
+            match link_digest_pair {
+                (current_dataset_file_link, current_dataset_file_md5_digest) => {
+                    println!("current_dataset_file_link = {}", current_dataset_file_link);
+                    println!("current_dataset_file_md5_digest = {}", current_dataset_file_md5_digest);
 
-    // let current_dataset_file_response: Response = get(current_dataset_file_link).await.unwrap();
-    //
-    // save_downloaded_file(
-    //     "/data/tweets.tar.gz",
-    //     current_dataset_file_response
-    //         .text()
-    //         .await
-    //         .unwrap()
-    //         .as_bytes(),
-    // )
+                    let current_dataset_file_response: Response = get(current_dataset_file_link).await.unwrap();
+
+                    save_downloaded_file(
+                        "/data/tweets.tar.gz",
+                        current_dataset_file_response
+                            .text()
+                            .await
+                            .unwrap()
+                            .as_bytes(),
+                    )
+                }
+            }
+        }
+        _ => {
+            eprintln!("Failed to get the database file link and MD5 digest.");
+        }
+    }
 }
 
 fn get_href_from_a_element(a_el: ElementRef) -> Option<String> {
@@ -89,8 +100,19 @@ fn find_small_md5_element_from_dataset_link_element(dataset_link_element: Elemen
     }
 }
 
+fn process_digest_string(start_string: String) -> String {
+    println!("start_string = \"{}\"", start_string);
+    start_string
+}
+
 fn find_md5_digest_from_small_element(small_md5_element: ElementRef) -> Option<String> {
-    println!("small_md5_element = {:#?}", small_md5_element);
+    for child in small_md5_element.children() {
+        if let Some(text) = child.value().as_text() {
+            let string = text.to_string();
+            return Some(process_digest_string(string));
+        }
+    }
+
     None
 }
 
@@ -113,6 +135,8 @@ fn current_dataset_page_to_dataset_file_link_and_md5_digest(
             let link = get_href_from_a_element(dataset_link_element).unwrap();
             let digest =
                 find_dataset_md5_digest_from_dataset_link_element(dataset_link_element).unwrap();
+
+            println!("digest = \"{}\"", digest);
 
             return Some((link, digest));
         }
