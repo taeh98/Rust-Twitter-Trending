@@ -1,10 +1,9 @@
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-
+use std::time::Instant;
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
-use std::time::Instant;
 
 mod get_data;
 mod get_tweets;
@@ -12,8 +11,9 @@ mod process_tweets;
 
 const NUMBER_TO_SHOW: usize = 10;
 
-fn main() {
-    get_data::check_or_get_tweets_data();
+#[tokio::main]
+async fn main() {
+    get_data::check_or_get_tweets_data().await;
     match get_tweets::get_tweets() {
         Some(tweets) => {
             let num_tweets: usize = tweets.len();

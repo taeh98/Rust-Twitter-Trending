@@ -10,15 +10,17 @@
 8. delete the .tsv.gz file
 
  */
-extern crate reqwest;
-
 use std::fs::File;
 use std::io;
+use html_parser::Dom;
+use reqwest::{get, Response};
 
 const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
 
 pub async fn check_or_get_tweets_data() {
-    let current_dataset_page: String = reqwest::get(CURRENT_VERSION_URL)
+    println!("in check_or_get_tweets_data()");
+
+    let current_dataset_page: String = get(CURRENT_VERSION_URL)
         .await
         .unwrap()
         .text()
@@ -28,25 +30,32 @@ pub async fn check_or_get_tweets_data() {
     println!("current_dataset_page = {}", current_dataset_page);
 
     let current_dataset_file_link: String =
-        current_dataset_page_to_dataset_file_link(current_dataset_page);
+        current_dataset_page_to_dataset_file_link(&current_dataset_page);
 
-    let current_dataset_file_contents = reqwest::get(current_dataset_file_link)
-        .await
-        .unwrap()
-        .bytes()
-        .await
-        .unwrap();
+    let current_dataset_file_response: Response = get(current_dataset_file_link).await.unwrap();
 
     save_downloaded_file(
         "/data/tweets.tar.gz",
-        current_dataset_file_contents.as_ref(),
+        current_dataset_file_response
+            .text()
+            .await
+            .unwrap()
+            .as_bytes(),
     )
 }
 
-fn current_dataset_page_to_dataset_file_link(current_dataset_page: String) -> String {}
+fn current_dataset_page_to_dataset_file_link(current_dataset_page: &String) -> String {
+    let json_str: String = Dom::parse(current_dataset_page)
+        .unwrap()
+        .to_json_pretty()
+        .unwrap();
+    println!("html json = {}", json_str);
+    current_dataset_page.clone()
+}
 
-fn save_downloaded_file(file_path: &str, current_dataset_file_contents: &[u8]) {
+fn save_downloaded_file(file_path: &str, mut current_dataset_file_contents: &[u8]) {
     let mut out = File::create(file_path)
-        .expect(format!("Failed to create the file \"{}\".", file_path).as_str());
-    io::copy(current_dataset_file_contents, &mut out).expect("failed to copy content");
+        .expect(format!("Failed to create the data file \"{}\".", file_path).as_str());
+    io::copy(&mut current_dataset_file_contents, &mut out)
+        .expect(format!("Failed to copy content to the data file \"{}\".", file_path).as_str());
 }
