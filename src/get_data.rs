@@ -1,7 +1,7 @@
 use reqwest::{get, Response};
 use scraper::html::Select;
 use scraper::node::{Attrs, Element};
-use scraper::{ElementRef, Html, Selector};
+use scraper::{ElementRef, Html, Node, Selector};
 /**
 
 1. go to https://doi.org/10.5281/zenodo.3723939 for latest version of https://github.com/thepanacealab/covid19_twitter
@@ -74,13 +74,22 @@ fn find_dataset_link_element(document: &Html) -> Option<ElementRef> {
     None
 }
 
-fn find_dataset_file_link_and_md5_digest_from_dataset_link_element(
+fn find_dataset_md5_digest_from_dataset_link_element(
     dataset_link_element: ElementRef,
-) -> Option<(String, String)> {
+) -> Option<String> {
     match dataset_link_element.parent() {
-        Some(parent_table_cell) => {
-            let children = parent_table_cell.children();
-            println!("children = {:#?}", children);
+        Some(parent_table_cell_node_ref) => {
+            let small_element_selector: Selector = Selector::parse(r#"small"#).unwrap();
+            let parent_element: ElementRef = ElementRef::wrap(parent_table_cell_node_ref).unwrap();
+
+            let small_elements = parent_element.select(&small_element_selector);
+
+            println!("small_elements = {:#?}", small_elements);
+
+            for small_element in small_elements {
+                println!("small_element = {:#?}", small_element);
+            }
+
             None
         }
         _ => None,
@@ -92,7 +101,11 @@ fn current_dataset_page_to_dataset_file_link_and_md5_digest(
 ) -> Option<(String, String)> {
     match find_dataset_link_element(&document) {
         Some(dataset_link_element) => {
-            find_dataset_file_link_and_md5_digest_from_dataset_link_element(dataset_link_element)
+            let link = get_href_from_a_element(dataset_link_element).unwrap();
+            let digest =
+                find_dataset_md5_digest_from_dataset_link_element(dataset_link_element).unwrap();
+
+            return Some((link, digest));
         }
         _ => None,
     }
