@@ -1,3 +1,7 @@
+use reqwest::{get, Response};
+use scraper::html::Select;
+use scraper::node::{Attrs, Element};
+use scraper::{ElementRef, Html, Selector};
 /**
 
 1. go to https://doi.org/10.5281/zenodo.3723939 for latest version of https://github.com/thepanacealab/covid19_twitter
@@ -12,14 +16,10 @@
  */
 use std::fs::File;
 use std::io;
-use html_parser::Dom;
-use reqwest::{get, Response};
 
 const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
 
 pub async fn check_or_get_tweets_data() {
-    println!("in check_or_get_tweets_data()");
-
     let current_dataset_page: String = get(CURRENT_VERSION_URL)
         .await
         .unwrap()
@@ -27,30 +27,75 @@ pub async fn check_or_get_tweets_data() {
         .await
         .unwrap();
 
-    println!("current_dataset_page = {}", current_dataset_page);
+    let document = Html::parse_document(current_dataset_page.as_str());
 
-    let current_dataset_file_link: String =
-        current_dataset_page_to_dataset_file_link(&current_dataset_page);
+    let (current_dataset_file_link, current_dataset_file_md5_digest) =
+        current_dataset_page_to_dataset_file_link_and_md5_digest(document).unwrap();
 
-    let current_dataset_file_response: Response = get(current_dataset_file_link).await.unwrap();
-
-    save_downloaded_file(
-        "/data/tweets.tar.gz",
-        current_dataset_file_response
-            .text()
-            .await
-            .unwrap()
-            .as_bytes(),
-    )
+    // let current_dataset_file_response: Response = get(current_dataset_file_link).await.unwrap();
+    //
+    // save_downloaded_file(
+    //     "/data/tweets.tar.gz",
+    //     current_dataset_file_response
+    //         .text()
+    //         .await
+    //         .unwrap()
+    //         .as_bytes(),
+    // )
 }
 
-fn current_dataset_page_to_dataset_file_link(current_dataset_page: &String) -> String {
-    let json_str: String = Dom::parse(current_dataset_page)
-        .unwrap()
-        .to_json_pretty()
-        .unwrap();
-    println!("html json = {}", json_str);
-    current_dataset_page.clone()
+fn get_href_from_a_element(a_el: ElementRef) -> Option<String> {
+    let attrs: Attrs = a_el.value().attrs();
+    for attribute in attrs {
+        if attribute.0 == "href" {
+            return Some(String::from(attribute.1));
+        }
+    }
+
+    None
+}
+
+fn find_dataset_link_element(document: &Html) -> Option<ElementRef> {
+    let file_link_element_selector: Selector = Selector::parse(r#"a.filename"#).unwrap();
+    let file_link_elements: Select = document.select(&file_link_element_selector);
+
+    for file_link_element in file_link_elements {
+        let href = get_href_from_a_element(file_link_element);
+        match href {
+            Some(link) => {
+                if link.contains("full_dataset_clean.tsv.gz") {
+                    return Some(file_link_element);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    None
+}
+
+fn find_dataset_file_link_and_md5_digest_from_dataset_link_element(
+    dataset_link_element: ElementRef,
+) -> Option<(String, String)> {
+    match dataset_link_element.parent() {
+        Some(parent_table_cell) => {
+            let children = parent_table_cell.children();
+            println!("children = {:#?}", children);
+            None
+        }
+        _ => None,
+    }
+}
+
+fn current_dataset_page_to_dataset_file_link_and_md5_digest(
+    document: Html,
+) -> Option<(String, String)> {
+    match find_dataset_link_element(&document) {
+        Some(dataset_link_element) => {
+            find_dataset_file_link_and_md5_digest_from_dataset_link_element(dataset_link_element)
+        }
+        _ => None,
+    }
 }
 
 fn save_downloaded_file(file_path: &str, mut current_dataset_file_contents: &[u8]) {
