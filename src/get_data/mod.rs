@@ -129,13 +129,6 @@ fn current_dataset_page_to_dataset_file_link_and_md5_digest(
     }
 }
 
-fn save_downloaded_file(file_path: &str, mut current_dataset_file_contents: &[u8]) {
-    let mut out = File::create(file_path)
-        .expect(format!("Failed to create the data file \"{}\".", file_path).as_str());
-    io::copy(&mut current_dataset_file_contents, &mut out)
-        .expect(format!("Failed to copy content to the data file \"{}\".", file_path).as_str());
-}
-
 fn get_record_id_from_file_link(file_link: &String) -> String {
     file_link
         .split("https://zenodo.org/record/")

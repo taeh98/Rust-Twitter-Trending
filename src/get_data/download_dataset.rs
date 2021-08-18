@@ -1,4 +1,4 @@
-use std::fs::{read_to_string, remove_file, write};
+use std::fs::{read_to_string, remove_file, write, File};
 use std::io::Read;
 
 use flate2::read::GzDecoder;
@@ -63,4 +63,11 @@ fn download_compressed_dataset_file(
 ) {
 
     //TODO: download latest file with progress bar (like wget)
+}
+
+fn save_downloaded_file(file_path: &str, mut current_dataset_file_contents: &[u8]) {
+    let mut out: File = File::create(file_path)
+        .expect(format!("Failed to create the data file \"{}\".", file_path).as_str());
+    io::copy(&mut current_dataset_file_contents, &mut out)
+        .expect(format!("Failed to copy content to the data file \"{}\".", file_path).as_str());
 }
