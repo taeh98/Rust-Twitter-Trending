@@ -8,7 +8,7 @@ use scraper::node::Attrs;
 use scraper::{ElementRef, Html, Selector};
 
 const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
-const DATA_DIRECTORY_PATH: &str = "/data";
+const DATA_DIRECTORY_PATH: &str = "data";
 
 pub fn check_or_get_tweets_data() {
     let current_dataset_page: String = get(CURRENT_VERSION_URL).unwrap().text().unwrap();
