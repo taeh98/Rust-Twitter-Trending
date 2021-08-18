@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io;
+use std::path::Path;
 
 use reqwest::blocking::{get, Response};
 use scraper::html::Select;
@@ -153,6 +154,15 @@ fn check_or_download_dataset_file(
     let extracted_data_file_path: String = format!("/data/data_{}.tsv", record_id);
     let compressed_data_file_path: String = format!("{}.gz", extracted_data_file_path);
 
+    if Path::new(extracted_data_file_path.as_str()).exists() {
+        println!("The latest dataset has already been downloaded.");
+        return;
+    }
+
+    else {
+        println!("The latest dataset is not already present, downloading it now.");
+    }
+
     println!(
         "extracted_data_file_path = \"{}\"",
         extracted_data_file_path
@@ -171,7 +181,6 @@ fn check_or_download_dataset_file(
         current_dataset_file_md5_digest
     );
 
-    //TODO: check if latest file already saved
     //TODO: if not already saved, delete all files in the /data directory and then download latest file with progress bar (like wget)
     //TODO: once downloaded, verify downloaded file against md5 digest
     //TODO: once verified, extract downloaded .tsv.gz file to a .tsv file
