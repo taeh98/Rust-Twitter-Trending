@@ -3,7 +3,7 @@ use std::io;
 
 use reqwest::blocking::{get, Response};
 use scraper::html::Select;
-use scraper::node::{Attrs};
+use scraper::node::Attrs;
 use scraper::{ElementRef, Html, Selector};
 
 const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
@@ -148,7 +148,7 @@ fn check_or_download_dataset_file(
     //TODO: check if latest file already saved
     //TODO: if not already saved, download latest file with progress bar (like wget)
     //TODO: once downloaded, verify downloaded file against md5 digest
-    //TODO: once verified, extract downladed .tsv.gz file to a .tsv file
+    //TODO: once verified, extract downloaded .tsv.gz file to a .tsv file
     //TODO: once extracted, delete the .tsv.gz file
 
     // let current_dataset_file_response: Response = get(current_dataset_file_link).unwrap();
