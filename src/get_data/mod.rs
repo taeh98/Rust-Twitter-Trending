@@ -1,5 +1,4 @@
-use std::fs::{create_dir, remove_dir_all, File};
-use std::io;
+use std::fs::{create_dir, remove_dir_all};
 use std::path::Path;
 
 use reqwest::blocking::get;
