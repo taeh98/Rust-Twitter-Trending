@@ -24,7 +24,7 @@ fn extract_compressed_dataset_file(
     compressed_data_file_path: &String,
 ) {
     let mut decoder = GzDecoder::new(
-        file_to_string(compressed_data_file_path)
+        file_to_u8_vec(compressed_data_file_path)
             .expect("Failed to open a decoder to decompress the GZIP-compressed dataset."),
     );
     let mut decompressed_output: String = String::new();
@@ -38,7 +38,7 @@ fn verify_compressed_dataset_file(
     current_dataset_file_md5_digest: &String,
     extracted_data_file_path: &String,
 ) -> bool {
-    match file_to_bytes(extracted_data_file_path) {
+    match file_to_u8_vec(extracted_data_file_path) {
         Some(file_bytes) => {
             format!("{:x}", compute(file_bytes)).eq(current_dataset_file_md5_digest)
         }
@@ -50,9 +50,9 @@ fn file_to_string(filepath: &String) -> Option<String> {
     read_to_string(filepath).ok()
 }
 
-fn file_to_bytes(filepath: &String) -> Option<&[u8]> {
+fn file_to_u8_vec(filepath: &String) -> Option<Vec<u8>> {
     match file_to_string(filepath) {
-        Some(contents) => Some(contents.as_bytes()),
+        Some(contents) => Some(Vec::from(contents.as_bytes())),
         _ => None,
     }
 }
