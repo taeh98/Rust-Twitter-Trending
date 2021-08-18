@@ -7,6 +7,8 @@ use scraper::html::Select;
 use scraper::node::Attrs;
 use scraper::{ElementRef, Html, Selector};
 
+mod download_dataset;
+
 const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
 const DATA_DIRECTORY_PATH: &str = "data";
 
@@ -165,15 +167,10 @@ fn check_or_download_dataset_file(
     remove_dir_all(DATA_DIRECTORY_PATH);
     create_dir(DATA_DIRECTORY_PATH);
 
-    //TODO: download latest file with progress bar (like wget)
-    //TODO: once downloaded, verify downloaded file against md5 digest
-    //TODO: once verified, extract downloaded .tsv.gz file to a .tsv file
-    //TODO: once extracted, delete the .tsv.gz file
-
-    // let current_dataset_file_response: Response = get(current_dataset_file_link).unwrap();
-    //
-    // save_downloaded_file(
-    //     "/data/full_dataset_clean.tsv.gz",
-    //     current_dataset_file_response.text().unwrap().as_bytes(),
-    // )
+    download_dataset::download_dataset(
+        current_dataset_file_link,
+        current_dataset_file_md5_digest,
+        extracted_data_file_path,
+        compressed_data_file_path,
+    );
 }
