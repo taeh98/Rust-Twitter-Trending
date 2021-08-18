@@ -149,7 +149,6 @@ fn check_or_download_dataset_file(
     current_dataset_file_md5_digest: String,
 ) {
     let record_id: String = get_record_id_from_file_link(&current_dataset_file_link);
-    println!("record_id = \"{}\"", record_id);
 
     let extracted_data_file_path: String = format!("/data/data_{}.tsv", record_id);
     let compressed_data_file_path: String = format!("{}.gz", extracted_data_file_path);
@@ -159,27 +158,7 @@ fn check_or_download_dataset_file(
         return;
     }
 
-    else {
-        println!("The latest dataset is not already present, downloading it now.");
-    }
-
-    println!(
-        "extracted_data_file_path = \"{}\"",
-        extracted_data_file_path
-    );
-    println!(
-        "compressed_data_file_path = \"{}\"",
-        compressed_data_file_path
-    );
-
-    println!(
-        "current_dataset_file_link = \"{}\"",
-        current_dataset_file_link
-    );
-    println!(
-        "current_dataset_file_md5_digest = \"{}\"",
-        current_dataset_file_md5_digest
-    );
+    println!("The latest dataset is not already present, downloading it now.");
 
     //TODO: if not already saved, delete all files in the /data directory and then download latest file with progress bar (like wget)
     //TODO: once downloaded, verify downloaded file against md5 digest

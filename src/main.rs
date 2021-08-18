@@ -30,7 +30,7 @@ fn main() {
 
             print_top_words(top_words, top_hashtags, num_tweets, time_taken_ms);
         }
-        _ => println!("Couldn't get tweets data."),
+        _ => panic!("Couldn't get tweets data."),
     }
 }
 
