@@ -1,4 +1,4 @@
-use std::fs::{read_to_string, remove_file, write, File};
+use std::fs::{read_to_string, remove_file, write};
 use std::io::Read;
 
 use flate2::read::GzDecoder;
@@ -16,22 +16,23 @@ pub fn download_dataset(
         panic!("The compressed dataset file failed md5 checksum verification.");
     }
     extract_compressed_dataset_file(&extracted_data_file_path, &compressed_data_file_path);
-    remove_file(&extracted_data_file_path);
+    remove_file(&extracted_data_file_path)
+        .expect("Failed to remove the GZIP-compressed datafile after extracting it.");
 }
 
 fn extract_compressed_dataset_file(
     extracted_data_file_path: &String,
     compressed_data_file_path: &String,
 ) {
-    let mut decoder = GzDecoder::new(
-        file_to_u8_vec(compressed_data_file_path)
-            .expect("Failed to open a decoder to decompress the GZIP-compressed dataset."),
-    );
+    let compressed_file_u8_vec: Vec<u8> = file_to_u8_vec(compressed_data_file_path)
+        .expect("Failed to open the GZIP-compressed dataset as a u8 vector.");
+    let mut decoder = GzDecoder::new(compressed_file_u8_vec.as_slice());
     let mut decompressed_output: String = String::new();
     decoder
         .read_to_string(&mut decompressed_output)
         .expect("Failed to decompress the GZIP-compressed dataset.");
-    write(extracted_data_file_path, decompressed_output);
+    write(extracted_data_file_path, decompressed_output)
+        .expect("Failed to write the decompressed datafile.");
 }
 
 fn verify_compressed_dataset_file(
@@ -63,11 +64,4 @@ fn download_compressed_dataset_file(
 ) {
 
     //TODO: download latest file with progress bar (like wget)
-}
-
-fn save_downloaded_file(file_path: &str, mut current_dataset_file_contents: &[u8]) {
-    let mut out: File = File::create(file_path)
-        .expect(format!("Failed to create the data file \"{}\".", file_path).as_str());
-    io::copy(&mut current_dataset_file_contents, &mut out)
-        .expect(format!("Failed to copy content to the data file \"{}\".", file_path).as_str());
 }
