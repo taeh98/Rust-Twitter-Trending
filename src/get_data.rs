@@ -132,10 +132,24 @@ fn save_downloaded_file(file_path: &str, mut current_dataset_file_contents: &[u8
         .expect(format!("Failed to copy content to the data file \"{}\".", file_path).as_str());
 }
 
+fn get_record_id_from_file_link(file_link: &String) -> String {
+    file_link
+        .split("https://zenodo.org/record/")
+        .find(|string: &&str| !string.is_empty())
+        .unwrap()
+        .split("/")
+        .next()
+        .unwrap()
+        .to_string()
+}
+
 fn check_or_download_dataset_file(
     current_dataset_file_link: String,
     current_dataset_file_md5_digest: String,
 ) {
+    let record_id: String = get_record_id_from_file_link(&current_dataset_file_link);
+    println!("record_id = \"{}\"", record_id);
+
     println!(
         "current_dataset_file_link = \"{}\"",
         current_dataset_file_link
