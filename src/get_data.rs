@@ -23,7 +23,7 @@ pub fn check_or_get_tweets_data() {
             }
         },
         _ => {
-            eprintln!("Failed to get the database file link and MD5 digest.");
+            panic!("Failed to get the database file link and MD5 digest.");
         }
     }
 }
