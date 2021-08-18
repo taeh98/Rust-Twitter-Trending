@@ -24,7 +24,7 @@ fn extract_compressed_dataset_file(
     compressed_data_file_path: &String,
 ) {
     let mut decoder = GzDecoder::new(
-        file_to_bytes(compressed_data_file_path)
+        file_to_string(compressed_data_file_path)
             .expect("Failed to open a decoder to decompress the GZIP-compressed dataset."),
     );
     let mut decompressed_output: String = String::new();
@@ -46,8 +46,12 @@ fn verify_compressed_dataset_file(
     }
 }
 
+fn file_to_string(filepath: &String) -> Option<String> {
+    read_to_string(filepath).ok()
+}
+
 fn file_to_bytes(filepath: &String) -> Option<&[u8]> {
-    match read_to_string(filepath).ok() {
+    match file_to_string(filepath) {
         Some(contents) => Some(contents.as_bytes()),
         _ => None,
     }
