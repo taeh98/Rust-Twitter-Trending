@@ -1,5 +1,7 @@
-use std::fs::read_to_string;
+use std::fs::{read_to_string, remove_file, write};
+use std::io::Read;
 
+use flate2::read::GzDecoder;
 use md5::compute;
 
 pub fn download_dataset(
@@ -13,8 +15,23 @@ pub fn download_dataset(
     {
         panic!("The compressed dataset file failed md5 checksum verification.");
     }
-    //TODO: once verified, extract downloaded .tsv.gz file to a .tsv file
-    //TODO: once extracted, delete the .tsv.gz file
+    extract_compressed_dataset_file(&extracted_data_file_path, &compressed_data_file_path);
+    remove_file(&extracted_data_file_path);
+}
+
+fn extract_compressed_dataset_file(
+    extracted_data_file_path: &String,
+    compressed_data_file_path: &String,
+) {
+    let mut decoder = GzDecoder::new(
+        file_to_bytes(compressed_data_file_path)
+            .expect("Failed to open a decoder to decompress the GZIP-compressed dataset."),
+    );
+    let mut decompressed_output: String = String::new();
+    decoder
+        .read_to_string(&mut decompressed_output)
+        .expect("Failed to decompress the GZIP-compressed dataset.");
+    write(extracted_data_file_path, decompressed_output);
 }
 
 fn verify_compressed_dataset_file(
