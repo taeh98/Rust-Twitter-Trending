@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::fs::{create_dir, remove_dir_all, File};
 use std::io;
 use std::path::Path;
 
@@ -8,6 +8,7 @@ use scraper::node::Attrs;
 use scraper::{ElementRef, Html, Selector};
 
 const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
+const DATA_DIRECTORY_PATH: &str = "/data";
 
 pub fn check_or_get_tweets_data() {
     let current_dataset_page: String = get(CURRENT_VERSION_URL).unwrap().text().unwrap();
@@ -150,7 +151,8 @@ fn check_or_download_dataset_file(
 ) {
     let record_id: String = get_record_id_from_file_link(&current_dataset_file_link);
 
-    let extracted_data_file_path: String = format!("/data/data_{}.tsv", record_id);
+    let extracted_data_file_path: String =
+        format!("{}/data_{}.tsv", DATA_DIRECTORY_PATH, record_id);
     let compressed_data_file_path: String = format!("{}.gz", extracted_data_file_path);
 
     if Path::new(extracted_data_file_path.as_str()).exists() {
@@ -160,7 +162,10 @@ fn check_or_download_dataset_file(
 
     println!("The latest dataset is not already present, downloading it now.");
 
-    //TODO: if not already saved, delete all files in the /data directory and then download latest file with progress bar (like wget)
+    remove_dir_all(DATA_DIRECTORY_PATH);
+    create_dir(DATA_DIRECTORY_PATH);
+
+    //TODO: download latest file with progress bar (like wget)
     //TODO: once downloaded, verify downloaded file against md5 digest
     //TODO: once verified, extract downloaded .tsv.gz file to a .tsv file
     //TODO: once extracted, delete the .tsv.gz file
