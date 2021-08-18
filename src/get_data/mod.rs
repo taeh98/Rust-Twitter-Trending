@@ -156,8 +156,8 @@ fn check_or_download_dataset_file(
 
     println!("The latest dataset is not already present, downloading it now.");
 
-    remove_dir_all(DATA_DIRECTORY_PATH);
-    create_dir(DATA_DIRECTORY_PATH);
+    remove_dir_all(DATA_DIRECTORY_PATH).expect("Failed to clear the /data directory.");
+    create_dir(DATA_DIRECTORY_PATH).expect("Failed to recreate the /data directory.");
 
     download_dataset::download_dataset(
         current_dataset_file_link,
