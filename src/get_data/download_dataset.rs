@@ -39,7 +39,9 @@ fn verify_compressed_dataset_file(
     extracted_data_file_path: &String,
 ) -> bool {
     match file_to_bytes(extracted_data_file_path) {
-        Some(file_bytes) => compute(file_bytes).eq(current_dataset_file_md5_digest.as_bytes()),
+        Some(file_bytes) => {
+            format!("{:x}", compute(file_bytes)).eq(current_dataset_file_md5_digest)
+        }
         _ => false,
     }
 }
