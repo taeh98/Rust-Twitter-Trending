@@ -1,22 +1,10 @@
-/**
-
-1. go to https://doi.org/10.5281/zenodo.3723939 for latest version of https://github.com/thepanacealab/covid19_twitter
-2. find full_dataset_clean.tsv.gz element and current date or version
-3. if latest version already downloaded then exit
-4. get download link and its md5 checksum digest
-5. download the dataset
-6. verify integrity against the md5 digest
-7. extract the .tsv.gz file to a .tsv file
-8. delete the .tsv.gz file
-
- */
 use std::fs::File;
 use std::io;
 
 use reqwest::blocking::{get, Response};
 use scraper::html::Select;
-use scraper::node::{Attrs, Element};
-use scraper::{ElementRef, Html, Node, Selector};
+use scraper::node::{Attrs};
+use scraper::{ElementRef, Html, Selector};
 
 const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
 
@@ -157,10 +145,16 @@ fn check_or_download_dataset_file(
         current_dataset_file_md5_digest
     );
 
+    //TODO: check if latest file already saved
+    //TODO: if not already saved, download latest file with progress bar (like wget)
+    //TODO: once downloaded, verify downloaded file against md5 digest
+    //TODO: once verified, extract downladed .tsv.gz file to a .tsv file
+    //TODO: once extracted, delete the .tsv.gz file
+
     // let current_dataset_file_response: Response = get(current_dataset_file_link).unwrap();
     //
     // save_downloaded_file(
-    //     "/data/tweets.tar.gz",
+    //     "/data/full_dataset_clean.tsv.gz",
     //     current_dataset_file_response.text().unwrap().as_bytes(),
     // )
 }
