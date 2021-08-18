@@ -2,7 +2,7 @@ use std::fs::{create_dir, remove_dir_all, File};
 use std::io;
 use std::path::Path;
 
-use reqwest::blocking::{get, Response};
+use reqwest::blocking::get;
 use scraper::html::Select;
 use scraper::node::Attrs;
 use scraper::{ElementRef, Html, Selector};
