@@ -172,7 +172,7 @@ fn check_or_download_dataset_file(
     );
 
     //TODO: check if latest file already saved
-    //TODO: if not already saved, download latest file with progress bar (like wget)
+    //TODO: if not already saved, delete all files in the /data directory and then download latest file with progress bar (like wget)
     //TODO: once downloaded, verify downloaded file against md5 digest
     //TODO: once verified, extract downloaded .tsv.gz file to a .tsv file
     //TODO: once extracted, delete the .tsv.gz file
