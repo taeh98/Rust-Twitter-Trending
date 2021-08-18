@@ -150,6 +150,18 @@ fn check_or_download_dataset_file(
     let record_id: String = get_record_id_from_file_link(&current_dataset_file_link);
     println!("record_id = \"{}\"", record_id);
 
+    let extracted_data_file_path: String = format!("/data/data_{}.tsv", record_id);
+    let compressed_data_file_path: String = format!("{}.gz", extracted_data_file_path);
+
+    println!(
+        "extracted_data_file_path = \"{}\"",
+        extracted_data_file_path
+    );
+    println!(
+        "compressed_data_file_path = \"{}\"",
+        compressed_data_file_path
+    );
+
     println!(
         "current_dataset_file_link = \"{}\"",
         current_dataset_file_link
