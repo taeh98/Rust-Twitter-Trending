@@ -4,6 +4,8 @@ use std::io::Read;
 use flate2::read::GzDecoder;
 use md5::compute;
 
+mod verbose_file_download;
+
 pub fn download_dataset(
     current_dataset_file_link: String,
     current_dataset_file_md5_digest: String,
@@ -62,6 +64,8 @@ fn download_compressed_dataset_file(
     current_dataset_file_link: &String,
     compressed_data_file_path: &String,
 ) {
-
-    //TODO: download latest file with progress bar (like wget)
+    verbose_file_download::download_file_with_progress(
+        current_dataset_file_link,
+        compressed_data_file_path,
+    );
 }
