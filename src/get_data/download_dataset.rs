@@ -10,10 +10,10 @@ pub fn download_dataset(
     extracted_data_file_path: String,
     compressed_data_file_path: String,
 ) {
-    download_compressed_dataset_file(&current_dataset_file_link, &extracted_data_file_path);
-    verify_compressed_dataset_file(&current_dataset_file_md5_digest, &extracted_data_file_path);
+    download_compressed_dataset_file(&current_dataset_file_link, &compressed_data_file_path);
+    verify_compressed_dataset_file(&current_dataset_file_md5_digest, &compressed_data_file_path);
     extract_compressed_dataset_file(&extracted_data_file_path, &compressed_data_file_path);
-    remove_file(&extracted_data_file_path)
+    remove_file(&compressed_data_file_path)
         .expect("Failed to remove the GZIP-compressed datafile after extracting it.");
 }
 
@@ -34,9 +34,9 @@ fn extract_compressed_dataset_file(
 
 fn verify_compressed_dataset_file(
     current_dataset_file_md5_digest: &String,
-    extracted_data_file_path: &String,
+    compressed_data_file_path: &String,
 ) {
-    match file_to_u8_vec(extracted_data_file_path) {
+    match file_to_u8_vec(compressed_data_file_path) {
         Some(file_bytes) => {
             let actual_digest: String = format!("{:x}", compute(file_bytes));
             if !actual_digest.eq(current_dataset_file_md5_digest) {
@@ -60,7 +60,7 @@ fn file_to_u8_vec(filepath: &String) -> Option<Vec<u8>> {
 
 fn download_compressed_dataset_file(
     current_dataset_file_link: &String,
-    extracted_data_file_path: &String,
+    compressed_data_file_path: &String,
 ) {
 
     //TODO: download latest file with progress bar (like wget)
