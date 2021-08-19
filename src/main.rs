@@ -26,9 +26,9 @@ fn main() {
             let top_hashtags: Vec<(String, i128)> = get_top_words(&counts, true);
             let top_words: Vec<(String, i128)> = get_top_words(&counts, false);
 
-            let time_taken_ms: u128 = start_time.elapsed().as_millis();
+            let time_taken_secs: f64 = (start_time.elapsed().as_millis() as f64) / 1000.0;
 
-            print_top_words(top_words, top_hashtags, num_tweets, time_taken_ms);
+            print_top_words(top_words, top_hashtags, num_tweets, time_taken_secs);
         }
         _ => panic!("Couldn't get tweets data."),
     }
@@ -55,12 +55,14 @@ fn print_top_words(
     top_words: Vec<(String, i128)>,
     top_hashtags: Vec<(String, i128)>,
     num_tweets: usize,
-    time_taken_ms: u128,
+    time_taken_secs: f64,
 ) {
+    let tweets_per_sec: f64 = (num_tweets as f64) / time_taken_secs;
     let res = format!(
-        "Processed {} tweets in {} ms.\r\n\r\nTop words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
+        "Processed {} tweets in {} seconds, at a rate of {} tweets/second.\r\n\r\nTop words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
         num_tweets,
-        time_taken_ms,
+        time_taken_secs.round(),
+        tweets_per_sec.round(),
         top_word_list_to_string(top_words),
         top_word_list_to_string(top_hashtags)
     );
