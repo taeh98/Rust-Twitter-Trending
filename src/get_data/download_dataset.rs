@@ -11,10 +11,7 @@ pub fn download_dataset(
     compressed_data_file_path: String,
 ) {
     download_compressed_dataset_file(&current_dataset_file_link, &extracted_data_file_path);
-    if !verify_compressed_dataset_file(&current_dataset_file_md5_digest, &extracted_data_file_path)
-    {
-        panic!("The compressed dataset file failed md5 checksum verification.");
-    }
+    verify_compressed_dataset_file(&current_dataset_file_md5_digest, &extracted_data_file_path);
     extract_compressed_dataset_file(&extracted_data_file_path, &compressed_data_file_path);
     remove_file(&extracted_data_file_path)
         .expect("Failed to remove the GZIP-compressed datafile after extracting it.");
@@ -38,12 +35,15 @@ fn extract_compressed_dataset_file(
 fn verify_compressed_dataset_file(
     current_dataset_file_md5_digest: &String,
     extracted_data_file_path: &String,
-) -> bool {
+) {
     match file_to_u8_vec(extracted_data_file_path) {
         Some(file_bytes) => {
-            format!("{:x}", compute(file_bytes)).eq(current_dataset_file_md5_digest)
+            let actual_digest: String = format!("{:x}", compute(file_bytes));
+            if !actual_digest.eq(current_dataset_file_md5_digest) {
+                panic!("The compressed dataset file failed md5 checksum verification. actual_digest = {} and current_dataset_file_md5_digest = {}.", actual_digest, current_dataset_file_md5_digest);
+            }
         }
-        _ => false,
+        _ => {}
     }
 }
 
