@@ -5,6 +5,8 @@ use std::time::Instant;
 
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
 
 mod get_data;
 mod get_tweets;
@@ -12,6 +14,13 @@ mod process_tweets;
 
 const NUMBER_TO_SHOW: usize = 10;
 const NUM_REPEATS_BEFORE_MEAN: i8 = 15;
+
+#[derive(Serialize, Deserialize)]
+struct TweetProcessingResult {
+    name: String,
+    time_taken_secs: f64,
+    tweets_processed_per_sec: f64,
+}
 
 fn main() {
     println!("Getting the tweets data or checking they are already saved.");
