@@ -1,6 +1,6 @@
 /target/
-/out.txt
 /Cargo.lock
 /data/full_who_dataset1.csv
 /data/full_who_dataset2.csv
 /data/full_who_dataset3.csv
+/out
