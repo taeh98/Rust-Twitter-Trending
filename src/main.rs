@@ -29,6 +29,12 @@ fn main() {
             processed_tweets_output::print_top_words_text_from_counts(&counts);
 
             println!("Running tweet processing algorithms.");
+            let algorithm_results: Vec<TweetProcessingResult> = vec![
+                run_rust_tweet_processing_algorithm(&tweets, num_tweets, true),
+                run_rust_tweet_processing_algorithm(&tweets, num_tweets, false),
+            ];
+
+            println!("Done running tweet processing algorithms.");
         }
         _ => panic!("Couldn't get tweets data."),
     }
