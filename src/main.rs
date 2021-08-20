@@ -11,6 +11,7 @@ mod get_tweets;
 mod process_tweets;
 
 const NUMBER_TO_SHOW: usize = 10;
+const NUM_REPEATS_BEFORE_MEAN: i8 = 15;
 
 fn main() {
     println!("Getting the tweets data or checking they are already saved.");
