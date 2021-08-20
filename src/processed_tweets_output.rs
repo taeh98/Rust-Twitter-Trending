@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::fs::{create_dir, File};
 use std::io::Write;
 use std::path::Path;
 
@@ -6,7 +6,7 @@ use priority_queue::PriorityQueue;
 use rayon::prelude::*;
 
 const NUMBER_TO_SHOW: usize = 10;
-const TOP_WORDS_HASHTAGS_OUTPUT_FILEPATH: &str = "top_words_hashtags.txt";
+const TOP_WORDS_HASHTAGS_OUTPUT_FILEPATH: &str = "out/top_words_hashtags.txt";
 
 pub fn get_top_words_text_from_counts(counts: &PriorityQueue<String, i128>) -> String {
     let top_hashtags: Vec<(String, i128)> = get_top_words(counts, true);
@@ -49,6 +49,10 @@ fn print_top_words_text(top_words: Vec<(String, i128)>, top_hashtags: Vec<(Strin
     let text: String = get_top_words_text(top_words, top_hashtags);
 
     println!("{}", text);
+
+    if !Path::new("out/").exists() {
+        create_dir("out");
+    }
 
     let path = Path::new(TOP_WORDS_HASHTAGS_OUTPUT_FILEPATH);
     let mut file = File::create(&path).unwrap();
