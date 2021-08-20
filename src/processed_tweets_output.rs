@@ -6,6 +6,7 @@ use priority_queue::PriorityQueue;
 use rayon::prelude::*;
 
 const NUMBER_TO_SHOW: usize = 10;
+const TOP_WORDS_HASHTAGS_OUTPUT_FILEPATH: &str = "out.txt";
 
 pub fn get_top_words_text_from_counts(counts: &PriorityQueue<String, i128>) -> String {
     let top_hashtags: Vec<(String, i128)> = get_top_words(counts, true);
@@ -49,7 +50,7 @@ fn print_top_words_text(top_words: Vec<(String, i128)>, top_hashtags: Vec<(Strin
 
     println!("{}", text);
 
-    let path = Path::new("out.txt");
+    let path = Path::new(TOP_WORDS_HASHTAGS_OUTPUT_FILEPATH);
     let mut file = File::create(&path).unwrap();
     file.write_all(text.as_bytes()).unwrap();
 }
