@@ -13,8 +13,7 @@ const NUM_REPEATS_BEFORE_MEAN: i8 = 15;
 #[derive(Serialize, Deserialize)]
 struct TweetProcessingResult {
     name: String,
-    time_taken_secs: f64,
-    tweets_processed_per_sec: f64,
+    time_taken_tweets_per_sec_values: Vec<(f64, f64)>,
 }
 
 fn main() {
@@ -45,8 +44,8 @@ fn run_rust_tweet_processing_algorithm(
     num_tweets: usize,
     parallel: bool,
 ) -> TweetProcessingResult {
-    let mut sum_time_taken_secs: f64 = 0.0;
-    let mut sum_tweets_per_sec: f64 = 0.0;
+    let mut time_taken_tweets_per_sec_values: Vec<(f64, f64)> = Vec::new();
+
     let algorithm_name = format!(
         "Rust {} map-reduce",
         if parallel {
@@ -64,13 +63,11 @@ fn run_rust_tweet_processing_algorithm(
         process_tweets::process_tweets(&tweets, true);
         let time_taken_secs: f64 = (start_time.elapsed().as_millis() as f64) / 1000.0;
         let tweets_per_sec: f64 = (num_tweets as f64) / time_taken_secs;
-        sum_tweets_per_sec += tweets_per_sec;
-        sum_time_taken_secs += time_taken_secs;
+        time_taken_tweets_per_sec_values.push((time_taken_secs, tweets_per_sec));
     }
 
     TweetProcessingResult {
         name: algorithm_name,
-        time_taken_secs: sum_time_taken_secs / NUM_REPEATS_BEFORE_MEAN as f64,
-        tweets_processed_per_sec: sum_tweets_per_sec / NUM_REPEATS_BEFORE_MEAN as f64,
+        time_taken_tweets_per_sec_values,
     }
 }
