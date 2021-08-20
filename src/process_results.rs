@@ -2,6 +2,7 @@ use crate::TweetProcessingResult;
 
 pub fn process_results(algorithm_results: Vec<TweetProcessingResult>) {
     //TODO: write the results to a csv (use polars), make stats measurements (use statrs), and make visualisations of them (use plotters)
+    //TODO: figure out how to do this analysis in an environment like a Jupyter notebook - use Evcxr with Jupyter? Or Google Colab?
     /*
     write results to csv: algorithm name, time taken values (seconds), tweet processing speed values (tweets/second)
 
