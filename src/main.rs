@@ -24,15 +24,45 @@ fn main() {
 
     match get_tweets::get_tweets() {
         Some(tweets) => {
-            let num_tweets: usize = tweets.len();
-            let start_time: Instant = Instant::now();
-
+            println!("Getting the top words text.");
             let counts: PriorityQueue<String, i128> = process_tweets::process_tweets(&tweets, true);
+            let top_words_hashtags_text: String =
+                processed_tweets_output::get_top_words_text_from_counts(&counts);
 
-            let time_taken_secs: f64 = (start_time.elapsed().as_millis() as f64) / 1000.0;
-
-            processed_tweets_output::print_top_words_from_counts(&counts);
+            println!("Running tweet processing algorithms.");
         }
         _ => panic!("Couldn't get tweets data."),
+    }
+}
+
+fn run_rust_tweet_processing_algorithm(
+    tweets: &Vec<String>,
+    num_tweets: usize,
+    parallel: bool,
+) -> TweetProcessingResult {
+    let mut sum_time_taken_secs: f64 = 0.0;
+    let mut sum_tweets_per_sec: f64 = 0.0;
+    let algorithm_name = format!(
+        "Rust {} map-reduce",
+        if parallel {
+            "parallelised"
+        } else {
+            "non-parallelised"
+        }
+    );
+
+    for repeat in 1..=NUM_REPEATS_BEFORE_MEAN {
+        let start_time: Instant = Instant::now();
+        process_tweets::process_tweets(&tweets, true);
+        let time_taken_secs: f64 = (start_time.elapsed().as_millis() as f64) / 1000.0;
+        let tweets_per_sec: f64 = (num_tweets as f64) / time_taken_secs;
+        sum_tweets_per_sec += tweets_per_sec;
+        sum_time_taken_secs += time_taken_secs;
+    }
+
+    TweetProcessingResult {
+        name: algorithm_name,
+        time_taken_secs: sum_time_taken_secs / NUM_REPEATS_BEFORE_MEAN as f64,
+        tweets_processed_per_sec: sum_tweets_per_sec / NUM_REPEATS_BEFORE_MEAN as f64,
     }
 }
