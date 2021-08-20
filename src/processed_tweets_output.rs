@@ -2,7 +2,8 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use rayon::iter::IntoParallelIterator;
+use priority_queue::PriorityQueue;
+use rayon::prelude::*;
 
 const NUMBER_TO_SHOW: usize = 10;
 

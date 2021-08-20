@@ -1,13 +1,7 @@
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
 use std::time::Instant;
 
 use priority_queue::PriorityQueue;
-use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
-
-use serde_json::Result;
 
 mod get_data;
 mod get_tweets;
