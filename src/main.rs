@@ -51,7 +51,10 @@ fn run_rust_tweet_processing_algorithm(
         }
     );
 
+    println!("Running the {} algorithm.", algorithm_name);
+
     for repeat in 1..=NUM_REPEATS_BEFORE_MEAN {
+        println!("Starting repeat {} of {}.", repeat, NUM_REPEATS_BEFORE_MEAN);
         let start_time: Instant = Instant::now();
         process_tweets::process_tweets(&tweets, true);
         let time_taken_secs: f64 = (start_time.elapsed().as_millis() as f64) / 1000.0;
