@@ -25,6 +25,8 @@ fn main() {
         Some(tweets) => {
             println!("Getting the top words text.");
             let counts: PriorityQueue<String, i128> = process_tweets::process_tweets(&tweets, true);
+            let num_tweets: usize = counts.len();
+
             processed_tweets_output::print_top_words_text_from_counts(&counts);
 
             println!("Running tweet processing algorithms.");
