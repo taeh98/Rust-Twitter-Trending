@@ -7,10 +7,16 @@ use rayon::prelude::*;
 
 const NUMBER_TO_SHOW: usize = 10;
 
-pub fn print_top_words_from_counts(counts: &PriorityQueue<String, i128>) {
+pub fn get_top_words_text_from_counts(counts: &PriorityQueue<String, i128>) -> String {
     let top_hashtags: Vec<(String, i128)> = get_top_words(counts, true);
     let top_words: Vec<(String, i128)> = get_top_words(counts, false);
-    print_top_words(top_words, top_hashtags);
+    get_top_words_text(top_words, top_hashtags)
+}
+
+pub fn print_top_words_text_from_counts(counts: &PriorityQueue<String, i128>) {
+    let top_hashtags: Vec<(String, i128)> = get_top_words(counts, true);
+    let top_words: Vec<(String, i128)> = get_top_words(counts, false);
+    print_top_words_text(top_words, top_hashtags)
 }
 
 fn get_top_words(
@@ -30,18 +36,22 @@ fn get_top_words(
     res
 }
 
-fn print_top_words(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i128)>) {
-    let res = format!(
+fn get_top_words_text(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i128)>) -> String {
+    format!(
         "Top words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
         top_word_list_to_string(top_words),
         top_word_list_to_string(top_hashtags)
-    );
+    )
+}
 
-    println!("{}", res);
+fn print_top_words_text(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i128)>) {
+    let text: String = get_top_words_text(top_words, top_hashtags);
+
+    println!("{}", text);
 
     let path = Path::new("out.txt");
     let mut file = File::create(&path).unwrap();
-    file.write_all(res.as_bytes()).unwrap();
+    file.write_all(text.as_bytes()).unwrap();
 }
 
 fn top_word_list_to_string(list: Vec<(String, i128)>) -> String {
