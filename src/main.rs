@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 mod get_data;
 mod get_tweets;
+mod process_results;
 mod process_tweets;
 mod processed_tweets_output;
 
@@ -36,6 +37,7 @@ fn main() {
             ];
 
             println!("Done running tweet processing algorithms.");
+            process_results::process_results(algorithm_results);
         }
         _ => panic!("Couldn't get tweets data."),
     }
