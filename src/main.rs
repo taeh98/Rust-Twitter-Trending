@@ -18,9 +18,9 @@ pub struct TweetProcessingResult {
 }
 
 fn main() {
-    println!("Getting the tweets data or checking they are already saved.");
+    println!("Getting the tweets data files or checking they are already saved.");
     get_data::check_or_get_tweets_data();
-    println!("The tweets data are present, proceeding to process them.");
+    println!("The tweets data files are present. Proceeding to read and process them.");
 
     match get_tweets::get_tweets() {
         Some(tweets) => {
