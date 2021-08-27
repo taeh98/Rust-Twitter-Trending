@@ -30,6 +30,8 @@ fn process_dataframe(df: DataFrame, res: &Mutex<HashMap<String, String>>, path: 
 
     let indices: Vec<usize> = (0..df.height()).collect();
 
+    println!("Started processing the data from the dataset file {}", path);
+
     indices
         .into_par_iter()
         .map(|idx: usize| df.get(idx))
@@ -38,9 +40,15 @@ fn process_dataframe(df: DataFrame, res: &Mutex<HashMap<String, String>>, path: 
                 add_df_row_to_hash_map(values, res);
             }
         });
+
+    println!(
+        "Finished processing the data from the dataset file {}",
+        path
+    );
 }
 
 fn get_tweets_from_filepath(path: &str, res: &Mutex<HashMap<String, String>>) {
+    println!("Reading in the data from the dataset file {}", path);
     match CsvReader::from_path(path) {
         Ok(file_data) => match file_data.infer_schema(None).has_header(true).finish() {
             Ok(df) => match df.select(("id_str", "text")).ok() {
