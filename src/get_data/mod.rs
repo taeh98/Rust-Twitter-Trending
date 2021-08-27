@@ -2,34 +2,34 @@ use std::fs::{create_dir, remove_dir_all};
 use std::path::Path;
 
 use reqwest::blocking::get;
+use scraper::{ElementRef, Html, Selector};
 use scraper::html::Select;
 use scraper::node::Attrs;
-use scraper::{ElementRef, Html, Selector};
 
 mod download_dataset;
 
-struct TweetProcessingResult {
+struct DataFileMetaData {
     pub name: String,
     pub md5_digest: String,
     pub uri: String,
 }
 
-const DATA_FILES: [TweetProcessingResult; 3] = [
-    TweetProcessingResult {
+const DATA_FILES: [DataFileMetaData; 3] = [
+    DataFileMetaData {
         name: String::from("full_who_dataset1.csv"),
         md5_digest: String::from("259389f2f6c1b232fe248c91107eeccd"),
         uri: String::from(
             "https://zenodo.org/record/3928240/files/full_who_dataset1.csv?download=1",
         ),
     },
-    TweetProcessingResult {
+    DataFileMetaData {
         name: String::from("full_who_dataset2.csv"),
         md5_digest: String::from("ea266ada5b1b817638ab89388138d95e"),
         uri: String::from(
             "https://zenodo.org/record/3928240/files/full_who_dataset2.csv?download=1",
         ),
     },
-    TweetProcessingResult {
+    DataFileMetaData {
         name: String::from("full_who_dataset3.csv"),
         md5_digest: String::from("fc4b898f8d7c81293a776bf116668bab"),
         uri: String::from(
