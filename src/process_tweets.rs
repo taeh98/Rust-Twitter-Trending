@@ -1,7 +1,7 @@
 use std::sync::Mutex;
 
-use dashmap::mapref::multiple::RefMulti;
 use dashmap::DashMap;
+use dashmap::mapref::multiple::RefMulti;
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
 
