@@ -8,8 +8,35 @@ use scraper::{ElementRef, Html, Selector};
 
 mod download_dataset;
 
-const CURRENT_VERSION_URL: &str = "https://doi.org/10.5281/zenodo.3723939";
-const DATA_DIRECTORY_PATH: &str = "data";
+struct TweetProcessingResult {
+    pub name: String,
+    pub md5_digest: String,
+    pub uri: String,
+}
+
+const DATA_FILES: [TweetProcessingResult; 3] = [
+    TweetProcessingResult {
+        name: String::from("full_who_dataset1.csv"),
+        md5_digest: String::from("259389f2f6c1b232fe248c91107eeccd"),
+        uri: String::from(
+            "https://zenodo.org/record/3928240/files/full_who_dataset1.csv?download=1",
+        ),
+    },
+    TweetProcessingResult {
+        name: String::from("full_who_dataset2.csv"),
+        md5_digest: String::from("ea266ada5b1b817638ab89388138d95e"),
+        uri: String::from(
+            "https://zenodo.org/record/3928240/files/full_who_dataset2.csv?download=1",
+        ),
+    },
+    TweetProcessingResult {
+        name: String::from("full_who_dataset3.csv"),
+        md5_digest: String::from("fc4b898f8d7c81293a776bf116668bab"),
+        uri: String::from(
+            "https://zenodo.org/record/3928240/files/full_who_dataset3.csv?download=1",
+        ),
+    },
+];
 
 pub fn check_or_get_tweets_data() {
     let current_dataset_page: String = get(CURRENT_VERSION_URL).unwrap().text().unwrap();
