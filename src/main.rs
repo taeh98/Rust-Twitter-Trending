@@ -9,7 +9,7 @@ mod process_results;
 mod process_tweets;
 mod processed_tweets_output;
 
-const NUM_REPEATS_BEFORE_MEAN: i8 = 200;
+const NUM_REPEATS_BEFORE_MEAN: usize = 200;
 
 #[derive(Serialize, Deserialize)]
 pub struct TweetProcessingResult {
