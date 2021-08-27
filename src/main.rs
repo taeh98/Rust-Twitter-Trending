@@ -12,7 +12,7 @@ mod processed_tweets_output;
 const NUM_REPEATS_BEFORE_MEAN: i8 = 15;
 
 #[derive(Serialize, Deserialize)]
-struct TweetProcessingResult {
+pub struct TweetProcessingResult {
     name: String,
     time_taken_tweets_per_sec_values: Vec<(f64, f64)>,
 }
