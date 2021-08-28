@@ -44,8 +44,8 @@ pub fn check_or_get_tweets_data() {
         .for_each(|df: DataFileMetaData| check_or_get_data_file(df));
 }
 
-fn name_to_filepath(path: &str) -> String {
-    format!("{}/{}", DATA_DIRECTORY_PATH, path)
+fn name_to_filepath(name: &str) -> String {
+    format!("{}/{}", DATA_DIRECTORY_PATH, name)
 }
 
 fn check_or_get_data_file(df: DataFileMetaData) {
