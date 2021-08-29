@@ -11,3 +11,16 @@
    https://rust-lang-nursery.github.io/rust-cookbook/web/clients/download.html#make-a-partial-download-with-http-range-headers
    https://gist.github.com/giuliano-oliveira/4d11d6b3bb003dba3a1b53f43d81b30d
 */
+
+const DATA_DIRECTORY_PATH: &str = "data";
+
+#[derive(Clone, Debug)]
+pub struct DataFileMetaData<'a> {
+    pub name: &'a str,
+    pub md5_digest: &'a str,
+    pub uri: &'a str,
+}
+
+pub fn name_to_filepath(name: &str) -> String {
+    format!("{}/{}", DATA_DIRECTORY_PATH, name)
+}

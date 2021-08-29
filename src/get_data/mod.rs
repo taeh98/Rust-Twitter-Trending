@@ -8,16 +8,9 @@ use scraper::html::Select;
 use scraper::node::Attrs;
 use scraper::{ElementRef, Html, Selector};
 
+use verbose_file_download::{name_to_filepath, DataFileMetaData};
+
 mod verbose_file_download;
-
-#[derive(Clone, Debug)]
-struct DataFileMetaData<'a> {
-    pub name: &'a str,
-    pub md5_digest: &'a str,
-    pub uri: &'a str,
-}
-
-const DATA_DIRECTORY_PATH: &str = "data";
 
 pub fn check_or_get_tweets_data() {
     let data_files: [DataFileMetaData; 3] = [
@@ -42,10 +35,6 @@ pub fn check_or_get_tweets_data() {
         .to_vec()
         .into_par_iter()
         .for_each(|df: DataFileMetaData| check_or_get_data_file(df));
-}
-
-fn name_to_filepath(name: &str) -> String {
-    format!("{}/{}", DATA_DIRECTORY_PATH, name)
 }
 
 fn check_or_get_data_file(df: DataFileMetaData) {
