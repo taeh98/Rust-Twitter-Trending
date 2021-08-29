@@ -17,6 +17,7 @@ use std::process::{Command, ExitStatus};
 
 const DATA_DIRECTORY_PATH: &str = "data";
 const CURL_CONTAINER_NAME: &str = "Rust-Twitter-Trending-Curl-Container";
+const CURL_IMAGE_NAME: &str = "curlimages/curl:7.78.0";
 
 #[derive(Clone, Debug)]
 pub struct DataFileMetaData<'a> {
@@ -35,7 +36,7 @@ pub fn download_data_files(dfs: &Vec<DataFileMetaData>) {
     }
 
     let mut curl_cmd: Command = Command::new("docker");
-    curl_cmd.args(["run", "curlimages/curl:7.78.0"]);
+    curl_cmd.args(["run", CURL_IMAGE_NAME]);
 
     for df in dfs {
         curl_cmd.args(["-L", df.uri, "-o", name_to_filepath(df.name).as_str()]);
@@ -48,6 +49,9 @@ pub fn download_data_files(dfs: &Vec<DataFileMetaData>) {
 
     let mut rm_curl_cmd: Command = Command::new("docker");
     rm_curl_cmd.args(["rm", CURL_CONTAINER_NAME]);
+
+    let mut docker_pull_cmd: Command = Command::new("docker");
+    docker_pull_cmd.args(["pull", CURL_IMAGE_NAME]);
 
     rm_curl_cmd.status();
 
