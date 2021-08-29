@@ -1,4 +1,4 @@
-use std::fs::{read_to_string};
+use std::fs::read_to_string;
 use std::path::Path;
 
 use md5::compute;
@@ -35,14 +35,14 @@ pub fn check_or_get_tweets_data() {
         .collect();
 
     download_data_files(&dfs_to_get);
+
     for df in dfs_to_get {
-        assert!(
-            check_file_is_present_and_intact(&name_to_filepath(df.name), df.md5_digest),
-            format!(
+        if !check_file_is_present_and_intact(&name_to_filepath(df.name), df.md5_digest) {
+            panic!(
                 "The data file {} was not intact after downloading.",
                 df.name
-            )
-        );
+            );
+        }
     }
 }
 
