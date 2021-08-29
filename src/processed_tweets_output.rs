@@ -51,7 +51,7 @@ fn print_top_words_text(top_words: Vec<(String, i128)>, top_hashtags: Vec<(Strin
     println!("{}", text);
 
     if !Path::new("out/").exists() {
-        create_dir("out");
+        create_dir("out").expect("Couldn't create the out/ directory.");
     }
 
     let path = Path::new(TOP_WORDS_HASHTAGS_OUTPUT_FILEPATH);
