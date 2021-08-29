@@ -78,8 +78,11 @@ fn check_or_get_data_file(df: DataFileMetaData) {
 }
 
 fn check_file_integrity(filepath: &String, expected_md5_digest: &str) -> bool {
-    let actual_md5_digest: String = gen_file_md5_digest(&filepath).unwrap();
-    actual_md5_digest.as_str().eq(expected_md5_digest)
+    if Path::new(filepath.as_str()).exists() {
+        let actual_md5_digest: String = gen_file_md5_digest(&filepath).unwrap();
+        actual_md5_digest.as_str().eq(expected_md5_digest)
+    }
+    false
 }
 
 fn file_to_string(filepath: &String) -> Option<String> {
