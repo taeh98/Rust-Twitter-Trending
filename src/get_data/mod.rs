@@ -31,14 +31,23 @@ pub fn check_or_get_tweets_data() {
         },
     ];
 
-    download_data_files(
-        data_files
-            .into_par_iter()
-            .filter(|df: DataFileMetaData| {
-                !check_file_is_present_and_intact(&name_to_filepath(df.name), df.md5_digest)
-            })
-            .collect(),
-    );
+    let dfs_to_get: Vec<DataFileMetaData> = data_files
+        .into_par_iter()
+        .filter(|df: DataFileMetaData| {
+            !check_file_is_present_and_intact(&name_to_filepath(df.name), df.md5_digest)
+        })
+        .collect();
+
+    download_data_files(dfs_to_get);
+    for df in dfs_to_get {
+        assert!(
+            check_file_is_present_and_intact(&name_to_filepath(df.name), df.md5_digest),
+            format!(
+                "The data file {} was not intact after downloading.",
+                df.name
+            )
+        );
+    }
 }
 
 fn check_or_get_data_file(df: DataFileMetaData) {
