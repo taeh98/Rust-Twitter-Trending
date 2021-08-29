@@ -42,7 +42,7 @@ fn check_or_get_data_file(df: DataFileMetaData) {
     let mut path: &Path = Path::new(filepath.as_str());
 
     if path.exists() {
-        if check_file_integrity(&filepath, df.md5_digest) {
+        if check_file_is_present_and_intact(&filepath, df.md5_digest) {
             println!("The data file {} was already present and intact.", df.name);
             return;
         }
@@ -52,7 +52,7 @@ fn check_or_get_data_file(df: DataFileMetaData) {
     path = Path::new(filepath.as_str());
 
     if path.exists() {
-        if check_file_integrity(&filepath, df.md5_digest) {
+        if check_file_is_present_and_intact(&filepath, df.md5_digest) {
             println!("The data file {} was downloaded successfully.", df.name);
             return;
         } else {
@@ -66,7 +66,7 @@ fn check_or_get_data_file(df: DataFileMetaData) {
     }
 }
 
-fn check_file_integrity(filepath: &String, expected_md5_digest: &str) -> bool {
+fn check_file_is_present_and_intact(filepath: &String, expected_md5_digest: &str) -> bool {
     if Path::new(filepath.as_str()).exists() {
         let actual_md5_digest: String = gen_file_md5_digest(&filepath).unwrap();
         actual_md5_digest.as_str().eq(expected_md5_digest)
