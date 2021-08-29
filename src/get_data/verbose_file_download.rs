@@ -34,25 +34,29 @@ pub fn download_data_files(dfs: &Vec<DataFileMetaData>) {
         return;
     }
 
-    let mut curl_cmd: &mut Command = Command::new("docker").args(["run", "curlimages/curl:7.78.0"]);
+    let mut curl_cmd: Command = Command::new("docker");
+    curl_cmd.args(["run", "curlimages/curl:7.78.0"]);
 
     for df in dfs {
-        curl_cmd = curl_cmd.args(["-L", df.uri, "-o", name_to_filepath(df.name).as_str()]);
+        curl_cmd.args(["-L", df.uri, "-o", name_to_filepath(df.name).as_str()]);
     }
 
-    curl_cmd = curl_cmd.args(["--name", CURL_CONTAINER_NAME]);
+    curl_cmd.args(["--name", CURL_CONTAINER_NAME]);
 
-    let await_curl_cmd: &mut Command = Command::new("docker").args(["wait", CURL_CONTAINER_NAME]);
-    let rm_curl_cmd: &mut Command = Command::new("docker").args(["rm", CURL_CONTAINER_NAME]);
+    let mut await_curl_cmd: Command = Command::new("docker");
+    await_curl_cmd.args(["wait", CURL_CONTAINER_NAME]);
+
+    let mut rm_curl_cmd: Command = Command::new("docker");
+    rm_curl_cmd.args(["rm", CURL_CONTAINER_NAME]);
 
     rm_curl_cmd.status();
 
     assert!(
-        run_command_and_get_if_success(curl_cmd),
+        run_command_and_get_if_success(&mut curl_cmd),
         "Could not run the curl Docker image."
     );
     assert!(
-        run_command_and_get_if_success(await_curl_cmd),
+        run_command_and_get_if_success(&mut await_curl_cmd),
         "Could not wait for the curl Docker image to complete."
     );
 
