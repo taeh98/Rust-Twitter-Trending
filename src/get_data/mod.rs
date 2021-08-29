@@ -1,12 +1,8 @@
-use std::fs::{create_dir, read_to_string, remove_dir_all};
+use std::fs::{read_to_string};
 use std::path::Path;
 
 use md5::compute;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use reqwest::blocking::get;
-use scraper::html::Select;
-use scraper::node::Attrs;
-use scraper::{ElementRef, Html, Selector};
 
 use verbose_file_download::{download_data_files, name_to_filepath, DataFileMetaData};
 
@@ -33,12 +29,12 @@ pub fn check_or_get_tweets_data() {
 
     let dfs_to_get: Vec<DataFileMetaData> = data_files
         .into_par_iter()
-        .filter(|df: DataFileMetaData| {
+        .filter(|df: &DataFileMetaData| {
             !check_file_is_present_and_intact(&name_to_filepath(df.name), df.md5_digest)
         })
         .collect();
 
-    download_data_files(dfs_to_get);
+    download_data_files(&dfs_to_get);
     for df in dfs_to_get {
         assert!(
             check_file_is_present_and_intact(&name_to_filepath(df.name), df.md5_digest),
@@ -53,7 +49,7 @@ pub fn check_or_get_tweets_data() {
 fn check_file_is_present_and_intact(filepath: &String, expected_md5_digest: &str) -> bool {
     if Path::new(filepath.as_str()).exists() {
         let actual_md5_digest: String = gen_file_md5_digest(&filepath).unwrap();
-        actual_md5_digest.as_str().eq(expected_md5_digest)
+        return actual_md5_digest.as_str().eq(expected_md5_digest);
     }
     false
 }

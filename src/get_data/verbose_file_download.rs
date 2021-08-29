@@ -29,7 +29,7 @@ pub fn name_to_filepath(name: &str) -> String {
     format!("{}/{}", DATA_DIRECTORY_PATH, name)
 }
 
-pub fn download_data_files(dfs: Vec<DataFileMetaData>) {
+pub fn download_data_files(dfs: &Vec<DataFileMetaData>) {
     if dfs.is_empty() {
         return;
     }
