@@ -50,35 +50,6 @@ pub fn check_or_get_tweets_data() {
     }
 }
 
-fn check_or_get_data_file(df: DataFileMetaData) {
-    let filepath: String = name_to_filepath(df.name);
-    let mut path: &Path = Path::new(filepath.as_str());
-
-    if path.exists() {
-        if check_file_is_present_and_intact(&filepath, df.md5_digest) {
-            println!("The data file {} was already present and intact.", df.name);
-            return;
-        }
-    }
-
-    verbose_file_download::download_file_with_progress(df.uri, filepath.as_str());
-    path = Path::new(filepath.as_str());
-
-    if path.exists() {
-        if check_file_is_present_and_intact(&filepath, df.md5_digest) {
-            println!("The data file {} was downloaded successfully.", df.name);
-            return;
-        } else {
-            panic!(
-                "The data file {} was not intact after downloading.",
-                df.name
-            );
-        }
-    } else {
-        panic!("The data file {} could not be downloaded.", df.name);
-    }
-}
-
 fn check_file_is_present_and_intact(filepath: &String, expected_md5_digest: &str) -> bool {
     if Path::new(filepath.as_str()).exists() {
         let actual_md5_digest: String = gen_file_md5_digest(&filepath).unwrap();
