@@ -8,7 +8,7 @@ use scraper::html::Select;
 use scraper::node::Attrs;
 use scraper::{ElementRef, Html, Selector};
 
-use verbose_file_download::{name_to_filepath, DataFileMetaData};
+use verbose_file_download::{download_data_files, name_to_filepath, DataFileMetaData};
 
 mod verbose_file_download;
 
@@ -31,10 +31,14 @@ pub fn check_or_get_tweets_data() {
         },
     ];
 
-    data_files
-        .to_vec()
+    let dfs_to_download: Vec<DataFileMetaData> = data_files
         .into_par_iter()
-        .for_each(|df: DataFileMetaData| check_or_get_data_file(df));
+        .filter(|df: DataFileMetaData| {
+            !check_file_is_present_and_intact(&name_to_filepath(df.name), df.md5_digest)
+        })
+        .collect();
+
+    download_data_files(dfs_to_download);
 }
 
 fn check_or_get_data_file(df: DataFileMetaData) {
