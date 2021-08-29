@@ -12,7 +12,8 @@
    https://gist.github.com/giuliano-oliveira/4d11d6b3bb003dba3a1b53f43d81b30d
 */
 
-use std::process::Command;
+use std::io::Result;
+use std::process::{Command, ExitStatus};
 
 const DATA_DIRECTORY_PATH: &str = "data";
 const CURL_CONTAINER_NAME: &str = "Rust-Twitter-Trending-Curl-Container";
@@ -41,9 +42,24 @@ pub fn download_data_files(dfs: Vec<DataFileMetaData>) {
 
     curl_cmd = curl_cmd.args(["--name", CURL_CONTAINER_NAME]);
 
-    let await_curl_cmd: &Command = Command::new("docker").args(["wait", CURL_CONTAINER_NAME]);
-    let rm_curl_cmd: &Command = Command::new("docker").args(["rm", CURL_CONTAINER_NAME]);
+    let await_curl_cmd: &mut Command = Command::new("docker").args(["wait", CURL_CONTAINER_NAME]);
+    let rm_curl_cmd: &mut Command = Command::new("docker").args(["rm", CURL_CONTAINER_NAME]);
 
+    rm_curl_cmd.status();
 
+    assert!(
+        run_command_and_get_if_success(curl_cmd),
+        "Could not run the curl Docker image."
+    );
+    assert!(
+        run_command_and_get_if_success(await_curl_cmd),
+        "Could not wait for the curl Docker image to complete."
+    );
 
+    rm_curl_cmd.status();
+}
+
+fn run_command_and_get_if_success(cmd: &mut Command) -> bool {
+    let status: Result<ExitStatus> = cmd.status();
+    status.is_ok() && status.unwrap().success()
 }
