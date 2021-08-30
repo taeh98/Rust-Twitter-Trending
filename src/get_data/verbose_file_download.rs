@@ -56,6 +56,10 @@ pub fn download_data_files(dfs: &Vec<DataFileMetaData>) {
     rm_curl_cmd.status();
 
     assert!(
+        run_command_and_get_if_success(&mut docker_pull_cmd),
+        "Could not pull the curl Docker image."
+    );
+    assert!(
         run_command_and_get_if_success(&mut curl_cmd),
         "Could not run the curl Docker image."
     );
