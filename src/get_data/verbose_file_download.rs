@@ -36,13 +36,11 @@ pub fn download_data_files(dfs: &Vec<DataFileMetaData>) {
     }
 
     let mut curl_cmd: Command = Command::new("docker");
-    curl_cmd.args(["run", CURL_IMAGE_NAME]);
+    curl_cmd.args(["run", "--name", CURL_CONTAINER_NAME, CURL_IMAGE_NAME]);
 
     for df in dfs {
         curl_cmd.args(["-L", df.uri, "-o", name_to_filepath(df.name).as_str()]);
     }
-
-    curl_cmd.args(["--name", CURL_CONTAINER_NAME]);
 
     let mut await_curl_cmd: Command = Command::new("docker");
     await_curl_cmd.args(["wait", CURL_CONTAINER_NAME]);
