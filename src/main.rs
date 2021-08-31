@@ -122,8 +122,5 @@ fn run_rust_tweet_processing_algorithm(
         ));
     }
 
-    TweetProcessingResult {
-        name: algorithm_name,
-        time_taken_tweets_per_sec_values,
-    }
+    TweetProcessingResult::new(name: algorithm_name, time_taken_tweets_per_sec_values)
 }
