@@ -12,12 +12,14 @@
    https://gist.github.com/giuliano-oliveira/4d11d6b3bb003dba3a1b53f43d81b30d
 */
 
-use std::io::Result;
-use std::process::{Command, ExitStatus};
+use std::fs::File;
+use std::io::copy;
+
+use rayon::iter::IntoParallelIterator;
+use rayon::iter::ParallelIterator;
+use reqwest::blocking::{get, Response};
 
 const DATA_DIRECTORY_PATH: &str = "data";
-const CURL_CONTAINER_NAME: &str = "Rust-Twitter-Trending-Curl-Container";
-const CURL_IMAGE_NAME: &str = "curlimages/curl:7.78.0";
 
 #[derive(Clone, Debug)]
 pub struct DataFileMetaData<'a> {
@@ -57,41 +59,40 @@ pub fn download_data_files(dfs: &Vec<DataFileMetaData>) {
         return;
     }
 
-    let mut curl_cmd: Command = Command::new("docker");
-    curl_cmd.args(["run", "--name", CURL_CONTAINER_NAME, CURL_IMAGE_NAME]);
+    println!("Downloading data files.");
 
-    for df in dfs {
-        curl_cmd.args(["-L", df.uri, "-o", name_to_filepath(df.name).as_str()]);
-    }
-
-    let mut await_curl_cmd: Command = Command::new("docker");
-    await_curl_cmd.args(["wait", CURL_CONTAINER_NAME]);
-
-    let mut rm_curl_cmd: Command = Command::new("docker");
-    rm_curl_cmd.args(["rm", CURL_CONTAINER_NAME]);
-
-    let mut docker_pull_cmd: Command = Command::new("docker");
-    docker_pull_cmd.args(["pull", CURL_IMAGE_NAME]);
-
-    rm_curl_cmd.status();
-
-    assert!(
-        run_command_and_get_if_success(&mut docker_pull_cmd),
-        "Could not pull the curl Docker image."
-    );
-    assert!(
-        run_command_and_get_if_success(&mut curl_cmd),
-        "Could not run the curl Docker image."
-    );
-    assert!(
-        run_command_and_get_if_success(&mut await_curl_cmd),
-        "Could not wait for the curl Docker image to complete."
-    );
-
-    rm_curl_cmd.status();
+    dfs.into_par_iter()
+        .for_each(|df: &DataFileMetaData| download_data_file(df));
 }
 
-fn run_command_and_get_if_success(cmd: &mut Command) -> bool {
-    let status: Result<ExitStatus> = cmd.status();
-    status.is_ok() && status.unwrap().success()
+fn download_data_file(df: &DataFileMetaData) {
+    println!("Starting to download the data file {}.", df.get_file_name());
+
+    let file_path: String = df.get_file_path();
+    let response: Response = get(df.get_url())
+        .expect(format!("Failed to download the data file {}.", df.get_file_name()).as_str());
+    let bytes: Vec<u8> = response
+        .bytes()
+        .expect(
+            format!(
+                "Failed to get the bytes content of the downloaded data file {}.",
+                df.get_file_name()
+            )
+            .as_str(),
+        )
+        .to_vec();
+    let mut current_dataset_file_contents: &[u8] = bytes.as_slice();
+
+    let mut out = File::create(&file_path)
+        .expect(format!("Failed to create the data file \"{}\".", &file_path).as_str());
+
+    copy(&mut current_dataset_file_contents, &mut out).expect(
+        format!(
+            "Failed to copy content to the data file \"{}\".",
+            &file_path
+        )
+        .as_str(),
+    );
+
+    println!("Finished downloading the data file {}.", df.get_file_name());
 }
