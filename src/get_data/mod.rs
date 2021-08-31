@@ -30,7 +30,10 @@ pub fn check_or_get_tweets_data() {
     let dfs_to_get: Vec<DataFileMetaData> = data_files
         .into_par_iter()
         .filter(|df: &DataFileMetaData| {
-            !check_file_is_present_and_intact(&name_to_filepath(df.name), df.md5_digest)
+            !check_file_is_present_and_intact(
+                &file_name_to_filepath(df.get_file_name()),
+                df.get_md5_digest(),
+            )
         })
         .collect();
 
