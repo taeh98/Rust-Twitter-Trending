@@ -107,7 +107,11 @@ fn download_data_file(df: &DataFileMetaData) {
         df.get_file_name()
     );
 
-    copy(&mut response, &mut out).expect(
+    // let res_bytes = response.bytes().expect("failed to get bytes");
+    // let res_bytes_vec: Vec<u8> = res_bytes.to_vec();
+    // let mut res_bytes_slice: &[u8] = res_bytes_vec.as_slice();
+
+    response.copy_to(&mut out).expect(
         format!(
             "Failed to save the downloaded content of the data file {} to its output file.",
             &file_path
