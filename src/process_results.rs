@@ -71,7 +71,7 @@ fn write_results_csv(results: &Vec<TweetProcessingResult>) {
 
     let time_taken_values_series: Series = gen_time_taken_or_processing_speed_series(true, results);
     let processing_speed_values_series: Series =
-        gen_time_taken_or_processing_speed_series(true, results);
+        gen_time_taken_or_processing_speed_series(false, results);
 
     let df: DataFrame = DataFrame::new(vec![algorithm_names_series, time_taken_values_series, processing_speed_values_series])
         .expect("Failed to generate a dataframe to save the results in write_results_csv() in process_results.rs.");
