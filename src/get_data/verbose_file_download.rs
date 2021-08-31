@@ -13,7 +13,6 @@
 */
 
 use std::fs::File;
-use std::io::copy;
 
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
