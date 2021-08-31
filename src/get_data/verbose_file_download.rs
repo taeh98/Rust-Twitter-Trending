@@ -107,7 +107,13 @@ fn download_data_file(df: &DataFileMetaData) {
         df.get_file_name()
     );
 
-    copy(&mut response, &mut out).expect("failed to copy content");
+    copy(&mut response, &mut out).expect(
+        format!(
+            "Failed to save the downloaded content of the data file {} to its output file.",
+            &file_path
+        )
+        .as_str(),
+    );
 
     println!("Finished downloading the data file {}.", df.get_file_name());
 }
