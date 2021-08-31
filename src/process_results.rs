@@ -1,4 +1,5 @@
-use std::fs::File;
+use std::fs::{create_dir, File};
+use std::path::Path;
 
 use polars::frame::DataFrame;
 use polars::io::SerWriter;
@@ -10,7 +11,7 @@ use rayon::prelude::IntoParallelIterator;
 
 use crate::{TimeTakenTweetProcessingSpeedValuePair, TweetProcessingResult};
 
-const OUTPUT_FILES_DIRECTORY: &str = "/out";
+const OUTPUT_FILES_DIRECTORY: &str = "./out";
 const RAW_RESULTS_FILE_NAME: &str = "results.csv";
 
 pub fn process_results(algorithm_results: Vec<TweetProcessingResult>) {
@@ -82,6 +83,10 @@ fn write_results_csv(results: &Vec<TweetProcessingResult>) {
 
     let df: DataFrame = DataFrame::new(vec![algorithm_names_series, time_taken_values_series, processing_speed_values_series])
         .expect("Failed to generate a dataframe to save the results in write_results_csv() in process_results.rs.");
+
+    if !Path::new(OUTPUT_FILES_DIRECTORY).exists() {
+        create_dir(OUTPUT_FILES_DIRECTORY).expect("Couldn't create the out/ directory.");
+    }
 
     let file_path: String = format!("{}/{}", OUTPUT_FILES_DIRECTORY, RAW_RESULTS_FILE_NAME);
     let mut output_file: File = File::create(file_path).expect("could not create file");
