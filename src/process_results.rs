@@ -1,10 +1,17 @@
+use std::fs::File;
+
 use polars::frame::DataFrame;
+use polars::io::SerWriter;
+use polars::prelude::CsvWriter;
 use polars::prelude::NamedFrom;
 use polars::series::Series;
 use rayon::iter::ParallelIterator;
 use rayon::prelude::IntoParallelIterator;
 
 use crate::{TimeTakenTweetProcessingSpeedValuePair, TweetProcessingResult};
+
+const OUTPUT_FILES_DIRECTORY: &str = "/out";
+const RAW_RESULTS_FILE_NAME: &str = "results.csv";
 
 pub fn process_results(algorithm_results: Vec<TweetProcessingResult>) {
     //TODO: write the results to a csv (use polars), make stats measurements (use statrs), and make visualisations of them (use plotters)
@@ -75,4 +82,11 @@ fn write_results_csv(results: &Vec<TweetProcessingResult>) {
 
     let df: DataFrame = DataFrame::new(vec![algorithm_names_series, time_taken_values_series, processing_speed_values_series])
         .expect("Failed to generate a dataframe to save the results in write_results_csv() in process_results.rs.");
+
+    let file_path: String = format!("{}/{}", OUTPUT_FILES_DIRECTORY, RAW_RESULTS_FILE_NAME);
+    let mut output_file: File = File::create(file_path).expect("could not create file");
+
+    CsvWriter::new(&mut output_file)
+        .has_headers(true)
+        .finish(&df);
 }
