@@ -71,6 +71,13 @@ fn download_data_file(df: &DataFileMetaData) {
     let file_path: String = df.get_file_path();
     let response: Response = get(df.get_url())
         .expect(format!("Failed to download the data file {}.", df.get_file_name()).as_str());
+
+    assert!(
+        response.status().is_success(),
+        "The request to download the data file {} failed.",
+        df.get_file_name()
+    );
+
     let bytes: Vec<u8> = response
         .bytes()
         .expect(
