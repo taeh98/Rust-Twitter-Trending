@@ -69,7 +69,7 @@ fn download_data_file(df: &DataFileMetaData) {
     println!("Starting to download the data file {}.", df.get_file_name());
 
     let file_path: String = df.get_file_path();
-    let response: Response = get(df.get_url())
+    let mut response: Response = get(df.get_url())
         .expect(format!("Failed to download the data file {}.", df.get_file_name()).as_str());
 
     assert!(
@@ -94,28 +94,20 @@ fn download_data_file(df: &DataFileMetaData) {
         );
     }
 
-    let bytes: Vec<u8> = response
-        .bytes()
-        .expect(
-            format!(
-                "Failed to get the bytes content of the downloaded data file {}.",
-                df.get_file_name()
-            )
-            .as_str(),
-        )
-        .to_vec();
-    let mut current_dataset_file_contents: &[u8] = bytes.as_slice();
-
-    let mut out = File::create(&file_path)
-        .expect(format!("Failed to create the data file \"{}\".", &file_path).as_str());
-
-    copy(&mut current_dataset_file_contents, &mut out).expect(
+    let mut out: File = File::create(&file_path).expect(
         format!(
-            "Failed to copy content to the data file \"{}\".",
+            "Couldn't create the output file to which to save the data file {}.",
             &file_path
         )
         .as_str(),
     );
+
+    println!(
+        "Copying the downloaded data file contents {} to its output file.",
+        df.get_file_name()
+    );
+
+    copy(&mut response, &mut out).expect("failed to copy content");
 
     println!("Finished downloading the data file {}.", df.get_file_name());
 }
