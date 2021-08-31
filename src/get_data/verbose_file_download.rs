@@ -21,12 +21,34 @@ const CURL_IMAGE_NAME: &str = "curlimages/curl:7.78.0";
 
 #[derive(Clone, Debug)]
 pub struct DataFileMetaData<'a> {
-    pub name: &'a str,
-    pub md5_digest: &'a str,
-    pub uri: &'a str,
+    file_name: &'a str,
+    md5_digest: &'a str,
+    url: &'a str,
 }
 
-pub fn name_to_filepath(name: &str) -> String {
+impl<'a> DataFileMetaData<'a> {
+    pub fn new<'b>(file_name: &'b str, md5_digest: &'b str, url: &'b str) -> DataFileMetaData<'b> {
+        DataFileMetaData {
+            file_name,
+            md5_digest,
+            url,
+        }
+    }
+    pub fn get_file_name(&self) -> &str {
+        self.file_name
+    }
+    pub fn get_file_path(&self) -> String {
+        file_name_to_filepath(self.get_file_name())
+    }
+    pub fn get_md5_digest(&self) -> &str {
+        self.md5_digest
+    }
+    pub fn get_url(&self) -> &str {
+        self.url
+    }
+}
+
+pub fn file_name_to_filepath(name: &str) -> String {
     format!("{}/{}", DATA_DIRECTORY_PATH, name)
 }
 
