@@ -78,6 +78,22 @@ fn download_data_file(df: &DataFileMetaData) {
         df.get_file_name()
     );
 
+    if response.headers().contains_key("content-md5") {
+        let actual_digest = response
+            .headers()
+            .get("content-md5")
+            .unwrap()
+            .to_str()
+            .unwrap();
+
+        assert_eq!(actual_digest, df.get_md5_digest(),
+                   "The request to download the data file {} gave an MD5 checksum digest of {} when the expected value was {}.",
+            df.get_file_name(),
+                   actual_digest,
+            df.get_md5_digest()
+        );
+    }
+
     let bytes: Vec<u8> = response
         .bytes()
         .expect(
