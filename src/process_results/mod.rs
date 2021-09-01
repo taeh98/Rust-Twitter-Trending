@@ -56,6 +56,9 @@ pub fn process_results(algorithm_results: Vec<TweetProcessingResult>) {
     let processing_speed_values: Vec<Vec<f64>> =
         gen_time_taken_or_processing_speed_values(&algorithm_results, false);
 
+    assert_eq!(algorithm_names.len(), time_taken_values.len());
+    assert_eq!(processing_speed_values.len(), time_taken_values.len());
+
     write_results_csv(&algorithm_results);
     make_visualisations::make_visualisations(
         &algorithm_names,
