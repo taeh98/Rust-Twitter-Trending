@@ -32,23 +32,55 @@ fn find_mean(values: &Vec<f64>) -> f64 {
     values.iter().sum::<f64>() / values.len() as f64
 }
 
+fn find_median(values: &mut Vec<f64>) -> f64 {
+    OrderStatistics::median(values)
+}
+
+fn find_mode(numbers: &Vec<f64>) -> f64 {
+    let mut map: HashMap<f64, f64> = HashMap::new();
+    for integer in numbers {
+        let count = map.entry(*integer).or_insert(0.0);
+        *count += 1;
+    }
+
+    let max_value = map.values().cloned().max().unwrap_or(0.0);
+
+    map.into_iter()
+        .filter(|&(_, v)| v == max_value)
+        .map(|(&k, _)| k)
+        .collect()
+}
+
 fn make_bar_charts(
     algorithm_names: &Vec<String>,
     time_taken_values: &Vec<Vec<f64>>,
     processing_speed_values: &Vec<Vec<f64>>,
 ) {
-    let means: Vec<f64> = time_taken_values
+    let mean_time_taken_values: Vec<f64> = time_taken_values
         .into_par_iter()
         .map(|values: &Vec<f64>| find_mean(values))
         .collect();
-    gen_bar_chart(
-        algorithm_names,
-        &means,
-        "./out/tst_path.svg",
-        "tst title",
-        "y axis units",
-        "x axis units",
-    );
+    let median_time_taken_values: Vec<f64> = time_taken_values
+        .into_par_iter()
+        .map(|values: &Vec<f64>| find_median(values))
+        .collect();
+    let mode_time_taken_values: Vec<f64> = time_taken_values
+        .into_par_iter()
+        .map(|values: &Vec<f64>| find_mode(values))
+        .collect();
+
+    let mean_processing_speed_values: Vec<f64> = processing_speed_values
+        .into_par_iter()
+        .map(|values: &Vec<f64>| find_mean(values))
+        .collect();
+    let median_processing_speed_values: Vec<f64> = processing_speed_values
+        .into_par_iter()
+        .map(|values: &Vec<f64>| find_median(values))
+        .collect();
+    let mode_processing_speed_values: Vec<f64> = processing_speed_values
+        .into_par_iter()
+        .map(|values: &Vec<f64>| find_mode(values))
+        .collect();
 }
 
 fn gen_bar_chart(
