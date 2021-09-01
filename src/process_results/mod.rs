@@ -82,7 +82,7 @@ fn write_results_csv(results: &Vec<TweetProcessingResult>) {
         gen_time_taken_or_processing_speed_series(false, results);
 
     let df: DataFrame = DataFrame::new(vec![algorithm_names_series, time_taken_values_series, processing_speed_values_series])
-        .expect("Failed to generate a dataframe to save the results in write_results_csv() in process_results.rs.");
+        .expect("Failed to generate a dataframe to save the results in write_results_csv() in the process_results module");
 
     if !Path::new(OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(OUTPUT_FILES_DIRECTORY).expect("Couldn't create the out/ directory.");
@@ -94,5 +94,5 @@ fn write_results_csv(results: &Vec<TweetProcessingResult>) {
     CsvWriter::new(&mut output_file)
         .has_headers(true)
         .finish(&df)
-        .expect("Failed to write the CSV file of raw results in write_results_csv() in process_results.rs.");
+        .expect("Failed to write the CSV file of raw results in write_results_csv() in the process_results module");
 }
