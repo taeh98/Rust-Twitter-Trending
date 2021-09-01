@@ -93,5 +93,6 @@ fn write_results_csv(results: &Vec<TweetProcessingResult>) {
 
     CsvWriter::new(&mut output_file)
         .has_headers(true)
-        .finish(&df);
+        .finish(&df)
+        .expect("Failed to write the CSV file of raw results in write_results_csv() in process_results.rs.");
 }
