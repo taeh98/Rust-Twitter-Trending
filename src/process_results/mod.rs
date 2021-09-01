@@ -11,34 +11,16 @@ use rayon::prelude::IntoParallelIterator;
 
 use crate::{TimeTakenTweetProcessingSpeedValuePair, TweetProcessingResult};
 
+mod make_stats;
+mod make_visualisations;
+
 const OUTPUT_FILES_DIRECTORY: &str = "./out";
 const RAW_RESULTS_FILE_NAME: &str = "results.csv";
 
 pub fn process_results(algorithm_results: Vec<TweetProcessingResult>) {
-    //TODO: write the results to a csv (use polars), make stats measurements (use statrs), and make visualisations of them (use plotters)
-    //TODO: figure out how to do this analysis in an environment like a Jupyter notebook - use Evcxr with Jupyter? Or Google Colab?
     write_results_csv(&algorithm_results);
-
-    /*
-
-    VISUALISATIONS
-    bar chart of mean time taken and tweets per second for each algorithm
-    box plots of each value of times taken and tweets per second rates for each algorithm
-    dot plots of each value of times taken and tweets per second rates for each algorithm
-    scatter plot of test number and time taken and test number and tweets/second for each algorithm
-
-    STATS (indented are non-parametric alternatives to above parametric tests)
-    mean, median, mode, std dev, variance, IQR of times taken and processing speeds for each algorithm
-    independent samples t-tests between times taken and tweets per second rates of all algorithms
-        Wilcoxon Rank-Sum tests between times taken and tweets per second rates of all algorithms
-    one-way anova tests between times taken and tweets per second rates of all algorithms
-        Kruskal Wallis H Tests between times taken and tweets per second rates of all algorithms
-    Chi-squared test to see how dependent the categorical variables (Rust or Python and serial or parallel) are
-    Phi coefficient to see how associated the categorical variables (Rust or Python and serial or parallel) are
-    F-test to compare the variances of the samples
-    pearson and spearman correlation coefficients for test number vs time taken for all algorithms
-
-    */
+    make_visualisations::make_visualisations(&algorithm_results);
+    make_stats::make_stats(&algorithm_results);
 }
 
 fn gen_time_taken_or_processing_speed_series(
