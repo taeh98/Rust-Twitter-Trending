@@ -16,8 +16,8 @@ use rayon::prelude::ParallelSliceMut;
 
 use crate::TweetProcessingResult;
 
-const CHART_WIDTH_PIXELS: isize = 2000;
-const CHART_HEIGHT_PIXELS: isize = 1500;
+const CHART_WIDTH_PIXELS: isize = 1000;
+const CHART_HEIGHT_PIXELS: isize = 750;
 
 //TODO: implement this with plotters (?)
 pub fn make_visualisations(
@@ -28,21 +28,51 @@ pub fn make_visualisations(
     make_bar_charts(algorithm_names, time_taken_values, processing_speed_values);
 }
 
+fn find_mean(values: &Vec<f64>) -> f64 {
+    values.iter().sum::<f64>() / values.len() as f64
+}
+
 fn make_bar_charts(
     algorithm_names: &Vec<String>,
     time_taken_values: &Vec<Vec<f64>>,
     processing_speed_values: &Vec<Vec<f64>>,
 ) {
-    println!("make_visualisations()");
+    let means: Vec<f64> = time_taken_values
+        .into_par_iter()
+        .map(|values: &Vec<f64>| find_mean(values))
+        .collect();
+    gen_bar_chart(
+        algorithm_names,
+        &means,
+        "./out/tst_path.svg",
+        "tst title",
+        "y axis units",
+        "x axis units",
+    );
 }
 
-fn gen_bar_chart(category_names: &Vec<String>, values: &Vec<f64>) {
+fn gen_bar_chart(
+    category_names: &Vec<String>,
+    values_in: &Vec<f64>,
+    filepath: &str,
+    title: &str,
+    y_axis_label: &str,
+    x_axis_label: &str,
+) {
     // Define chart related sizes.
     let (top, right, bottom, left) = (90, 40, 50, 60);
 
-    let max_value: f64 = values
+    let values: Vec<f32> = values_in
         .into_par_iter()
-        .reduce_with(|a: &f64, b: &f64| if a > b { a } else { b })
+        .map(|val: &f64| val.clone() as f32)
+        .collect();
+
+    assert_eq!(category_names.len(), (&values).len());
+
+    let max_value: f32 = values
+        .clone()
+        .into_par_iter()
+        .reduce_with(|a: f32, b: f32| if a > b { a } else { b })
         .unwrap()
         .clone();
 
@@ -60,11 +90,17 @@ fn gen_bar_chart(category_names: &Vec<String>, values: &Vec<f64>) {
     // in top left corner, while chart's origin is in bottom left corner, hence we need to invert
     // the range on Y axis for the chart to display as though its origin is at bottom left.
     let y = ScaleLinear::new()
-        .set_domain(vec![0.0, 100.0])
+        .set_domain(vec![0.0, (1.1 * max_value).round()])
         .set_range(vec![CHART_HEIGHT_PIXELS - top - bottom, 0]);
 
     // You can use your own iterable as data as long as its items implement the `BarDatum` trait.
-    let data = vec![("A", 90), ("B", 10), ("C", 30)];
+    let data: Vec<(String, f32)> = category_names
+        .iter()
+        .zip(values.clone().iter())
+        .collect::<Vec<(&String, &f32)>>()
+        .into_par_iter()
+        .map(|val: (&String, &f32)| (val.0.clone(), val.1.clone()))
+        .collect();
 
     // Create VerticalBar view that is going to represent the data as vertical bars.
     let view = VerticalBarView::new()
@@ -78,12 +114,12 @@ fn gen_bar_chart(category_names: &Vec<String>, values: &Vec<f64>) {
         .set_width(CHART_WIDTH_PIXELS)
         .set_height(CHART_HEIGHT_PIXELS)
         .set_margins(top, right, bottom, left)
-        .add_title(String::from("Bar Chart"))
+        .add_title(String::from(title))
         .add_view(&view)
         .add_axis_bottom(&x)
         .add_axis_left(&y)
-        .add_left_axis_label("Units of Measurement")
-        .add_bottom_axis_label("Categories")
-        .save("vertical-bar-chart.svg")
+        .add_left_axis_label(y_axis_label)
+        .add_bottom_axis_label(x_axis_label)
+        .save(filepath)
         .unwrap();
 }
