@@ -1,3 +1,7 @@
+/*
+  bar chart of mean, median, and mode time taken and tweets per second for each algorithm
+*/
+
 use std::fs::create_dir;
 use std::path::Path;
 
