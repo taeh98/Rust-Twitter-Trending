@@ -24,3 +24,4 @@ serde = { version = "1.0.127", features = ["derive"] }
 charts = "0.3.0"
 statrs = "0.15.0"
 const_format = "0.2.15"
+plotters = "^0.3.1"
