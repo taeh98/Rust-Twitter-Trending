@@ -7,7 +7,11 @@
    scatter plot of test number and time taken and test number and tweets/second for each algorithm
 */
 
+use std::fs::create_dir;
+use std::path::Path;
+
 use charts::{Chart, ScaleBand, ScaleLinear, VerticalBarView};
+use const_format::concatcp;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 use statrs::statistics::Distribution;
@@ -15,6 +19,31 @@ use statrs::statistics::{Data, OrderStatistics};
 
 const CHART_WIDTH_PIXELS: isize = 1000;
 const CHART_HEIGHT_PIXELS: isize = 750;
+const OUTPUT_FILES_DIRECTORY: &'static str = "./out/visualisations";
+const BAR_CHART_OUTPUT_FILES_DIRECTORY: &'static str =
+    concatcp!(OUTPUT_FILES_DIRECTORY, "/bar_charts") as &'static str;
+
+#[derive(Clone, Copy)]
+enum Average {
+    Mean,
+    Median,
+    Mode,
+}
+
+fn average_to_string(av: Average) -> String {
+    match av {
+        Average::Mean => String::from("mean"),
+        Average::Median => String::from("median"),
+        _ => String::from("mode"),
+    }
+}
+
+const ALL_AVERAGES: [Average; 3] = [Average::Mean, Average::Median, Average::Mode];
+
+enum Variable {
+    TimeTaken,
+    ProcessingSpeed,
+}
 
 //TODO: implement this with plotters (?)
 pub fn make_visualisations(
@@ -22,6 +51,10 @@ pub fn make_visualisations(
     time_taken_values: &Vec<Vec<f64>>,
     processing_speed_values: &Vec<Vec<f64>>,
 ) {
+    if !Path::new(OUTPUT_FILES_DIRECTORY).exists() {
+        create_dir(OUTPUT_FILES_DIRECTORY)
+            .expect("Couldn't create the out/visualisations/ directory.");
+    }
     make_bar_charts(algorithm_names, time_taken_values, processing_speed_values);
 }
 
@@ -42,60 +75,95 @@ fn find_mode(values: &Vec<f64>) -> f64 {
     find_mean(values)
 }
 
+fn gen_value_lists_averages(values_list: &Vec<Vec<f64>>, average_type: Average) -> Vec<f64> {
+    values_list
+        .into_par_iter()
+        .map(|values: &Vec<f64>| match average_type {
+            Average::Mean => find_mean(values),
+            Average::Median => find_median(values),
+            _ => find_mode(values),
+        })
+        .collect()
+}
+
 fn make_bar_charts(
     algorithm_names: &Vec<String>,
     time_taken_values: &Vec<Vec<f64>>,
     processing_speed_values: &Vec<Vec<f64>>,
 ) {
-    let mean_time_taken_values: Vec<f64> = time_taken_values
-        .into_par_iter()
-        .map(|values: &Vec<f64>| find_mean(values))
-        .collect();
-    let median_time_taken_values: Vec<f64> = time_taken_values
-        .into_par_iter()
-        .map(|values: &Vec<f64>| find_median(values))
-        .collect();
-    let mode_time_taken_values: Vec<f64> = time_taken_values
-        .into_par_iter()
-        .map(|values: &Vec<f64>| find_mode(values))
-        .collect();
+    if !Path::new(BAR_CHART_OUTPUT_FILES_DIRECTORY).exists() {
+        create_dir(BAR_CHART_OUTPUT_FILES_DIRECTORY)
+            .expect("Couldn't create the out/visualisations/ directory.");
+    }
 
-    gen_time_taken_bar_chart(algorithm_names, &mean_time_taken_values, "mean");
-
-    let mean_processing_speed_values: Vec<f64> = processing_speed_values
-        .into_par_iter()
-        .map(|values: &Vec<f64>| find_mean(values))
-        .collect();
-    let median_processing_speed_values: Vec<f64> = processing_speed_values
-        .into_par_iter()
-        .map(|values: &Vec<f64>| find_median(values))
-        .collect();
-    let mode_processing_speed_values: Vec<f64> = processing_speed_values
-        .into_par_iter()
-        .map(|values: &Vec<f64>| find_mode(values))
-        .collect();
+    [
+        (Variable::TimeTaken, time_taken_values),
+        (Variable::ProcessingSpeed, processing_speed_values),
+    ]
+    .into_par_iter()
+    .for_each(|var_name_val_pair: (Variable, &Vec<Vec<f64>>)| {
+        ALL_AVERAGES
+            .into_par_iter()
+            .for_each(|average_type: Average| {
+                let values: Vec<f64> = gen_value_lists_averages(var_name_val_pair.1, average_type);
+                match var_name_val_pair.0 {
+                    Variable::ProcessingSpeed => {
+                        gen_processing_speed_bar_chart(algorithm_names, &values, average_type)
+                    }
+                    _ => gen_time_taken_bar_chart(algorithm_names, &values, average_type),
+                }
+            });
+    });
 }
 
 fn gen_time_taken_bar_chart(
-    category_names: &Vec<String>,
+    algorithm_names: &Vec<String>,
     values_in: &Vec<f64>,
-    average_type: &str,
+    average_type: Average,
 ) {
+    let average_string: String = average_to_string(average_type);
     gen_bar_chart(
-        category_names,
+        algorithm_names,
         values_in,
         format!(
-            "./out/{}_time_taken_values.svg",
-            average_type.to_lowercase()
+            "{}/{}_time_taken_values.svg",
+            BAR_CHART_OUTPUT_FILES_DIRECTORY,
+            average_string.to_lowercase()
         )
         .as_str(),
         format!(
             "{}{} time taken values for different algorithms",
-            average_type.get(0..=0).unwrap().to_uppercase(),
-            average_type.get(1..).unwrap()
+            average_string.get(0..=0).unwrap().to_uppercase(),
+            average_string.get(1..).unwrap().to_lowercase()
         )
         .as_str(),
         "Time taken (seconds)",
+        "Algorithm",
+    );
+}
+
+fn gen_processing_speed_bar_chart(
+    algorithm_names: &Vec<String>,
+    values_in: &Vec<f64>,
+    average_type: Average,
+) {
+    let average_string: String = average_to_string(average_type);
+    gen_bar_chart(
+        algorithm_names,
+        values_in,
+        format!(
+            "{}/{}_processing_speed_values.svg",
+            BAR_CHART_OUTPUT_FILES_DIRECTORY,
+            average_string.to_lowercase()
+        )
+        .as_str(),
+        format!(
+            "{}{} tweet processing speeds for different algorithms",
+            average_string.get(0..=0).unwrap().to_uppercase(),
+            average_string.get(1..).unwrap().to_lowercase()
+        )
+        .as_str(),
+        "Processing speed (tweets/second)",
         "Algorithm",
     );
 }

@@ -23,3 +23,4 @@ flate2 = "1.0.20"
 serde = { version = "1.0.127", features = ["derive"] }
 charts = "0.3.0"
 statrs = "0.15.0"
+const_format = "0.2.15"
