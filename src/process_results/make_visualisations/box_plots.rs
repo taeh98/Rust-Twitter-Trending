@@ -74,7 +74,10 @@ fn gen_box_plot(
     let mut chart = ChartBuilder::on(&root)
         .x_label_area_size(40)
         .y_label_area_size(40)
-        .caption(variable_to_string(variable), ("sans-serif", 20))
+        .caption(
+            format!("{} of different algorithms", variable_to_string(variable)),
+            ("sans-serif", 20),
+        )
         .build_cartesian_2d(
             ab_axis[..].into_segmented(),
             values_range.start - 10.0..values_range.end + 10.0,
