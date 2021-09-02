@@ -7,14 +7,11 @@
    scatter plot of test number and time taken and test number and tweets/second for each algorithm
 */
 
-use std::cmp::max;
-
 use charts::{Chart, ScaleBand, ScaleLinear, VerticalBarView};
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
-use rayon::prelude::ParallelSliceMut;
-
-use crate::TweetProcessingResult;
+use statrs::statistics::Distribution;
+use statrs::statistics::{Data, OrderStatistics};
 
 const CHART_WIDTH_PIXELS: isize = 1000;
 const CHART_HEIGHT_PIXELS: isize = 750;
@@ -29,26 +26,20 @@ pub fn make_visualisations(
 }
 
 fn find_mean(values: &Vec<f64>) -> f64 {
-    values.iter().sum::<f64>() / values.len() as f64
+    let mut clone = values.clone();
+    let slice = clone.as_mut_slice();
+    Data::new(slice).mean().unwrap()
 }
 
-fn find_median(values: &mut Vec<f64>) -> f64 {
-    OrderStatistics::median(values)
+fn find_median(values: &Vec<f64>) -> f64 {
+    let mut clone = values.clone();
+    let slice = clone.as_mut_slice();
+    Data::new(slice).median()
 }
 
-fn find_mode(numbers: &Vec<f64>) -> f64 {
-    let mut map: HashMap<f64, f64> = HashMap::new();
-    for integer in numbers {
-        let count = map.entry(*integer).or_insert(0.0);
-        *count += 1;
-    }
-
-    let max_value = map.values().cloned().max().unwrap_or(0.0);
-
-    map.into_iter()
-        .filter(|&(_, v)| v == max_value)
-        .map(|(&k, _)| k)
-        .collect()
+fn find_mode(values: &Vec<f64>) -> f64 {
+    //TODO: do this properly
+    find_mean(values)
 }
 
 fn make_bar_charts(
@@ -69,6 +60,8 @@ fn make_bar_charts(
         .map(|values: &Vec<f64>| find_mode(values))
         .collect();
 
+    gen_time_taken_bar_chart(algorithm_names, &mean_time_taken_values, "mean");
+
     let mean_processing_speed_values: Vec<f64> = processing_speed_values
         .into_par_iter()
         .map(|values: &Vec<f64>| find_mean(values))
@@ -81,6 +74,30 @@ fn make_bar_charts(
         .into_par_iter()
         .map(|values: &Vec<f64>| find_mode(values))
         .collect();
+}
+
+fn gen_time_taken_bar_chart(
+    category_names: &Vec<String>,
+    values_in: &Vec<f64>,
+    average_type: &str,
+) {
+    gen_bar_chart(
+        category_names,
+        values_in,
+        format!(
+            "./out/{}_time_taken_values.svg",
+            average_type.to_lowercase()
+        )
+        .as_str(),
+        format!(
+            "{}{} time taken values for different algorithms",
+            average_type.get(0..=0).unwrap().to_uppercase(),
+            average_type.get(1..).unwrap()
+        )
+        .as_str(),
+        "Time taken (seconds)",
+        "Algorithm",
+    );
 }
 
 fn gen_bar_chart(
