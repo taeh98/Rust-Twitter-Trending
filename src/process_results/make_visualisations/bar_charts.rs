@@ -11,7 +11,7 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use statrs::statistics::{Data, Distribution, OrderStatistics};
 
 use crate::process_results::make_visualisations::{
-    CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
+    Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
 
 #[derive(Clone, Copy)]
@@ -32,11 +32,6 @@ fn average_to_string(av: Average) -> String {
 const ALL_AVERAGES: [Average; 3] = [Average::Mean, Average::Median, Average::Mode];
 const BAR_CHART_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/bar_charts") as &'static str;
-
-enum Variable {
-    TimeTaken,
-    ProcessingSpeed,
-}
 
 fn find_mean(values: &Vec<f64>) -> f64 {
     let mut clone = values.clone();

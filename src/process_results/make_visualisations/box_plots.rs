@@ -10,9 +10,11 @@ use std::io::{self, prelude::*, BufReader};
 use const_format::concatcp;
 use plotters::data::fitting_range;
 use plotters::prelude::*;
+use rayon::iter::IntoParallelIterator;
+use rayon::iter::ParallelIterator;
 
 use crate::process_results::make_visualisations::{
-    CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
+    variable_to_string, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
 
 const BOX_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
@@ -23,6 +25,21 @@ pub(crate) fn make_box_plots(
     algorithm_names: &Vec<String>,
     time_taken_values: &Vec<Vec<f64>>,
     processing_speed_values: &Vec<Vec<f64>>,
+) {
+    [
+        (Variable::TimeTaken, time_taken_values),
+        (Variable::ProcessingSpeed, processing_speed_values),
+    ]
+    .into_par_iter()
+    .for_each(|var_values_pair: (Variable, &Vec<Vec<f64>>)| {
+        gen_box_plot(algorithm_names, var_values_pair.1, var_values_pair.0)
+    })
+}
+
+fn gen_box_plot(
+    algorithm_names: &Vec<String>,
+    time_taken_values: &Vec<Vec<f64>>,
+    variable: Variable,
 ) {
     let root = SVGBackend::new(
         OUT_FILE_NAME,
@@ -36,7 +53,10 @@ pub(crate) fn make_box_plots(
     ]);
     let quartiles_b = Quartiles::new(&[16.0, 17.0, 50.0, 60.0, 40.2, 41.3, 42.7, 43.3, 47.0]);
 
-    let ab_axis = ["a", "b"];
+    let ab_axis: Vec<&str> = algorithm_names
+        .into_par_iter()
+        .map(|val: &String| val.as_str())
+        .collect::<Vec<&str>>();
 
     let values_range = fitting_range(
         quartiles_a
@@ -47,7 +67,7 @@ pub(crate) fn make_box_plots(
     let mut chart = ChartBuilder::on(&root)
         .x_label_area_size(40)
         .y_label_area_size(40)
-        .caption("Vertical Boxplot", ("sans-serif", 20))
+        .caption(variable_to_string(variable), ("sans-serif", 20))
         .build_cartesian_2d(
             ab_axis[..].into_segmented(),
             values_range.start - 10.0..values_range.end + 10.0,
@@ -68,5 +88,4 @@ pub(crate) fn make_box_plots(
 
     // To avoid the IO failure being ignored silently, we manually call the present function
     root.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");
-    println!("Result has been saved to {}", OUT_FILE_NAME);
 }

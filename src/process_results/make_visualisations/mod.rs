@@ -15,6 +15,18 @@ const OUTPUT_FILES_DIRECTORY: &'static str = "./out/visualisations";
 mod bar_charts;
 mod box_plots;
 
+enum Variable {
+    TimeTaken,
+    ProcessingSpeed,
+}
+
+fn variable_to_string(var: Variable) -> String {
+    match var {
+        Variable::TimeTaken => String::from("Time taken"),
+        _ => String::from("Processing speed"),
+    }
+}
+
 //TODO: implement this with plotters (?)
 pub fn make_visualisations(
     algorithm_names: &Vec<String>,
