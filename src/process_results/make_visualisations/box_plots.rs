@@ -48,10 +48,10 @@ fn gen_box_plot(
     .into_drawing_area();
     root.fill(&WHITE).unwrap();
 
-    let quartiles_a = Quartiles::new(&[
-        6.0, 7.0, 15.9, 36.9, 39.0, 40.0, 41.0, 42.0, 43.0, 47.0, 49.0,
-    ]);
-    let quartiles_b = Quartiles::new(&[16.0, 17.0, 50.0, 60.0, 40.2, 41.3, 42.7, 43.3, 47.0]);
+    let quartiles: Vec<Quartiles> = time_taken_values
+        .into_par_iter()
+        .map(|values: &Vec<f64>| Quartiles::new(values.as_slice()))
+        .collect();
 
     let ab_axis: Vec<&str> = algorithm_names
         .into_par_iter()
@@ -59,11 +59,18 @@ fn gen_box_plot(
         .collect::<Vec<&str>>();
 
     let values_range = fitting_range(
-        quartiles_a
-            .values()
-            .iter()
-            .chain(quartiles_b.values().iter()),
+        (&quartiles)
+            .into_par_iter()
+            .map(|quartiles: &Quartiles| quartiles.values().to_vec())
+            .reduce_with(|a: Vec<f32>, b: Vec<f32>| {
+                let mut mut_a: Vec<f32> = a.clone();
+                mut_a.append(b.clone().as_mut());
+                return a;
+            })
+            .unwrap()
+            .as_slice(),
     );
+
     let mut chart = ChartBuilder::on(&root)
         .x_label_area_size(40)
         .y_label_area_size(40)
@@ -79,11 +86,23 @@ fn gen_box_plot(
         .light_line_style(&WHITE)
         .draw()
         .unwrap();
+
+    let str_algorithm_names: Vec<&str> = algorithm_names
+        .into_par_iter()
+        .map(|name: &String| name.as_str())
+        .collect();
+
+    let names_quartiles: Vec<(&&str, &Quartiles)> =
+        str_algorithm_names.iter().zip(&quartiles).collect();
+
     chart
-        .draw_series(vec![
-            Boxplot::new_vertical(SegmentValue::CenterOf(&"a"), &quartiles_a),
-            Boxplot::new_vertical(SegmentValue::CenterOf(&"b"), &quartiles_b),
-        ])
+        .draw_series(
+            names_quartiles
+                .iter()
+                .map(|n_q_pair: &(&&str, &Quartiles)| {
+                    Boxplot::new_vertical(SegmentValue::CenterOf(n_q_pair.0), n_q_pair.1)
+                }),
+        )
         .unwrap();
 
     // To avoid the IO failure being ignored silently, we manually call the present function
