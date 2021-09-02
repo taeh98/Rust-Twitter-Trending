@@ -38,7 +38,7 @@ pub(crate) fn make_box_plots(
 
 fn gen_box_plot(
     algorithm_names: &Vec<String>,
-    time_taken_values: &Vec<Vec<f64>>,
+    algorithm_values: &Vec<Vec<f64>>,
     variable: Variable,
 ) {
     let root = SVGBackend::new(
@@ -48,7 +48,7 @@ fn gen_box_plot(
     .into_drawing_area();
     root.fill(&WHITE).unwrap();
 
-    let quartiles: Vec<Quartiles> = time_taken_values
+    let quartiles: Vec<Quartiles> = algorithm_values
         .into_par_iter()
         .map(|values: &Vec<f64>| Quartiles::new(values.as_slice()))
         .collect();
