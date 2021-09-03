@@ -8,7 +8,9 @@ use std::path::Path;
 use charts::{Chart, Color, MarkerType, PointLabelPosition, ScaleLinear, ScatterView};
 use const_format::concatcp;
 
-use crate::process_results::make_visualisations::{Variable, OUTPUT_FILES_DIRECTORY};
+use crate::process_results::make_visualisations::{
+    variable_to_axis_label, variable_to_string, Variable, OUTPUT_FILES_DIRECTORY,
+};
 
 const SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/scatter_plots") as &'static str;
@@ -29,17 +31,17 @@ pub(crate) fn make_scatter_plots(
         .zip(processing_speed_values_list.iter())
         .for_each(
             |((algorithm_name, time_taken_values), processing_speed_values)| {
-                gen_scatter_plot(algorithm_name, time_taken_values, Variable::TimeTaken);
+                gen_scatter_plot(algorithm_name, time_taken_values, &Variable::TimeTaken);
                 gen_scatter_plot(
                     algorithm_name,
                     processing_speed_values,
-                    Variable::ProcessingSpeed,
+                    &Variable::ProcessingSpeed,
                 );
             },
         );
 }
 
-fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: Variable) {
+fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: &Variable) {
     // Define chart related sizes.
     let width = 800;
     let height = 600;
@@ -78,17 +80,34 @@ fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: Variab
         .load_data(&scatter_data)
         .unwrap();
 
+    let file_path: String = format!(
+        "{}/{}_{}.svg",
+        SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY,
+        match variable {
+            Variable::TimeTaken => "time_taken",
+            _ => "processing_speed",
+        },
+        algorithm_name.to_lowercase().replace(" ", "_")
+    );
+
+    let y_axis_label: String = variable_to_axis_label(variable);
+    let title: String = format!(
+        "{} values of the {} algorithm in each iteration",
+        variable_to_string(variable),
+        algorithm_name
+    );
+
     // Generate and save the chart.
     Chart::new()
         .set_width(width)
         .set_height(height)
         .set_margins(top, right, bottom, left)
-        .add_title(String::from("Scatter Chart"))
+        .add_title(title)
         .add_view(&scatter_view)
         .add_axis_bottom(&x)
         .add_axis_left(&y)
-        .add_left_axis_label("Custom X Axis Label")
-        .add_bottom_axis_label("Custom Y Axis Label")
-        .save("scatter-chart-multiple-keys.svg")
+        .add_left_axis_label(y_axis_label)
+        .add_bottom_axis_label("Iteration number")
+        .save(file_path)
         .unwrap();
 }
