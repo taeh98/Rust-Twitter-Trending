@@ -29,7 +29,7 @@ pub(crate) fn make_box_plots(
 ) {
     if !Path::new(BOX_PLOTS_OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(BOX_PLOTS_OUTPUT_FILES_DIRECTORY)
-            .expect("Couldn't create the out/visualisations/ directory.");
+            .expect("Couldn't create the out/visualisations/box_plots/ directory.");
     }
 
     [

@@ -1,7 +1,6 @@
 /*
    VISUALISATIONS
 
-   dot plots of each value of times taken and tweets per second rates for each algorithm
    scatter plot of test number and time taken and test number and tweets/second for each algorithm
 */
 
@@ -14,6 +13,7 @@ const OUTPUT_FILES_DIRECTORY: &'static str = "./out/visualisations";
 
 mod bar_charts;
 mod box_plots;
+mod dot_plots;
 
 enum Variable {
     TimeTaken,
@@ -39,4 +39,5 @@ pub fn make_visualisations(
     }
     bar_charts::make_bar_charts(algorithm_names, time_taken_values, processing_speed_values);
     box_plots::make_box_plots(algorithm_names, time_taken_values, processing_speed_values);
+    dot_plots::make_dot_plots(algorithm_names, time_taken_values, processing_speed_values);
 }
