@@ -65,7 +65,11 @@ pub fn process_results(algorithm_results: Vec<TweetProcessingResult>) {
         &time_taken_values,
         &processing_speed_values,
     );
-    make_stats::make_stats(&algorithm_results);
+    make_stats::make_stats(
+        &algorithm_names,
+        &time_taken_values,
+        &processing_speed_values,
+    );
 }
 
 fn gen_time_taken_or_processing_speed_series(

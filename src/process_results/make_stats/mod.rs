@@ -15,6 +15,10 @@
 use crate::TweetProcessingResult;
 
 //TODO: implement this with statrs (?)
-pub fn make_stats(algorithm_results: &Vec<TweetProcessingResult>) {
+pub fn make_stats(
+    algorithm_names: &Vec<String>,
+    time_taken_values: &Vec<Vec<f64>>,
+    processing_speed_values: &Vec<Vec<f64>>,
+) {
     println!("make_stats()");
 }
