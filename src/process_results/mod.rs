@@ -104,3 +104,7 @@ pub(crate) fn find_mode(values: &Vec<f64>) -> f64 {
     //TODO: do this properly
     find_mean(values)
 }
+
+fn algorithm_name_to_lowercase_underscored(algorithm_name: &String) -> String {
+    algorithm_name.to_lowercase().replace(" ", "_")
+}

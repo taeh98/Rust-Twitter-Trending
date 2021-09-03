@@ -11,7 +11,9 @@ use const_format::concatcp;
 use crate::process_results::make_visualisations::{
     CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
-use crate::process_results::{variable_to_axis_label, variable_to_string, Variable};
+use crate::process_results::{
+    algorithm_name_to_lowercase_underscored, variable_to_axis_label, variable_to_string, Variable,
+};
 
 const SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/scatter_plots") as &'static str;
@@ -86,7 +88,7 @@ fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: &Varia
             Variable::TimeTaken => "time_taken",
             _ => "processing_speed",
         },
-        algorithm_name.to_lowercase().replace(" ", "_")
+        algorithm_name_to_lowercase_underscored(algorithm_name)
     );
 
     let y_axis_label: String = variable_to_axis_label(variable);
