@@ -64,8 +64,11 @@ fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: &Varia
         .set_range(vec![height - top - bottom, 0]);
 
     // You can use your own iterable as data as long as its items implement the `PointDatum` trait.
-    let scatter_data: Vec<(f32, f32)> =
-        vec![(120.0, 90.0), (12.0, 54.0), (100.0, 40.0), (180.0, 10.0)];
+    let scatter_data: Vec<(f32, f32)> = values
+        .iter()
+        .enumerate()
+        .map(|(index, value)| (index as f32, value.clone() as f32))
+        .collect();
 
     // Create Scatter view that is going to represent the data as points.
     let scatter_view = ScatterView::new()
