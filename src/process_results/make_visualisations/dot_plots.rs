@@ -22,29 +22,33 @@ const DOT_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
 
 pub(crate) fn make_dot_plots(
     algorithm_names: &Vec<String>,
-    time_taken_values: &Vec<Vec<f64>>,
-    processing_speed_values: &Vec<Vec<f64>>,
+    time_taken_values_list: &Vec<Vec<f64>>,
+    processing_speed_values_list: &Vec<Vec<f64>>,
 ) {
     if !Path::new(DOT_PLOTS_OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(DOT_PLOTS_OUTPUT_FILES_DIRECTORY)
             .expect("Couldn't create the out/visualisations/dot_plots/ directory.");
     }
 
-    [
-        (Variable::TimeTaken, time_taken_values),
-        (Variable::ProcessingSpeed, processing_speed_values),
-    ]
-    .into_par_iter()
-    .for_each(|var_values_pair: (Variable, &Vec<Vec<f64>>)| {
-        gen_dot_plot(algorithm_names, var_values_pair.1, var_values_pair.0)
-    })
+    algorithm_names
+        .iter()
+        .zip(time_taken_values_list.iter())
+        .zip(processing_speed_values_list.iter())
+        .for_each(
+            |algorithm_name: &String,
+             time_taken_values: &Vec<f64>,
+             processing_speed_values: &Vec<f64>| {
+                gen_dot_plot(algorithm_name, time_taken_values, Variable::TimeTaken);
+                gen_dot_plot(
+                    algorithm_name,
+                    processing_speed_values,
+                    Variable::ProcessingSpeed,
+                );
+            },
+        );
 }
 
-fn gen_dot_plot(
-    algorithm_names: &Vec<String>,
-    algorithm_values: &Vec<Vec<f64>>,
-    variable: Variable,
-) {
+fn gen_dot_plot(algorithm_name: &String, values: &Vec<f64>, variable: Variable) {
     // Define chart related sizes.
     let width = 800;
     let height = 600;
