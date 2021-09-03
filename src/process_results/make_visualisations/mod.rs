@@ -10,19 +10,19 @@ mod box_plots;
 mod dot_plots;
 mod scatter_plots;
 
-enum Variable {
+pub(crate) enum Variable {
     TimeTaken,
     ProcessingSpeed,
 }
 
-fn variable_to_string(var: &Variable) -> String {
+pub(crate) fn variable_to_string(var: &Variable) -> String {
     match var {
         Variable::TimeTaken => String::from("Time taken"),
         _ => String::from("Processing speed"),
     }
 }
 
-fn variable_to_axis_label(var: &Variable) -> String {
+pub(crate) fn variable_to_axis_label(var: &Variable) -> String {
     match var {
         Variable::TimeTaken => String::from("Time taken (seconds)"),
         _ => String::from("Processing speed (tweets/second)"),
