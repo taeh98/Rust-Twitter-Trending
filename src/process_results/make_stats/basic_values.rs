@@ -2,17 +2,24 @@
    min, max, mean, median, mode, std dev, variance, Q1, Q3, IQR of times taken and processing speeds for each algorithm
 */
 
-use std::fs::create_dir;
+use std::fs::{create_dir, File};
 use std::path::Path;
 
 use const_format::concatcp;
+use polars::frame::DataFrame;
+use polars::io::csv::CsvWriter;
+use polars::io::SerWriter;
+use polars::series::{NamedFrom, Series};
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 use statrs::statistics::Data;
 use statrs::statistics::{OrderStatistics, Statistics};
 
 use crate::process_results::make_stats::STATS_OUTPUT_FILES_DIRECTORY;
-use crate::process_results::{find_mean, find_median, find_mode, Variable};
+use crate::process_results::{
+    algorithm_name_to_lowercase_underscored, find_mean, find_median, find_mode,
+    variable_to_lowercase_underscored_string, variable_to_string, Variable,
+};
 
 const BASIC_VALUES_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/basic_values") as &'static str;
@@ -91,4 +98,40 @@ fn gen_basic_values(algorithm_name: &String, values: &Vec<f64>, variable: &Varia
     let q1: f64 = find_q1(values);
     let q3: f64 = find_q3(values);
     let iqr: f64 = find_iqr(values);
+
+    let measure_names_series: Series = Series::new(
+        "Measure",
+        vec![
+            "Minimum",
+            "Maximum",
+            "Mean",
+            "Median (Q2)",
+            "Mode",
+            "Standard deviation",
+            "Variance",
+            "Q1",
+            "Q3",
+            "IQR",
+        ],
+    );
+
+    let measure_values: Vec<f64> =
+        vec![min, max, mean, median, mode, std_dev, variance, q1, q3, iqr];
+    let measure_values_series: Series = Series::new("Value", measure_values);
+
+    let df: DataFrame = DataFrame::new(vec![measure_names_series, measure_values_series])
+        .expect("Failed to generate a dataframe to save the results in gen_basic_values() in the basic_values.rs");
+
+    let file_path: String = format!(
+        "{}/{}_{}.csv",
+        BASIC_VALUES_OUTPUT_FILES_DIRECTORY,
+        variable_to_lowercase_underscored_string(variable),
+        algorithm_name_to_lowercase_underscored(algorithm_name)
+    );
+    let mut output_file: File = File::create(file_path).expect("could not create file");
+
+    CsvWriter::new(&mut output_file)
+        .has_headers(true)
+        .finish(&df)
+        .expect("Failed to write the CSV file of raw results in gen_basic_values() in the basic_values.rs");
 }
