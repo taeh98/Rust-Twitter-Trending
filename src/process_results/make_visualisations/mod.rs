@@ -1,9 +1,3 @@
-/*
-   VISUALISATIONS
-
-   scatter plot of test number and time taken and test number and tweets/second for each algorithm
-*/
-
 use std::fs::create_dir;
 use std::path::Path;
 

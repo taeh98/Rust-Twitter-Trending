@@ -1,5 +1,5 @@
 /*
-   dot plots of each value of times taken and tweets per second rates for each algorithm
+   scatter plot of test number and time taken and test number and tweets/second for each algorithm
 */
 
 use std::fs::create_dir;
