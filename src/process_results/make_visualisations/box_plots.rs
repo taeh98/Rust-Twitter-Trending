@@ -11,9 +11,9 @@ use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 
 use crate::process_results::make_visualisations::{
-    variable_to_axis_label, variable_to_string, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS,
-    OUTPUT_FILES_DIRECTORY,
+    CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
+use crate::process_results::{variable_to_axis_label, variable_to_string, Variable};
 
 const BOX_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/box_plots") as &'static str;

@@ -1,9 +1,9 @@
 use std::fs::create_dir;
 use std::path::Path;
 
-use polars::prelude::NamedFrom;
 use rayon::iter::ParallelIterator;
 use rayon::prelude::IntoParallelIterator;
+use statrs::statistics::{Data, Distribution, OrderStatistics};
 
 use crate::{TimeTakenTweetProcessingSpeedValuePair, TweetProcessingResult};
 
@@ -67,4 +67,40 @@ pub fn process_results(algorithm_results: Vec<TweetProcessingResult>) {
         &time_taken_values,
         &processing_speed_values,
     );
+}
+
+pub(crate) enum Variable {
+    TimeTaken,
+    ProcessingSpeed,
+}
+
+pub(crate) fn variable_to_string(var: &Variable) -> String {
+    match var {
+        Variable::TimeTaken => String::from("Time taken"),
+        _ => String::from("Processing speed"),
+    }
+}
+
+pub(crate) fn variable_to_axis_label(var: &Variable) -> String {
+    match var {
+        Variable::TimeTaken => String::from("Time taken (seconds)"),
+        _ => String::from("Processing speed (tweets/second)"),
+    }
+}
+
+pub(crate) fn find_mean(values: &Vec<f64>) -> f64 {
+    let mut clone = values.clone();
+    let slice = clone.as_mut_slice();
+    Data::new(slice).mean().unwrap()
+}
+
+pub(crate) fn find_median(values: &Vec<f64>) -> f64 {
+    let mut clone = values.clone();
+    let slice = clone.as_mut_slice();
+    Data::new(slice).median()
+}
+
+pub(crate) fn find_mode(values: &Vec<f64>) -> f64 {
+    //TODO: do this properly
+    find_mean(values)
 }

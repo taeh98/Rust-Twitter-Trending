@@ -10,25 +10,6 @@ mod box_plots;
 mod dot_plots;
 mod scatter_plots;
 
-pub(crate) enum Variable {
-    TimeTaken,
-    ProcessingSpeed,
-}
-
-pub(crate) fn variable_to_string(var: &Variable) -> String {
-    match var {
-        Variable::TimeTaken => String::from("Time taken"),
-        _ => String::from("Processing speed"),
-    }
-}
-
-pub(crate) fn variable_to_axis_label(var: &Variable) -> String {
-    match var {
-        Variable::TimeTaken => String::from("Time taken (seconds)"),
-        _ => String::from("Processing speed (tweets/second)"),
-    }
-}
-
 //TODO: implement this with plotters (?)
 pub fn make_visualisations(
     algorithm_names: &Vec<String>,

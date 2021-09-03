@@ -13,9 +13,9 @@ use statrs::statistics::Data;
 use statrs::statistics::Max;
 
 use crate::process_results::make_visualisations::{
-    variable_to_axis_label, variable_to_string, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS,
-    OUTPUT_FILES_DIRECTORY,
+    CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
+use crate::process_results::{variable_to_axis_label, variable_to_string, Variable};
 
 const DOT_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/dot_plots") as &'static str;
@@ -53,8 +53,8 @@ fn gen_dot_plot(
     let max: f64 = algorithm_values
         .into_par_iter()
         .map(|values: &Vec<f64>| {
-            let mut mut_values = values.clone();
-            let data = Data::new(mut_values);
+            let mut_values: Vec<f64> = values.clone();
+            let data: Data<Vec<f64>> = Data::new(mut_values);
             return data.max();
         })
         .reduce_with(|a: f64, b: f64| if a > b { a } else { b })

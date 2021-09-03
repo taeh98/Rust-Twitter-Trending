@@ -8,12 +8,11 @@ use std::path::Path;
 use const_format::concatcp;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
-use statrs::statistics::{Data, Max, Min};
+use statrs::statistics::Data;
 use statrs::statistics::{OrderStatistics, Statistics};
 
 use crate::process_results::make_stats::STATS_OUTPUT_FILES_DIRECTORY;
-use crate::process_results::make_visualisations::bar_charts::{find_mean, find_median, find_mode};
-use crate::process_results::make_visualisations::{variable_to_string, Variable};
+use crate::process_results::{find_mean, find_median, find_mode, Variable};
 
 const BASIC_VALUES_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/basic_values") as &'static str;
@@ -23,8 +22,8 @@ pub(crate) fn make_basic_values(
     time_taken_values: &Vec<Vec<f64>>,
     processing_speed_values: &Vec<Vec<f64>>,
 ) {
-    if !Path::new(STATS_OUTPUT_FILES_DIRECTORY).exists() {
-        create_dir(STATS_OUTPUT_FILES_DIRECTORY)
+    if !Path::new(BASIC_VALUES_OUTPUT_FILES_DIRECTORY).exists() {
+        create_dir(BASIC_VALUES_OUTPUT_FILES_DIRECTORY)
             .expect("Couldn't create the out/stats/basic_values/ directory.");
     }
 
@@ -91,5 +90,5 @@ fn gen_basic_values(algorithm_name: &String, values: &Vec<f64>, variable: &Varia
     let variance: f64 = find_variance(values);
     let q1: f64 = find_q1(values);
     let q3: f64 = find_q3(values);
-    let iqr: f64 = find_q3(values);
+    let iqr: f64 = find_iqr(values);
 }

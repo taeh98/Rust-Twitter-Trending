@@ -8,12 +8,11 @@ use std::path::Path;
 use charts::{Chart, ScaleBand, ScaleLinear, VerticalBarView};
 use const_format::concatcp;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use statrs::statistics::{Data, Distribution, OrderStatistics};
 
 use crate::process_results::make_visualisations::{
-    variable_to_axis_label, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS,
-    OUTPUT_FILES_DIRECTORY,
+    CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
+use crate::process_results::{find_mean, find_median, find_mode, variable_to_axis_label, Variable};
 
 #[derive(Clone, Copy)]
 enum Average {
@@ -33,23 +32,6 @@ fn average_to_string(av: Average) -> String {
 const ALL_AVERAGES: [Average; 3] = [Average::Mean, Average::Median, Average::Mode];
 const BAR_CHART_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/bar_charts") as &'static str;
-
-pub(crate) fn find_mean(values: &Vec<f64>) -> f64 {
-    let mut clone = values.clone();
-    let slice = clone.as_mut_slice();
-    Data::new(slice).mean().unwrap()
-}
-
-pub(crate) fn find_median(values: &Vec<f64>) -> f64 {
-    let mut clone = values.clone();
-    let slice = clone.as_mut_slice();
-    Data::new(slice).median()
-}
-
-pub(crate) fn find_mode(values: &Vec<f64>) -> f64 {
-    //TODO: do this properly
-    find_mean(values)
-}
 
 fn gen_value_lists_averages(values_list: &Vec<Vec<f64>>, average_type: Average) -> Vec<f64> {
     values_list
