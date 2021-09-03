@@ -77,7 +77,7 @@ fn gen_dot_plot(
     // in top left corner, while chart's origin is in bottom left corner, hence we need to invert
     // the range on Y axis for the chart to display as though its origin is at bottom left.
     let y = ScaleLinear::new()
-        .set_domain(vec![0.0, 100.0])
+        .set_domain(vec![0.0, (max * 1.1).round() as f32])
         .set_range(vec![height - top - bottom, 0]);
 
     // You can use your own iterable as data as long as its items implement the `PointDatum` trait.
@@ -97,6 +97,15 @@ fn gen_dot_plot(
         .load_data(&scatter_data)
         .unwrap();
 
+    let file_path: String = format!(
+        "{}/{}.svg",
+        DOT_PLOTS_OUTPUT_FILES_DIRECTORY,
+        match &variable {
+            Variable::TimeTaken => "time_taken",
+            _ => "processing_speed",
+        },
+    );
+
     // Generate and save the chart.
     Chart::new()
         .set_width(width)
@@ -108,6 +117,6 @@ fn gen_dot_plot(
         .add_axis_left(&y)
         .add_left_axis_label("Units of Measurement")
         .add_bottom_axis_label("Categories")
-        .save("composite-bar-and-scatter-chart.svg")
+        .save(file_path.as_str())
         .unwrap();
 }
