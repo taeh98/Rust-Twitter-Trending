@@ -81,6 +81,13 @@ pub(crate) fn variable_to_string(var: &Variable) -> String {
     }
 }
 
+pub(crate) fn variable_to_lowercase_underscored_string(var: &Variable) -> String {
+    match var {
+        Variable::TimeTaken => String::from("time_taken"),
+        _ => String::from("processing_speed"),
+    }
+}
+
 pub(crate) fn variable_to_axis_label(var: &Variable) -> String {
     match var {
         Variable::TimeTaken => String::from("Time taken (seconds)"),

@@ -15,7 +15,9 @@ use statrs::statistics::Max;
 use crate::process_results::make_visualisations::{
     CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
-use crate::process_results::{variable_to_axis_label, variable_to_string, Variable};
+use crate::process_results::{
+    variable_to_axis_label, variable_to_lowercase_underscored_string, variable_to_string, Variable,
+};
 
 const DOT_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/dot_plots") as &'static str;
@@ -97,10 +99,7 @@ fn gen_dot_plot(
     let file_path: String = format!(
         "{}/{}.svg",
         DOT_PLOTS_OUTPUT_FILES_DIRECTORY,
-        match variable {
-            Variable::TimeTaken => "time_taken",
-            _ => "processing_speed",
-        },
+        variable_to_lowercase_underscored_string(variable)
     );
 
     let y_axis_label: String = variable_to_axis_label(variable);

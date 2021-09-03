@@ -12,7 +12,8 @@ use crate::process_results::make_visualisations::{
     CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
 use crate::process_results::{
-    algorithm_name_to_lowercase_underscored, variable_to_axis_label, variable_to_string, Variable,
+    algorithm_name_to_lowercase_underscored, variable_to_axis_label,
+    variable_to_lowercase_underscored_string, variable_to_string, Variable,
 };
 
 const SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
@@ -84,10 +85,7 @@ fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: &Varia
     let file_path: String = format!(
         "{}/{}_{}.svg",
         SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY,
-        match variable {
-            Variable::TimeTaken => "time_taken",
-            _ => "processing_speed",
-        },
+        variable_to_lowercase_underscored_string(variable),
         algorithm_name_to_lowercase_underscored(algorithm_name)
     );
 

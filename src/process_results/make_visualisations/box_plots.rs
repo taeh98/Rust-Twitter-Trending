@@ -13,7 +13,9 @@ use rayon::iter::ParallelIterator;
 use crate::process_results::make_visualisations::{
     CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
-use crate::process_results::{variable_to_axis_label, variable_to_string, Variable};
+use crate::process_results::{
+    variable_to_axis_label, variable_to_lowercase_underscored_string, variable_to_string, Variable,
+};
 
 const BOX_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/box_plots") as &'static str;
@@ -46,10 +48,7 @@ fn gen_box_plot(
     let output_file_path: String = format!(
         "{}/{}.svg",
         BOX_PLOTS_OUTPUT_FILES_DIRECTORY,
-        match variable {
-            Variable::TimeTaken => "time_taken",
-            _ => "processing_speed",
-        },
+        variable_to_lowercase_underscored_string(variable)
     );
 
     let root = SVGBackend::new(
