@@ -13,7 +13,8 @@ use statrs::statistics::Data;
 use statrs::statistics::Max;
 
 use crate::process_results::make_visualisations::{
-    variable_to_string, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
+    variable_to_axis_label, variable_to_string, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS,
+    OUTPUT_FILES_DIRECTORY,
 };
 
 const DOT_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
@@ -35,14 +36,14 @@ pub(crate) fn make_dot_plots(
     ]
     .into_par_iter()
     .for_each(|var_values_pair: (Variable, &Vec<Vec<f64>>)| {
-        gen_dot_plot(algorithm_names, var_values_pair.1, var_values_pair.0)
+        gen_dot_plot(algorithm_names, var_values_pair.1, &var_values_pair.0)
     })
 }
 
 fn gen_dot_plot(
     algorithm_names: &Vec<String>,
     algorithm_values: &Vec<Vec<f64>>,
-    variable: Variable,
+    variable: &Variable,
 ) {
     // Define chart related sizes.
     let width: isize = CHART_WIDTH_PIXELS;
@@ -100,10 +101,16 @@ fn gen_dot_plot(
     let file_path: String = format!(
         "{}/{}.svg",
         DOT_PLOTS_OUTPUT_FILES_DIRECTORY,
-        match &variable {
+        match variable {
             Variable::TimeTaken => "time_taken",
             _ => "processing_speed",
         },
+    );
+
+    let y_axis_label: String = variable_to_axis_label(variable);
+    let title: String = format!(
+        "{} values of different algorithms",
+        variable_to_string(variable)
     );
 
     // Generate and save the chart.
@@ -111,11 +118,11 @@ fn gen_dot_plot(
         .set_width(width)
         .set_height(height)
         .set_margins(top, right, bottom, left)
-        .add_title(String::from("Composite Bar + Scatter Chart"))
+        .add_title(title)
         .add_view(&scatter_view) // <-- add scatter view
         .add_axis_bottom(&x)
         .add_axis_left(&y)
-        .add_left_axis_label("Units of Measurement")
+        .add_left_axis_label(y_axis_label.as_str())
         .add_bottom_axis_label("Algorithms")
         .save(file_path.as_str())
         .unwrap();
