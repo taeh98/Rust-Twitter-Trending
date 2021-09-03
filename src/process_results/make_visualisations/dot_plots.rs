@@ -60,16 +60,10 @@ fn gen_dot_plot(
         .reduce_with(|a: f64, b: f64| if a > b { a } else { b })
         .unwrap();
 
-    println!("max = {}", max);
-
     // Create a band scale that maps ["A", "B", "C"] categories to values in the [0, availableWidth]
     // range (the width of the chart without the margins).
     let x: ScaleBand = ScaleBand::new()
-        .set_domain(vec![
-            String::from("A"),
-            String::from("B"),
-            String::from("C"),
-        ])
+        .set_domain(algorithm_names.clone())
         .set_range(vec![0, width - left - right]);
 
     // Create a linear scale that will interpolate values in [0, 100] range to corresponding
@@ -82,11 +76,13 @@ fn gen_dot_plot(
         .set_range(vec![height - top - bottom, 0]);
 
     // You can use your own iterable as data as long as its items implement the `PointDatum` trait.
-    let scatter_data = vec![
-        (String::from("A"), 90.3),
-        (String::from("B"), 20.1),
-        (String::from("C"), 10.8),
-    ];
+    let mut scatter_data: Vec<(String, f32)> = Vec::new();
+
+    for (algorithm_name, algorithm_values) in algorithm_names.iter().zip(algorithm_values.iter()) {
+        for value in algorithm_values {
+            scatter_data.push((algorithm_name.clone(), value.clone() as f32));
+        }
+    }
 
     // Create Scatter view that is going to represent the data as points.
     let scatter_view = ScatterView::new()
