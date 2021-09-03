@@ -20,7 +20,7 @@ enum Variable {
     ProcessingSpeed,
 }
 
-fn variable_to_string(var: Variable) -> String {
+fn variable_to_string(var: &Variable) -> String {
     match var {
         Variable::TimeTaken => String::from("Time taken"),
         _ => String::from("Processing speed"),

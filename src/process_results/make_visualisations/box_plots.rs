@@ -75,7 +75,7 @@ fn gen_box_plot(
         .x_label_area_size(40)
         .y_label_area_size(40)
         .caption(
-            format!("{} of different algorithms", variable_to_string(variable)),
+            format!("{} of different algorithms", variable_to_string(&variable)),
             ("sans-serif", 20),
         )
         .build_cartesian_2d(
@@ -84,8 +84,15 @@ fn gen_box_plot(
         )
         .unwrap();
 
+    let y_desc: &str = match &variable {
+        Variable::TimeTaken => "Time taken (seconds)",
+        _ => "Processing speed (tweets/second)",
+    };
+
     chart
         .configure_mesh()
+        .x_desc("Algorithm")
+        .y_desc(y_desc)
         .light_line_style(&WHITE)
         .draw()
         .unwrap();
