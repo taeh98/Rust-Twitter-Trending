@@ -5,7 +5,7 @@ const CHART_WIDTH_PIXELS: isize = 1000;
 const CHART_HEIGHT_PIXELS: isize = 750;
 const OUTPUT_FILES_DIRECTORY: &'static str = "./out/visualisations";
 
-mod bar_charts;
+pub(crate) mod bar_charts;
 mod box_plots;
 mod dot_plots;
 mod scatter_plots;

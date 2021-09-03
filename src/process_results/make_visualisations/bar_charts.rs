@@ -34,19 +34,19 @@ const ALL_AVERAGES: [Average; 3] = [Average::Mean, Average::Median, Average::Mod
 const BAR_CHART_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/bar_charts") as &'static str;
 
-fn find_mean(values: &Vec<f64>) -> f64 {
+pub(crate) fn find_mean(values: &Vec<f64>) -> f64 {
     let mut clone = values.clone();
     let slice = clone.as_mut_slice();
     Data::new(slice).mean().unwrap()
 }
 
-fn find_median(values: &Vec<f64>) -> f64 {
+pub(crate) fn find_median(values: &Vec<f64>) -> f64 {
     let mut clone = values.clone();
     let slice = clone.as_mut_slice();
     Data::new(slice).median()
 }
 
-fn find_mode(values: &Vec<f64>) -> f64 {
+pub(crate) fn find_mode(values: &Vec<f64>) -> f64 {
     //TODO: do this properly
     find_mean(values)
 }
