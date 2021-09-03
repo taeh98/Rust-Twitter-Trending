@@ -64,7 +64,7 @@ fn gen_dot_plot(
 
     // Create a band scale that maps ["A", "B", "C"] categories to values in the [0, availableWidth]
     // range (the width of the chart without the margins).
-    let x = ScaleBand::new()
+    let x: ScaleBand = ScaleBand::new()
         .set_domain(vec![
             String::from("A"),
             String::from("B"),
@@ -77,7 +77,7 @@ fn gen_dot_plot(
     // The [availableHeight, 0] range is inverted because SVGs coordinate system's origin is
     // in top left corner, while chart's origin is in bottom left corner, hence we need to invert
     // the range on Y axis for the chart to display as though its origin is at bottom left.
-    let y = ScaleLinear::new()
+    let y: ScaleLinear = ScaleLinear::new()
         .set_domain(vec![0.0, (max * 1.1).round() as f32])
         .set_range(vec![height - top - bottom, 0]);
 
