@@ -116,7 +116,7 @@ fn gen_dot_plot(
         .add_axis_bottom(&x)
         .add_axis_left(&y)
         .add_left_axis_label("Units of Measurement")
-        .add_bottom_axis_label("Categories")
+        .add_bottom_axis_label("Algorithms")
         .save(file_path.as_str())
         .unwrap();
 }

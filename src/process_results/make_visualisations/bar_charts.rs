@@ -11,7 +11,8 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use statrs::statistics::{Data, Distribution, OrderStatistics};
 
 use crate::process_results::make_visualisations::{
-    Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
+    variable_to_axis_label, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS,
+    OUTPUT_FILES_DIRECTORY,
 };
 
 #[derive(Clone, Copy)]
@@ -112,7 +113,7 @@ fn gen_time_taken_bar_chart(
             average_string.get(1..).unwrap().to_lowercase()
         )
         .as_str(),
-        "Time taken (seconds)",
+        variable_to_axis_label(&Variable::TimeTaken).as_str(),
         "Algorithm",
     );
 }

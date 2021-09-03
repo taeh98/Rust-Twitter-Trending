@@ -94,10 +94,7 @@ fn gen_box_plot(
         )
         .unwrap();
 
-    let y_desc: &str = match &variable {
-        Variable::TimeTaken => "Time taken (seconds)",
-        _ => "Processing speed (tweets/second)",
-    };
+    let y_desc: String = variable_to_string(&variable);
 
     chart
         .configure_mesh()
