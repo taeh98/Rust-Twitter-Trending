@@ -1,12 +1,7 @@
 /*
    box plots of each value of times taken and tweets per second rates for each algorithm
 */
-use std::collections::BTreeMap;
-use std::collections::HashMap;
-use std::env;
-use std::fs;
 use std::fs::create_dir;
-use std::io::{self, prelude::*, BufReader};
 use std::path::Path;
 
 use const_format::concatcp;

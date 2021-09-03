@@ -5,10 +5,7 @@
 use std::fs::create_dir;
 use std::path::Path;
 
-use charts::{
-    Chart, Color, MarkerType, PointLabelPosition, ScaleBand, ScaleLinear, ScatterView,
-    VerticalBarView,
-};
+use charts::{Chart, Color, MarkerType, PointLabelPosition, ScaleBand, ScaleLinear, ScatterView};
 use const_format::concatcp;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
@@ -25,9 +22,9 @@ pub(crate) fn make_dot_plots(
     time_taken_values: &Vec<Vec<f64>>,
     processing_speed_values: &Vec<Vec<f64>>,
 ) {
-    if !Path::new(BOX_PLOTS_OUTPUT_FILES_DIRECTORY).exists() {
-        create_dir(BOX_PLOTS_OUTPUT_FILES_DIRECTORY)
-            .expect("Couldn't create the out/visualisations/box_plots/ directory.");
+    if !Path::new(DOT_PLOTS_OUTPUT_FILES_DIRECTORY).exists() {
+        create_dir(DOT_PLOTS_OUTPUT_FILES_DIRECTORY)
+            .expect("Couldn't create the out/visualisations/dot_plots/ directory.");
     }
 
     [
