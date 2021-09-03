@@ -31,5 +31,5 @@ pub fn make_stats(
         create_dir(STATS_OUTPUT_FILES_DIRECTORY)
             .expect("Couldn't create the out/stats/ directory.");
     }
-    println!("make_stats()");
+    basic_values::make_basic_values(algorithm_names, time_taken_values, processing_speed_values);
 }
