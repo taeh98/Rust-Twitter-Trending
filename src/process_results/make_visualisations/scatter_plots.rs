@@ -9,7 +9,8 @@ use charts::{Chart, Color, MarkerType, PointLabelPosition, ScaleLinear, ScatterV
 use const_format::concatcp;
 
 use crate::process_results::make_visualisations::{
-    variable_to_axis_label, variable_to_string, Variable, OUTPUT_FILES_DIRECTORY,
+    variable_to_axis_label, variable_to_string, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS,
+    OUTPUT_FILES_DIRECTORY,
 };
 
 const SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
@@ -43,13 +44,13 @@ pub(crate) fn make_scatter_plots(
 
 fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: &Variable) {
     // Define chart related sizes.
-    let width = 800;
-    let height = 600;
+    let width: isize = CHART_WIDTH_PIXELS;
+    let height: isize = CHART_HEIGHT_PIXELS;
     let (top, right, bottom, left) = (90, 40, 50, 60);
 
     // Create a band scale that will interpolate values in [0, 200] to values in the
     // [0, availableWidth] range (the width of the chart without the margins).
-    let x = ScaleLinear::new()
+    let x: ScaleLinear = ScaleLinear::new()
         .set_domain(vec![0.0, 200.0])
         .set_range(vec![0, width - left - right]);
 
@@ -58,16 +59,16 @@ fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: &Varia
     // The [availableHeight, 0] range is inverted because SVGs coordinate system's origin is
     // in top left corner, while chart's origin is in bottom left corner, hence we need to invert
     // the range on Y axis for the chart to display as though its origin is at bottom left.
-    let y = ScaleLinear::new()
+    let y: ScaleLinear = ScaleLinear::new()
         .set_domain(vec![0.0, 100.0])
         .set_range(vec![height - top - bottom, 0]);
 
     // You can use your own iterable as data as long as its items implement the `PointDatum` trait.
-    let scatter_data = vec![
-        (120, 90, "foo"),
-        (12, 54, "foo"),
-        (100, 40, "bar"),
-        (180, 10, "baz"),
+    let scatter_data: Vec<(f32, f32, &str)> = vec![
+        (120.0, 90.0, "foo"),
+        (12.0, 54.0, "foo"),
+        (100.0, 40.0, "bar"),
+        (180.0, 10.0, "baz"),
     ];
 
     // Create Scatter view that is going to represent the data as points.
