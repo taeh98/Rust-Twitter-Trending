@@ -9,6 +9,8 @@ use charts::{Chart, Color, MarkerType, PointLabelPosition, ScaleBand, ScaleLinea
 use const_format::concatcp;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
+use statrs::statistics::Data;
+use statrs::statistics::Max;
 
 use crate::process_results::make_visualisations::{
     variable_to_string, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
@@ -46,6 +48,18 @@ fn gen_dot_plot(
     let width: isize = CHART_WIDTH_PIXELS;
     let height: isize = CHART_HEIGHT_PIXELS;
     let (top, right, bottom, left) = (90, 40, 50, 60);
+
+    let max: f64 = algorithm_values
+        .into_par_iter()
+        .map(|values: &Vec<f64>| {
+            let mut mut_values = values.clone();
+            let data = Data::new(mut_values);
+            return data.max();
+        })
+        .reduce_with(|a: f64, b: f64| if a > b { a } else { b })
+        .unwrap();
+
+    println!("max = {}", max);
 
     // Create a band scale that maps ["A", "B", "C"] categories to values in the [0, availableWidth]
     // range (the width of the chart without the margins).
