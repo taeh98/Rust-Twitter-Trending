@@ -18,7 +18,7 @@ use statrs::statistics::{OrderStatistics, Statistics};
 use crate::process_results::make_stats::STATS_OUTPUT_FILES_DIRECTORY;
 use crate::process_results::{
     algorithm_name_to_lowercase_underscored, find_mean, find_median, find_mode,
-    variable_to_lowercase_underscored_string, variable_to_string, Variable,
+    variable_to_lowercase_underscored_string, Variable,
 };
 
 const BASIC_VALUES_OUTPUT_FILES_DIRECTORY: &'static str =
