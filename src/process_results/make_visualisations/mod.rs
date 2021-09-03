@@ -22,6 +22,13 @@ fn variable_to_string(var: &Variable) -> String {
     }
 }
 
+fn variable_to_axis_label(var: &Variable) -> String {
+    match var {
+        Variable::TimeTaken => String::from("Time taken (seconds)"),
+        _ => String::from("Processing speed (tweets/second)"),
+    }
+}
+
 //TODO: implement this with plotters (?)
 pub fn make_visualisations(
     algorithm_names: &Vec<String>,
