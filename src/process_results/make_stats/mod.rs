@@ -15,8 +15,6 @@
 use std::fs::create_dir;
 use std::path::Path;
 
-use crate::TweetProcessingResult;
-
 mod basic_values;
 
 const STATS_OUTPUT_FILES_DIRECTORY: &'static str = "./out/stats";
