@@ -5,7 +5,9 @@ use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
+use std::fs::create_dir;
 use std::io::{self, prelude::*, BufReader};
+use std::path::Path;
 
 use const_format::concatcp;
 use plotters::data::fitting_range;
@@ -19,13 +21,17 @@ use crate::process_results::make_visualisations::{
 
 const BOX_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/box_plots") as &'static str;
-const OUT_FILE_NAME: &'static str = "boxplot.svg";
 
 pub(crate) fn make_box_plots(
     algorithm_names: &Vec<String>,
     time_taken_values: &Vec<Vec<f64>>,
     processing_speed_values: &Vec<Vec<f64>>,
 ) {
+    if !Path::new(BOX_PLOTS_OUTPUT_FILES_DIRECTORY).exists() {
+        create_dir(BOX_PLOTS_OUTPUT_FILES_DIRECTORY)
+            .expect("Couldn't create the out/visualisations/ directory.");
+    }
+
     [
         (Variable::TimeTaken, time_taken_values),
         (Variable::ProcessingSpeed, processing_speed_values),
@@ -41,8 +47,17 @@ fn gen_box_plot(
     algorithm_values: &Vec<Vec<f64>>,
     variable: Variable,
 ) {
+    let output_file_path: String = format!(
+        "{}/{}.svg",
+        BOX_PLOTS_OUTPUT_FILES_DIRECTORY,
+        match &variable {
+            Variable::TimeTaken => "time_taken",
+            _ => "processing_speed",
+        },
+    );
+
     let root = SVGBackend::new(
-        OUT_FILE_NAME,
+        output_file_path.as_str(),
         (CHART_WIDTH_PIXELS as u32, CHART_HEIGHT_PIXELS as u32),
     )
     .into_drawing_area();
