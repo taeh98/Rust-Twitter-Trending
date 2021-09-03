@@ -35,9 +35,7 @@ pub(crate) fn make_dot_plots(
         .zip(time_taken_values_list.iter())
         .zip(processing_speed_values_list.iter())
         .for_each(
-            |algorithm_name: &String,
-             time_taken_values: &Vec<f64>,
-             processing_speed_values: &Vec<f64>| {
+            |((algorithm_name, time_taken_values), processing_speed_values)| {
                 gen_dot_plot(algorithm_name, time_taken_values, Variable::TimeTaken);
                 gen_dot_plot(
                     algorithm_name,
@@ -50,8 +48,8 @@ pub(crate) fn make_dot_plots(
 
 fn gen_dot_plot(algorithm_name: &String, values: &Vec<f64>, variable: Variable) {
     // Define chart related sizes.
-    let width = 800;
-    let height = 600;
+    let width: isize = CHART_WIDTH_PIXELS;
+    let height: isize = CHART_HEIGHT_PIXELS;
     let (top, right, bottom, left) = (90, 40, 50, 60);
 
     // Create a band scale that maps ["A", "B", "C"] categories to values in the [0, availableWidth]
