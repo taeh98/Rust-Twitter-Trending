@@ -11,7 +11,8 @@ use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 
 use crate::process_results::make_visualisations::{
-    variable_to_string, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
+    variable_to_axis_label, variable_to_string, Variable, CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS,
+    OUTPUT_FILES_DIRECTORY,
 };
 
 const BOX_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
@@ -33,19 +34,19 @@ pub(crate) fn make_box_plots(
     ]
     .into_par_iter()
     .for_each(|var_values_pair: (Variable, &Vec<Vec<f64>>)| {
-        gen_box_plot(algorithm_names, var_values_pair.1, var_values_pair.0)
+        gen_box_plot(algorithm_names, var_values_pair.1, &var_values_pair.0)
     })
 }
 
 fn gen_box_plot(
     algorithm_names: &Vec<String>,
     algorithm_values: &Vec<Vec<f64>>,
-    variable: Variable,
+    variable: &Variable,
 ) {
     let output_file_path: String = format!(
         "{}/{}.svg",
         BOX_PLOTS_OUTPUT_FILES_DIRECTORY,
-        match &variable {
+        match variable {
             Variable::TimeTaken => "time_taken",
             _ => "processing_speed",
         },
@@ -85,7 +86,7 @@ fn gen_box_plot(
         .x_label_area_size(40)
         .y_label_area_size(40)
         .caption(
-            format!("{} of different algorithms", variable_to_string(&variable)),
+            format!("{} of different algorithms", variable_to_string(variable)),
             ("sans-serif", 20),
         )
         .build_cartesian_2d(
@@ -94,7 +95,7 @@ fn gen_box_plot(
         )
         .unwrap();
 
-    let y_desc: String = variable_to_string(&variable);
+    let y_desc: String = variable_to_axis_label(variable);
 
     chart
         .configure_mesh()
