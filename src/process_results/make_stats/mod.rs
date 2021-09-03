@@ -1,7 +1,7 @@
 /*
    STATS (indented are non-parametric alternatives to above parametric tests)
 
-   mean, median, mode, std dev, variance, IQR of times taken and processing speeds for each algorithm
+   min, max, mean, median, mode, std dev, variance, Q1, Q3, IQR of times taken and processing speeds for each algorithm
    independent samples t-tests between times taken and tweets per second rates of all algorithms
        Wilcoxon Rank-Sum tests between times taken and tweets per second rates of all algorithms
    one-way anova tests between times taken and tweets per second rates of all algorithms
