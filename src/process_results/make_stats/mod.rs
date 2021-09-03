@@ -12,7 +12,14 @@
    pearson and spearman correlation coefficients for test number vs time taken for all algorithms
 */
 
+use std::fs::create_dir;
+use std::path::Path;
+
 use crate::TweetProcessingResult;
+
+mod basic_values;
+
+const STATS_OUTPUT_FILES_DIRECTORY: &'static str = "./out/stats";
 
 //TODO: implement this with statrs (?)
 pub fn make_stats(
@@ -20,5 +27,9 @@ pub fn make_stats(
     time_taken_values: &Vec<Vec<f64>>,
     processing_speed_values: &Vec<Vec<f64>>,
 ) {
+    if !Path::new(STATS_OUTPUT_FILES_DIRECTORY).exists() {
+        create_dir(STATS_OUTPUT_FILES_DIRECTORY)
+            .expect("Couldn't create the out/stats/ directory.");
+    }
     println!("make_stats()");
 }
