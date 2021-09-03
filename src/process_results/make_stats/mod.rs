@@ -1,8 +1,6 @@
 /*
    STATS (indented are non-parametric alternatives to above parametric tests)
 
-   min, max, mean, median, mode, std dev, variance, Q1, Q3, IQR of times taken and processing speeds for each algorithm
-   independent samples t-tests between times taken and tweets per second rates of all algorithms
        Wilcoxon Rank-Sum tests between times taken and tweets per second rates of all algorithms
    one-way anova tests between times taken and tweets per second rates of all algorithms
        Kruskal Wallis H Tests between times taken and tweets per second rates of all algorithms
@@ -16,6 +14,7 @@ use std::fs::create_dir;
 use std::path::Path;
 
 mod basic_values;
+mod t_tests;
 
 const STATS_OUTPUT_FILES_DIRECTORY: &'static str = "./out/stats";
 
@@ -30,4 +29,5 @@ pub fn make_stats(
             .expect("Couldn't create the out/stats/ directory.");
     }
     basic_values::make_basic_values(algorithm_names, time_taken_values, processing_speed_values);
+    t_tests::make_t_tests(algorithm_names, time_taken_values, processing_speed_values);
 }
