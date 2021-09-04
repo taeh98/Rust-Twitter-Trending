@@ -2,7 +2,7 @@
    independent samples t-tests between times taken and tweets per second rates of all algorithms
 */
 
-use std::fs::create_dir;
+use std::fs::{create_dir, File};
 use std::path::Path;
 use std::sync::{Mutex, MutexGuard};
 
@@ -11,12 +11,17 @@ use mathru::{
     self,
     statistics::test::{Test, T},
 };
+use polars::frame::DataFrame;
+use polars::io::csv::CsvWriter;
+use polars::io::SerWriter;
 use polars::series::{NamedFrom, Series};
 use rayon::iter::IndexedParallelIterator;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::process_results::make_stats::STATS_OUTPUT_FILES_DIRECTORY;
-use crate::process_results::{Variable, ALL_VARIABLE_VALUES};
+use crate::process_results::{
+    variable_to_lowercase_underscored_string, Variable, ALL_VARIABLE_VALUES,
+};
 
 const T_TESTS_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/t_tests") as &'static str;
@@ -124,4 +129,24 @@ fn print_t_test_results(results: Vec<(&String, &String, f64, f64)>, variable: &V
         "P-value of Welch's t-test",
         welch_t_test.into_inner().ok().unwrap(),
     );
+
+    let df: DataFrame = DataFrame::new(vec![
+        first_algorithm_series,
+        second_algorithm_series,
+        student_t_test_p_value_series,
+        welch_t_test_p_value_series,
+    ])
+    .expect("Failed to generate a dataframe.");
+
+    let filepath: String = format!(
+        "{}/{}.csv",
+        T_TESTS_OUTPUT_FILES_DIRECTORY,
+        variable_to_lowercase_underscored_string(variable)
+    );
+
+    let mut output_file: File = File::create(filepath).expect("Failed to create an output file.");
+
+    let writer: CsvWriter<File> = CsvWriter::new(&mut output_file).has_headers(true);
+
+    writer.finish(&df).expect("Failed to write the CSV file.");
 }
