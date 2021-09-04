@@ -99,10 +99,10 @@ fn run_t_tests_for_variable(
 }
 
 fn print_t_test_results(results: Vec<(&String, &String, f64, f64)>, variable: &Variable) {
-    let mut algorithm_a_names: Mutex<Vec<&String>> = Mutex::new(Vec::new());
-    let mut algorithm_b_names: Mutex<Vec<&String>> = Mutex::new(Vec::new());
-    let mut student_t_test_values: Mutex<Vec<f64>> = Mutex::new(Vec::new());
-    let mut welch_t_test_values: Mutex<Vec<f64>> = Mutex::new(Vec::new());
+    let algorithm_a_names: Mutex<Vec<&String>> = Mutex::new(Vec::new());
+    let algorithm_b_names: Mutex<Vec<&String>> = Mutex::new(Vec::new());
+    let student_t_test_values: Mutex<Vec<f64>> = Mutex::new(Vec::new());
+    let welch_t_test_values: Mutex<Vec<f64>> = Mutex::new(Vec::new());
 
     results
         .into_par_iter()
@@ -115,11 +115,23 @@ fn print_t_test_results(results: Vec<(&String, &String, f64, f64)>, variable: &V
 
     let first_algorithm_series: Series = Series::new(
         "Name of first algorithm",
-        algorithm_a_names.into_inner().ok().unwrap(),
+        algorithm_a_names
+            .into_inner()
+            .ok()
+            .unwrap()
+            .into_par_iter()
+            .map(|val: &String| val.clone())
+            .collect::<Vec<String>>(),
     );
     let second_algorithm_series: Series = Series::new(
         "Name of second algorithm",
-        algorithm_b_names.into_inner().ok().unwrap(),
+        algorithm_b_names
+            .into_inner()
+            .ok()
+            .unwrap()
+            .into_par_iter()
+            .map(|val: &String| val.clone())
+            .collect::<Vec<String>>(),
     );
     let student_t_test_p_value_series: Series = Series::new(
         "P-value of Student's t-test",
@@ -127,7 +139,7 @@ fn print_t_test_results(results: Vec<(&String, &String, f64, f64)>, variable: &V
     );
     let welch_t_test_p_value_series: Series = Series::new(
         "P-value of Welch's t-test",
-        welch_t_test.into_inner().ok().unwrap(),
+        welch_t_test_values.into_inner().ok().unwrap(),
     );
 
     let df: DataFrame = DataFrame::new(vec![
