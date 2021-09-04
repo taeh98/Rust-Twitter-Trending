@@ -9,6 +9,7 @@
    Phi coefficient to see how associated the categorical variables (Rust or Python and serial or parallel) are
    F-test to compare the variances of the samples
    pearson and spearman correlation coefficients for test number vs time taken for all algorithms
+   Skewness of values of time taken and processing speed values for all algorithms - Pearson’s first and second coefficients of skewness, Bowley’s method of measuring skewness, Pearson's moment coefficient of skewness, Groeneveld and Meeden's coefficient
 */
 
 use std::fs::create_dir;
