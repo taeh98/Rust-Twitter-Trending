@@ -11,6 +11,7 @@ use mathru::{
     self,
     statistics::test::{Test, T},
 };
+use polars::series::{NamedFrom, Series};
 use rayon::iter::IndexedParallelIterator;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
@@ -88,5 +89,39 @@ fn run_t_tests_for_variable(
                 });
         });
 
-    let result: Vec<(&String, &String, f64, f64)> = res_mutex.into_inner().ok().unwrap();
+    let results: Vec<(&String, &String, f64, f64)> = res_mutex.into_inner().ok().unwrap();
+    print_t_test_results(results, variable);
+}
+
+fn print_t_test_results(results: Vec<(&String, &String, f64, f64)>, variable: &Variable) {
+    let mut algorithm_a_names: Mutex<Vec<&String>> = Mutex::new(Vec::new());
+    let mut algorithm_b_names: Mutex<Vec<&String>> = Mutex::new(Vec::new());
+    let mut student_t_test_values: Mutex<Vec<f64>> = Mutex::new(Vec::new());
+    let mut welch_t_test_values: Mutex<Vec<f64>> = Mutex::new(Vec::new());
+
+    results
+        .into_par_iter()
+        .for_each(|value: (&String, &String, f64, f64)| {
+            algorithm_a_names.lock().unwrap().push(value.0);
+            algorithm_b_names.lock().unwrap().push(value.1);
+            student_t_test_values.lock().unwrap().push(value.2);
+            welch_t_test_values.lock().unwrap().push(value.3);
+        });
+
+    let first_algorithm_series: Series = Series::new(
+        "Name of first algorithm",
+        algorithm_a_names.into_inner().ok().unwrap(),
+    );
+    let second_algorithm_series: Series = Series::new(
+        "Name of second algorithm",
+        algorithm_b_names.into_inner().ok().unwrap(),
+    );
+    let student_t_test_p_value_series: Series = Series::new(
+        "P-value of Student's t-test",
+        student_t_test_values.into_inner().ok().unwrap(),
+    );
+    let welch_t_test_p_value_series: Series = Series::new(
+        "P-value of Welch's t-test",
+        welch_t_test.into_inner().ok().unwrap(),
+    );
 }
