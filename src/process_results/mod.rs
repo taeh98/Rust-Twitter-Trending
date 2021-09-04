@@ -74,6 +74,8 @@ pub(crate) enum Variable {
     ProcessingSpeed,
 }
 
+const ALL_VARIABLE_VALUES: [Variable; 2] = [Variable::TimeTaken, Variable::ProcessingSpeed];
+
 pub(crate) fn variable_to_string(var: &Variable) -> String {
     match var {
         Variable::TimeTaken => String::from("Time taken"),
