@@ -74,6 +74,6 @@ fn gen_t_test(
     values_b: &Vec<f64>,
     variable: &Variable,
 ) {
-    let student_t_test: T<f64> = T::test_independence_unequal_variance(values_a, values_b);
+    let student_t_test: T<f64> = T::test_independence_equal_variance(values_a, values_b);
     let welch_t_test: T<f64> = T::test_independence_unequal_variance(values_a, values_b);
 }
