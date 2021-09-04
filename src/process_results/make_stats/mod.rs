@@ -5,6 +5,7 @@
    one-way anova tests between times taken and tweets per second rates of all algorithms
        Kruskal Wallis H Tests between times taken and tweets per second rates of all algorithms
    Chi-squared test to see how dependent the categorical variables (Rust or Python and serial or parallel) are
+   G-test to see how dependent the categorical variables (Rust or Python and serial or parallel) are (?)
    Phi coefficient to see how associated the categorical variables (Rust or Python and serial or parallel) are
    F-test to compare the variances of the samples
    pearson and spearman correlation coefficients for test number vs time taken for all algorithms
