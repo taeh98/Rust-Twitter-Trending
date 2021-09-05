@@ -1,7 +1,6 @@
 /*
    STATS (indented are non-parametric alternatives to above parametric tests)
 
-       Wilcoxon Rank-Sum tests between times taken and tweets per second rates of all algorithms
    one-way anova tests between times taken and tweets per second rates of all algorithms
        Kruskal Wallis H Tests between times taken and tweets per second rates of all algorithms
    Chi-squared test to see how dependent the categorical variables (Rust or Python and serial or parallel) are
@@ -18,6 +17,7 @@ use std::path::Path;
 
 mod basic_values;
 mod t_tests;
+mod wilcoxon_rank_sum;
 
 const STATS_OUTPUT_FILES_DIRECTORY: &'static str = "./out/stats";
 
@@ -33,4 +33,9 @@ pub fn make_stats(
     }
     basic_values::make_basic_values(algorithm_names, time_taken_values, processing_speed_values);
     t_tests::make_t_tests(algorithm_names, time_taken_values, processing_speed_values);
+    wilcoxon_rank_sum::make_wilxocon_rank_sum_tests(
+        algorithm_names,
+        time_taken_values,
+        processing_speed_values,
+    );
 }
