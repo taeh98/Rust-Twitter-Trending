@@ -1,5 +1,5 @@
 /*
-   Wilcoxon Rank-Sum tests between times taken and tweets per second rates of all algorithms
+   Wilcoxon Rank-Sum tests (aka Mann–Whitney U test) between times taken and tweets per second rates of all algorithms
 */
 
 use std::fs::{create_dir, File};
