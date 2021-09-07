@@ -36,6 +36,8 @@ pub(crate) fn make_wilxocon_rank_sum_tests(
             .expect("Couldn't create the out/stats/wilcoxon_rank_sum/ directory.");
     }
 
+    //TODO: implement this statistic properly
+
     ALL_VARIABLE_VALUES
         .into_par_iter()
         .for_each(|variable: Variable| {
