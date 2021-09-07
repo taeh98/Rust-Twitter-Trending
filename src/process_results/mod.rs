@@ -1,5 +1,7 @@
+use std::collections::HashMap;
 use std::fs::create_dir;
 use std::path::Path;
+use std::sync::{Mutex, MutexGuard};
 
 use rayon::iter::ParallelIterator;
 use rayon::prelude::IntoParallelIterator;
@@ -109,9 +111,30 @@ pub(crate) fn find_median(values: &Vec<f64>) -> f64 {
     Data::new(slice).median()
 }
 
-pub(crate) fn find_mode(values: &Vec<f64>) -> f64 {
-    //TODO: do this properly
-    find_mean(values)
+pub(crate) fn find_mode(values: &Vec<f64>) -> Option<Vec<f64>> {
+    let counts_map_mutex: Mutex<HashMap<u64, i32>> = Mutex::new(HashMap::new());
+
+    values.into_par_iter().for_each(|&value: &f64| {
+        let mut counts_map_mutex_guard: MutexGuard<HashMap<u64, i32>> =
+            counts_map_mutex.lock().unwrap();
+        let count: &mut i32 = counts_map_mutex_guard.entry(value.to_bits()).or_insert(0);
+        *count += 1;
+    });
+
+    let counts_map: HashMap<u64, i32> = counts_map_mutex.into_inner().unwrap();
+
+    let max_count: i32 = counts_map.values().cloned().max().unwrap_or(0);
+
+    return match max_count <= 0 {
+        true => None,
+        _ => Some(
+            counts_map
+                .into_iter()
+                .filter(|&(_, count)| count == max_count)
+                .map(|(value, _)| f64::from_bits(value))
+                .collect(),
+        ),
+    };
 }
 
 fn algorithm_name_to_lowercase_underscored(algorithm_name: &String) -> String {
