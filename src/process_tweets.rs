@@ -11,6 +11,7 @@ use rayon::prelude::*;
 //TODO: try to debug errors that came from using reduce() rather than reduce_with() throughout project
 //TODO: integrate the use of "if let" throughout the project
 //TODO: replace uses of unwrap() with expect() throughout the project
+//TODO: check which pub functions really need to be
 
 pub fn process_tweets(tweets: &Vec<String>, parallel: bool) -> PriorityQueue<String, i128> {
     if parallel {

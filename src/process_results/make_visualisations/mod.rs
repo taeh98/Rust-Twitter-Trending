@@ -10,7 +10,6 @@ mod box_plots;
 mod dot_plots;
 mod scatter_plots;
 
-//TODO: implement this with plotters (?)
 pub fn make_visualisations(
     algorithm_names: &Vec<String>,
     time_taken_values: &Vec<Vec<f64>>,

@@ -21,7 +21,6 @@ mod t_tests;
 
 const STATS_OUTPUT_FILES_DIRECTORY: &'static str = "./out/stats";
 
-//TODO: implement this with statrs (?)
 pub fn make_stats(
     algorithm_names: &Vec<String>,
     time_taken_values: &Vec<Vec<f64>>,
