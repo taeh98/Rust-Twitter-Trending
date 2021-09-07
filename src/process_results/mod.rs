@@ -98,14 +98,14 @@ pub(crate) fn variable_to_axis_label(var: &Variable) -> String {
 }
 
 pub(crate) fn find_mean(values: &Vec<f64>) -> f64 {
-    let mut clone = values.clone();
-    let slice = clone.as_mut_slice();
+    let mut clone: Vec<f64> = values.clone();
+    let slice: &mut [f64] = clone.as_mut_slice();
     Data::new(slice).mean().unwrap()
 }
 
 pub(crate) fn find_median(values: &Vec<f64>) -> f64 {
-    let mut clone = values.clone();
-    let slice = clone.as_mut_slice();
+    let mut clone: Vec<f64> = values.clone();
+    let slice: &mut [f64] = clone.as_mut_slice();
     Data::new(slice).median()
 }
 
