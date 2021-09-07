@@ -90,7 +90,7 @@ fn find_iqr(values: &Vec<f64>) -> f64 {
 fn gen_basic_values(algorithm_name: &String, values: &Vec<f64>, variable: &Variable) {
     let mean: f64 = find_mean(values);
     let median: f64 = find_median(values);
-    let mode: f64 = find_mode(values);
+    let mode: Option<f64> = find_mode(values);
     let min: f64 = find_min(values);
     let max: f64 = find_max(values);
     let std_dev: f64 = find_std_dev(values);
@@ -115,8 +115,18 @@ fn gen_basic_values(algorithm_name: &String, values: &Vec<f64>, variable: &Varia
         ],
     );
 
-    let measure_values: Vec<f64> =
-        vec![min, max, mean, median, mode, std_dev, variance, q1, q3, iqr];
+    let measure_values: Vec<Option<f64>> = vec![
+        Some(min),
+        Some(max),
+        Some(mean),
+        Some(median),
+        mode,
+        Some(std_dev),
+        Some(variance),
+        Some(q1),
+        Some(q3),
+        Some(iqr),
+    ];
     let measure_values_series: Series = Series::new("Value", measure_values);
 
     let df: DataFrame = DataFrame::new(vec![measure_names_series, measure_values_series])
