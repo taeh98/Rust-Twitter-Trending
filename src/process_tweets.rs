@@ -3,6 +3,7 @@ use std::sync::Mutex;
 
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
+use std::cmp::Ordering;
 
 //TODO: replace PriorityQueue with std::collections::BinaryHeap
 //TODO: abstract word-count pairs to a separate data type
@@ -10,6 +11,48 @@ use rayon::prelude::*;
 //TODO: integrate the use of "if let" throughout the project
 //TODO: replace uses of unwrap() with expect() throughout the project
 //TODO: check which pub functions really need to be
+
+#[derive(Eq)]
+pub(crate) struct WordAndCount {
+    word: String,
+    count: isize
+}
+
+impl WordAndCount {
+    pub(crate) fn new(word: &str, count: isize) -> WordAndCount {
+        WordAndCount {
+            word: String::from(word),
+            count: count.clone()
+        }
+    }
+    pub(crate) fn get_word(&self) -> &String {
+        &self.word
+    }
+    pub(crate) fn get_count(&self) -> isize {
+        self.count
+    }
+    pub(crate) fn increment_count(&mut self) {
+        self.count += 1;
+    }
+}
+
+impl Ord for WordAndCount {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.count.cmp(&other.count)
+    }
+}
+
+impl PartialOrd for WordAndCount {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.count.cmp(&other.count))
+    }
+}
+
+impl PartialEq for WordAndCount {
+    fn eq(&self, other: &Self) -> bool {
+        self.word.eq(other.get_word()) && self.count == other.count
+    }
+}
 
 pub fn process_tweets(tweets: &Vec<String>, parallel: bool) -> PriorityQueue<String, i128> {
     if parallel {
