@@ -14,6 +14,8 @@ use crate::process_results::make_visualisations::{
 };
 use crate::process_results::{find_mean, find_median, find_mode, variable_to_axis_label, Variable};
 
+//TODO: integrate the updated find_mean() method from the process_results module
+
 #[derive(Clone, Copy)]
 enum Average {
     Mean,
