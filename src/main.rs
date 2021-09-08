@@ -1,5 +1,6 @@
 use std::time::Instant;
 
+use priority_queue::PriorityQueue;
 use serde::{Deserialize, Serialize};
 
 mod get_data;
