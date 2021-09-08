@@ -111,7 +111,7 @@ pub(crate) fn find_median(values: &Vec<f64>) -> f64 {
     Data::new(slice).median()
 }
 
-pub(crate) fn find_mode(values: &Vec<f64>) -> Option<Vec<f64>> {
+pub(crate) fn find_mode(values: &Vec<f64>) -> Option<f64> {
     let counts_map_mutex: Mutex<HashMap<u64, i32>> = Mutex::new(HashMap::new());
 
     values.into_par_iter().for_each(|&value: &f64| {
@@ -127,13 +127,14 @@ pub(crate) fn find_mode(values: &Vec<f64>) -> Option<Vec<f64>> {
 
     return match max_count <= 0 {
         true => None,
-        _ => Some(
-            counts_map
+        _ => {
+            let values: Vec<f64> = counts_map
                 .into_iter()
                 .filter(|&(_, count)| count == max_count)
                 .map(|(value, _)| f64::from_bits(value))
-                .collect(),
-        ),
+                .collect();
+            return Some(find_median(&values));
+        }
     };
 }
 

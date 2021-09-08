@@ -16,7 +16,7 @@ use crate::process_results::{find_mean, find_median, find_mode, variable_to_axis
 
 //TODO: integrate the updated find_mean() method from the process_results module
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 enum Average {
     Mean,
     Median,
@@ -35,15 +35,38 @@ const ALL_AVERAGES: [Average; 3] = [Average::Mean, Average::Median, Average::Mod
 const BAR_CHART_OUTPUT_FILES_DIRECTORY: &'static str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/bar_charts") as &'static str;
 
-fn gen_value_lists_averages(values_list: &Vec<Vec<f64>>, average_type: Average) -> Vec<f64> {
-    values_list
+fn gen_value_lists_averages(
+    values_list: &Vec<Vec<f64>>,
+    average_type: Average,
+) -> Option<Vec<f64>> {
+    if values_list.len() < 1 {
+        return None;
+    }
+
+    if average_type == Average::Mean || average_type == Average::Mode {
+        return Some(
+            values_list
+                .into_par_iter()
+                .map(|values: &Vec<f64>| match average_type {
+                    Average::Mean => find_mean(values),
+                    _ => find_median(values),
+                })
+                .collect(),
+        );
+    }
+
+    let averages: Vec<f64> = values_list
         .into_par_iter()
-        .map(|values: &Vec<f64>| match average_type {
-            Average::Mean => find_mean(values),
-            Average::Median => find_median(values),
-            _ => find_mode(values),
-        })
-        .collect()
+        .map(|values: &Vec<f64>| find_mode(values))
+        .filter(|value: &Option<f64>| value.is_some())
+        .map(|value: Option<f64>| value.unwrap())
+        .collect();
+
+    return if averages.len() == values_list.len() {
+        Some(averages)
+    } else {
+        None
+    };
 }
 
 pub(crate) fn make_bar_charts(
@@ -65,12 +88,21 @@ pub(crate) fn make_bar_charts(
         ALL_AVERAGES
             .into_par_iter()
             .for_each(|average_type: Average| {
-                let values: Vec<f64> = gen_value_lists_averages(var_name_val_pair.1, average_type);
-                match var_name_val_pair.0 {
-                    Variable::ProcessingSpeed => {
-                        gen_processing_speed_bar_chart(algorithm_names, &values, average_type)
+                let values: Option<Vec<f64>> =
+                    gen_value_lists_averages(var_name_val_pair.1, average_type);
+                if values.is_some() {
+                    match var_name_val_pair.0 {
+                        Variable::ProcessingSpeed => gen_processing_speed_bar_chart(
+                            algorithm_names,
+                            &values.unwrap(),
+                            average_type,
+                        ),
+                        _ => gen_time_taken_bar_chart(
+                            algorithm_names,
+                            &values.unwrap(),
+                            average_type,
+                        ),
                     }
-                    _ => gen_time_taken_bar_chart(algorithm_names, &values, average_type),
                 }
             });
     });
