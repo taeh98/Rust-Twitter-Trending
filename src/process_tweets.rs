@@ -1,7 +1,6 @@
+use std::collections::HashMap;
 use std::sync::Mutex;
 
-use dashmap::mapref::multiple::RefMulti;
-use dashmap::DashMap;
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
 
@@ -19,7 +18,7 @@ pub fn process_tweets(tweets: &Vec<String>, parallel: bool) -> PriorityQueue<Str
             tweets
                 .par_iter()
                 .map(|tweet: &String| process_tweet(tweet))
-                .reduce_with(|a: DashMap<String, i128>, b: DashMap<String, i128>| {
+                .reduce_with(|a: HashMap<String, i128>, b: HashMap<String, i128>| {
                     combine_processed_tweets(&a, &b, parallel)
                 })
                 .unwrap(),
@@ -30,7 +29,7 @@ pub fn process_tweets(tweets: &Vec<String>, parallel: bool) -> PriorityQueue<Str
             tweets
                 .iter()
                 .map(|tweet: &String| process_tweet(tweet))
-                .reduce(|a: DashMap<String, i128>, b: DashMap<String, i128>| {
+                .reduce(|a: HashMap<String, i128>, b: HashMap<String, i128>| {
                     combine_processed_tweets(&a, &b, parallel)
                 })
                 .unwrap(),
@@ -39,14 +38,14 @@ pub fn process_tweets(tweets: &Vec<String>, parallel: bool) -> PriorityQueue<Str
     }
 }
 
-fn process_tweet(tweet: &String) -> DashMap<String, i128> {
+fn process_tweet(tweet: &String) -> HashMap<String, i128> {
     let words: Vec<String> = tweet
         .clone()
         .split_whitespace()
         .into_iter()
         .map(|val: &str| String::from(val))
         .collect();
-    let res: DashMap<String, i128> = DashMap::new();
+    let res: HashMap<String, i128> = HashMap::new();
 
     for word in words.clone() {
         let count: i128 = words
@@ -62,28 +61,22 @@ fn process_tweet(tweet: &String) -> DashMap<String, i128> {
     res
 }
 
-fn get_dashmap_keys(a: &DashMap<String, i128>, parallel: bool) -> Vec<String> {
-    if parallel {
-        a.into_par_iter()
-            .map(|a: RefMulti<String, i128>| a.key().clone())
-            .collect()
-    } else {
-        a.into_iter()
-            .map(|a: RefMulti<String, i128>| a.key().clone())
-            .collect()
-    }
+fn get_hashmap_keys(a: &HashMap<String, i128>) -> Vec<String> {
+    a.into_par_iter()
+        .map(|value| value.0.clone())
+        .collect::<Vec<String>>()
 }
 
 fn combine_processed_tweets(
-    a: &DashMap<String, i128>,
-    b: &DashMap<String, i128>,
+    a: &HashMap<String, i128>,
+    b: &HashMap<String, i128>,
     parallel: bool,
-) -> DashMap<String, i128> {
-    let keys: Vec<String> = get_dashmap_keys(a, parallel)
+) -> HashMap<String, i128> {
+    let keys: Vec<String> = get_hashmap_keys(a)
         .into_iter()
-        .chain(get_dashmap_keys(b, parallel).into_iter())
+        .chain(get_hashmap_keys(b).into_iter())
         .collect();
-    let res: DashMap<String, i128> = DashMap::new();
+    let res: Mutex<HashMap<String, i128>> = Mutex::new(HashMap::new());
 
     if parallel {
         keys.into_par_iter().for_each(|key: String| {
@@ -92,16 +85,18 @@ fn combine_processed_tweets(
             match b.get(key_str) {
                 Some(b_count) => match a.get(key_str) {
                     Some(a_count) => {
-                        res.insert(key, a_count.clone() + b_count.clone());
+                        res.lock()
+                            .unwrap()
+                            .insert(key, a_count.clone() + b_count.clone());
                     }
                     _ => {
-                        res.insert(key, b_count.clone());
+                        res.lock().unwrap().insert(key, b_count.clone());
                     }
                 },
                 _ => {
                     match a.get(key_str) {
                         Some(val) => {
-                            res.insert(key, val.clone());
+                            res.lock().unwrap().insert(key, val.clone());
                         }
                         _ => {}
                     };
@@ -115,16 +110,18 @@ fn combine_processed_tweets(
             match b.get(key_str) {
                 Some(b_count) => match a.get(key_str) {
                     Some(a_count) => {
-                        res.insert(key, a_count.clone() + b_count.clone());
+                        res.lock()
+                            .unwrap()
+                            .insert(key, a_count.clone() + b_count.clone());
                     }
                     _ => {
-                        res.insert(key, b_count.clone());
+                        res.lock().unwrap().insert(key, b_count.clone());
                     }
                 },
                 _ => {
                     match a.get(key_str) {
                         Some(val) => {
-                            res.insert(key, val.clone());
+                            res.lock().unwrap().insert(key, val.clone());
                         }
                         _ => {}
                     };
@@ -133,11 +130,11 @@ fn combine_processed_tweets(
         });
     }
 
-    res
+    res.into_inner().unwrap()
 }
 
 fn processed_tweets_to_priority_queue(
-    pt: DashMap<String, i128>,
+    pt: HashMap<String, i128>,
     parallel: bool,
 ) -> PriorityQueue<String, i128> {
     if parallel {
