@@ -1,8 +1,9 @@
 /*
    TODO: create source files implementing the below stats
+   TODO: implement one-way ANOVA tests
 
    Wilcoxon Rank-Sum tests (aka Mann–Whitney U test) between times taken and tweets per second rates of all algorithms: non-parametric alternative to t-test
-   one-way anova tests between times taken and tweets per second rates of all algorithms
+   one-way ANOVA tests between times taken and tweets per second rates of all algorithms
    Kruskal Wallis H Tests between times taken and tweets per second rates of all algorithms: non-parametric alternative to anova
    Chi-squared test to see how dependent the categorical variables (Rust or Python and serial or parallel) are
    G-test to see how dependent the categorical variables (Rust or Python and serial or parallel) are (?)
