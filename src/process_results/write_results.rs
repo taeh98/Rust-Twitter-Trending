@@ -40,6 +40,8 @@ fn gen_time_taken_or_processing_speed_series(
 }
 
 pub(crate) fn write_results_csv(results: &Vec<TweetProcessingResult>) {
+    //TODO: make this work properly
+
     // write results to csv: algorithm name, time taken values (seconds), tweet processing speed values (tweets/second)
     let algorithm_names: Vec<String> = results
         .into_par_iter()
