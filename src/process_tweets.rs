@@ -124,11 +124,10 @@ fn combine_processed_tweets(
         .into_iter()
         .chain(get_hashmap_keys(b, parallel).into_iter())
         .collect();
-    let res: Mutex<HashMap<String, WordAndCount>> = Mutex::new(HashMap::new());
-
     let hms: [&HashMap<String, WordAndCount>; 2] = [a, b];
 
-    if parallel {
+    return if parallel {
+        let res: Mutex<HashMap<String, WordAndCount>> = Mutex::new(HashMap::new());
         keys.into_par_iter().for_each(|key: String| {
             let key_str: &str = key.as_str();
 
@@ -150,7 +149,11 @@ fn combine_processed_tweets(
                 WordAndCount::new(key_str, total_count.into_inner() as i64),
             );
         });
+
+        res.into_inner().unwrap()
     } else {
+        let mut res: HashMap<String, WordAndCount> = HashMap::new();
+
         keys.into_iter().for_each(|key: String| {
             let key_str: &str = key.as_str();
 
@@ -165,13 +168,11 @@ fn combine_processed_tweets(
                 },
             );
 
-            res.lock()
-                .unwrap()
-                .insert(key.clone(), WordAndCount::new(key_str, total_count));
+            res.insert(key.clone(), WordAndCount::new(key_str, total_count));
         });
-    }
 
-    res.into_inner().unwrap()
+        res
+    };
 }
 
 fn processed_tweets_to_priority_queue(
