@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::collections::binary_heap::BinaryHeap;
 use std::collections::HashMap;
+use std::sync::atomic::AtomicI64;
 use std::sync::Mutex;
 
 use rayon::prelude::*;
@@ -10,14 +11,14 @@ use rayon::prelude::*;
 //TODO: replace uses of unwrap() with expect() throughout the project
 //TODO: check which pub functions really need to be
 
-#[derive(Eq, Copy, Clone)]
+#[derive(Eq, Clone)]
 pub(crate) struct WordAndCount {
     word: String,
-    count: isize,
+    count: i64,
 }
 
 impl WordAndCount {
-    pub(crate) fn new(word: &str, count: isize) -> WordAndCount {
+    pub(crate) fn new(word: &str, count: i64) -> WordAndCount {
         WordAndCount {
             word: String::from(word),
             count: count.clone(),
@@ -26,7 +27,7 @@ impl WordAndCount {
     pub(crate) fn get_word(&self) -> &String {
         &self.word
     }
-    pub(crate) fn get_count(&self) -> isize {
+    pub(crate) fn get_count(&self) -> i64 {
         self.count
     }
     pub(crate) fn increment_count(&mut self) {
@@ -52,34 +53,29 @@ impl PartialEq for WordAndCount {
     }
 }
 
-pub fn process_tweets(tweets: &Vec<String>, parallel: bool) -> BinaryHeap<WordAndCount> {
-    if parallel {
-        processed_tweets_to_priority_queue(
-            tweets
-                .par_iter()
-                .map(|tweet: &String| process_tweet(tweet))
-                .reduce_with(
-                    |a: HashMap<String, WordAndCount>, b: HashMap<String, WordAndCount>| {
-                        combine_processed_tweets(&a, &b, parallel)
-                    },
-                )
-                .unwrap(),
-            parallel,
-        )
+pub(crate) fn process_tweets(tweets: &Vec<String>, parallel: bool) -> BinaryHeap<WordAndCount> {
+    let res_hashmap: HashMap<String, WordAndCount> = if parallel {
+        tweets
+            .par_iter()
+            .map(|tweet: &String| process_tweet(tweet))
+            .reduce_with(
+                |a: HashMap<String, WordAndCount>, b: HashMap<String, WordAndCount>| {
+                    combine_processed_tweets(&a, &b, parallel)
+                },
+            )
+            .unwrap()
     } else {
-        processed_tweets_to_priority_queue(
-            tweets
-                .iter()
-                .map(|tweet: &String| process_tweet(tweet))
-                .reduce(
-                    |a: HashMap<String, WordAndCount>, b: HashMap<String, WordAndCount>| {
-                        combine_processed_tweets(&a, &b, parallel)
-                    },
-                )
-                .unwrap(),
-            parallel,
-        )
-    }
+        tweets
+            .iter()
+            .map(|tweet: &String| process_tweet(tweet))
+            .reduce(
+                |a: HashMap<String, WordAndCount>, b: HashMap<String, WordAndCount>| {
+                    combine_processed_tweets(&a, &b, parallel)
+                },
+            )
+            .unwrap()
+    };
+    processed_tweets_to_priority_queue(res_hashmap)
 }
 
 fn process_tweet(tweet: &String) -> HashMap<String, WordAndCount> {
@@ -92,14 +88,14 @@ fn process_tweet(tweet: &String) -> HashMap<String, WordAndCount> {
     let mut res: HashMap<String, WordAndCount> = HashMap::new();
 
     for word in words.clone() {
-        let count: isize = words
+        let count: i64 = words
             .clone()
             .into_iter()
             .filter(|s: &String| s.clone() == word)
-            .count() as isize;
+            .count() as i64;
         let word_str: &str = word.as_str();
         if !res.contains_key(word_str) {
-            res.insert(word, WordAndCount::new(word_str, count));
+            res.insert(word.clone(), WordAndCount::new(word_str, count));
         }
     }
 
@@ -129,37 +125,43 @@ fn combine_processed_tweets(
         keys.into_par_iter().for_each(|key: String| {
             let key_str: &str = key.as_str();
 
-            let mut total_count: isize = 0;
+            let total_count: AtomicI64 = AtomicI64::new(0);
 
             hms.into_par_iter()
                 .for_each(|hm: &HashMap<String, WordAndCount>| match hm.get(key_str) {
                     Some(word_and_count) => {
-                        total_count += word_and_count.get_count();
+                        total_count.fetch_add(
+                            word_and_count.get_count() as i64,
+                            std::sync::atomic::Ordering::SeqCst,
+                        );
                     }
                     _ => {}
                 });
 
-            res.lock()
-                .unwrap()
-                .insert(key, WordAndCount::new(key_str, total_count));
+            res.lock().unwrap().insert(
+                key.clone(),
+                WordAndCount::new(key_str, total_count.into_inner() as i64),
+            );
         });
     } else {
         keys.into_iter().for_each(|key: String| {
             let key_str: &str = key.as_str();
 
-            let mut total_count: isize = 0;
+            let mut total_count: i64 = 0;
 
             hms.into_iter()
-                .for_each(|hm: &HashMap<String, WordAndCount>| match hm.get(key_str) {
-                    Some(word_and_count) => {
-                        total_count += word_and_count.get_count();
-                    }
-                    _ => {}
-                });
+                .for_each(
+                    |&hm: &&HashMap<String, WordAndCount>| match hm.get(key_str) {
+                        Some(word_and_count) => {
+                            total_count += word_and_count.get_count();
+                        }
+                        _ => {}
+                    },
+                );
 
             res.lock()
                 .unwrap()
-                .insert(key, WordAndCount::new(key_str, total_count));
+                .insert(key.clone(), WordAndCount::new(key_str, total_count));
         });
     }
 
@@ -168,17 +170,8 @@ fn combine_processed_tweets(
 
 fn processed_tweets_to_priority_queue(
     pt: HashMap<String, WordAndCount>,
-    parallel: bool,
 ) -> BinaryHeap<WordAndCount> {
-    if parallel {
-        let mut res: BinaryHeap<WordAndCount> = BinaryHeap::new();
-        pt.values()
-            .into_par_iter()
-            .for_each(|value: &WordAndCount| {
-                res.push(value.clone());
-            });
-        return res;
-    } else {
-        BinaryHeap::from(pt.values().collect())
-    }
+    // BinaryHeap::from(pt.values().collect::<Vec<&WordAndCount>>())
+    //TODO: do this properly
+    BinaryHeap::new()
 }

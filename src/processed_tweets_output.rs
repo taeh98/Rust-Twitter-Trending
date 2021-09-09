@@ -10,36 +10,39 @@ use crate::process_tweets::WordAndCount;
 const NUMBER_TO_SHOW: usize = 10;
 const TOP_WORDS_HASHTAGS_OUTPUT_FILEPATH: &str = "out/top_words_hashtags.txt";
 
-pub fn get_top_words_text_from_counts(counts: &BinaryHeap<WordAndCount>) -> String {
-    let top_hashtags: Vec<(String, i128)> = get_top_words(counts, true);
-    let top_words: Vec<(String, i128)> = get_top_words(counts, false);
+pub(crate) fn get_top_words_text_from_counts(counts: &BinaryHeap<WordAndCount>) -> String {
+    let top_hashtags: BinaryHeap<WordAndCount> = get_top_words(counts, true);
+    let top_words: BinaryHeap<WordAndCount> = get_top_words(counts, false);
     get_top_words_text(top_words, top_hashtags)
 }
 
-pub fn print_top_words_text_from_counts(counts: &BinaryHeap<WordAndCount>) {
-    let top_hashtags: Vec<(String, i128)> = get_top_words(counts, true);
-    let top_words: Vec<(String, i128)> = get_top_words(counts, false);
+pub(crate) fn print_top_words_text_from_counts(counts: &BinaryHeap<WordAndCount>) {
+    let top_hashtags: BinaryHeap<WordAndCount> = get_top_words(counts, true);
+    let top_words: BinaryHeap<WordAndCount> = get_top_words(counts, false);
     print_top_words_text(top_words, top_hashtags)
 }
 
 fn get_top_words(
     counts_in: &BinaryHeap<WordAndCount>,
     hashtag_not_word: bool,
-) -> Vec<(String, i128)> {
-    let mut res: Vec<(String, i128)> = Vec::new();
+) -> BinaryHeap<WordAndCount> {
+    let mut res: BinaryHeap<WordAndCount> = BinaryHeap::new();
     let mut counts: BinaryHeap<WordAndCount> = counts_in.clone();
 
     while res.len() < NUMBER_TO_SHOW && (!counts.is_empty()) {
-        let current_tc = counts.pop().unwrap();
-        if current_tc.0.starts_with("#") == hashtag_not_word {
-            res.push((current_tc.0.clone(), current_tc.1.clone()));
+        let current_wc: WordAndCount = counts.pop().unwrap();
+        if current_wc.get_word().starts_with("#") == hashtag_not_word {
+            res.push(current_wc.clone());
         }
     }
 
     res
 }
 
-fn get_top_words_text(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i128)>) -> String {
+fn get_top_words_text(
+    top_words: BinaryHeap<WordAndCount>,
+    top_hashtags: BinaryHeap<WordAndCount>,
+) -> String {
     format!(
         "Top words:\r\n{}\r\n\r\nTop hashtags:\r\n{}",
         top_word_list_to_string(top_words),
@@ -47,7 +50,10 @@ fn get_top_words_text(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String,
     )
 }
 
-fn print_top_words_text(top_words: Vec<(String, i128)>, top_hashtags: Vec<(String, i128)>) {
+fn print_top_words_text(
+    top_words: BinaryHeap<WordAndCount>,
+    top_hashtags: BinaryHeap<WordAndCount>,
+) {
     let text: String = get_top_words_text(top_words, top_hashtags);
 
     println!("{}", text);
@@ -61,9 +67,9 @@ fn print_top_words_text(top_words: Vec<(String, i128)>, top_hashtags: Vec<(Strin
     file.write_all(text.as_bytes()).unwrap();
 }
 
-fn top_word_list_to_string(list: Vec<(String, i128)>) -> String {
+fn top_word_list_to_string(list: BinaryHeap<WordAndCount>) -> String {
     list.into_par_iter()
-        .map(|val: (String, i128)| format!("{} {}", val.0, val.1))
+        .map(|val: WordAndCount| format!("{} {}", val.get_word(), val.get_count()))
         .reduce_with(|a: String, b: String| format!("{}\r\n{}", a, b))
         .unwrap()
 }
