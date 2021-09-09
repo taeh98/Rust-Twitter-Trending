@@ -84,7 +84,7 @@ fn main() {
                 run_rust_tweet_processing_algorithm(&tweets, num_tweets, false),
             ];
 
-            //TODO: implement parallelised and non-parallelised algorithms in Python to compare to
+            //TODO: implement parallelised and non-parallelised algorithms in Python to compare Rust ones against
 
             println!("Done running tweet processing algorithms.");
             process_results::process_results(algorithm_results);
