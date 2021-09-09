@@ -53,7 +53,7 @@ pub fn file_name_to_filepath(name: &str) -> String {
     format!("{}/{}", DATA_DIRECTORY_PATH, name)
 }
 
-pub fn download_data_files(dfs: &Vec<DataFileMetaData>) {
+pub fn download_data_files(dfs: &[DataFileMetaData]) {
     if dfs.is_empty() {
         return;
     }
@@ -69,7 +69,7 @@ fn download_data_file(df: &DataFileMetaData) {
 
     let file_path: String = df.get_file_path();
     let mut response: Response = get(df.get_url())
-        .expect(format!("Failed to download the data file {}.", df.get_file_name()).as_str());
+        .unwrap_or_else(|_| panic!("Failed to download the data file {}.", df.get_file_name()));
 
     assert!(
         response.status().is_success(),
@@ -93,21 +93,19 @@ fn download_data_file(df: &DataFileMetaData) {
         );
     }
 
-    let mut out: File = File::create(&file_path).expect(
-        format!(
+    let mut out: File = File::create(&file_path).unwrap_or_else(|_| {
+        panic!(
             "Couldn't create the output file to which to save the data file {}.",
             &file_path
         )
-        .as_str(),
-    );
+    });
 
-    response.copy_to(&mut out).expect(
-        format!(
+    response.copy_to(&mut out).unwrap_or_else(|_| {
+        panic!(
             "Failed to save the downloaded content of the data file {} to its output file.",
             &file_path
         )
-        .as_str(),
-    );
+    });
 
     println!("Finished downloading the data file {}.", df.get_file_name());
 }

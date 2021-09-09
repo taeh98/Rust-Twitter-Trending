@@ -25,69 +25,76 @@ const BASIC_VALUES_OUTPUT_FILES_DIRECTORY: &str =
     concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/basic_values") as &str;
 
 pub(crate) fn make_basic_values(
-    algorithm_names: &Vec<String>,
-    time_taken_values: &Vec<Vec<f64>>,
-    processing_speed_values: &Vec<Vec<f64>>,
+    algorithm_names: &[String],
+    time_taken_values: &[Vec<f64>],
+    processing_speed_values: &[Vec<f64>],
 ) {
     if !Path::new(BASIC_VALUES_OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(BASIC_VALUES_OUTPUT_FILES_DIRECTORY)
             .expect("Couldn't create the out/stats/basic_values/ directory.");
     }
 
-    let combined_values: Vec<(&String, (&Vec<f64>, &Vec<f64>))> = algorithm_names
+    let combined_values: Vec<(&String, &Vec<f64>, &Vec<f64>)> = algorithm_names
         .iter()
         .zip(time_taken_values.iter().zip(processing_speed_values.iter()))
+        .collect::<Vec<(&String, (&Vec<f64>, &Vec<f64>))>>()
+        .into_iter()
+        .map(
+            |(algorithm_name, (time_taken_values, processing_speed_values))| {
+                (algorithm_name, time_taken_values, processing_speed_values)
+            },
+        )
         .collect();
 
     let time_taken: Variable = Variable::TimeTaken;
     let processing_speed: Variable = Variable::ProcessingSpeed;
 
     combined_values.into_par_iter().for_each(
-        |(algorithm_name, (time_taken_values, processing_speed_values))| {
+        |(algorithm_name, time_taken_values, processing_speed_values)| {
             gen_basic_values(algorithm_name, time_taken_values, &time_taken);
             gen_basic_values(algorithm_name, processing_speed_values, &processing_speed);
         },
     );
 }
 
-fn find_max(values: &Vec<f64>) -> f64 {
+fn find_max(values: &[f64]) -> f64 {
     values.max()
 }
 
-fn find_min(values: &Vec<f64>) -> f64 {
+fn find_min(values: &[f64]) -> f64 {
     values.min()
 }
 
-fn find_std_dev(values: &Vec<f64>) -> f64 {
+fn find_std_dev(values: &[f64]) -> f64 {
     values.std_dev()
 }
 
-fn find_variance(values: &Vec<f64>) -> f64 {
+fn find_variance(values: &[f64]) -> f64 {
     values.variance()
 }
 
-fn find_q1(values: &Vec<f64>) -> f64 {
-    let mut clone: Vec<f64> = values.clone();
+fn find_q1(values: &[f64]) -> f64 {
+    let mut clone: Vec<f64> = values.to_vec();
     let slice: &mut [f64] = clone.as_mut_slice();
     let mut data: Data<&mut [f64]> = Data::new(slice);
     data.lower_quartile()
 }
 
-fn find_q3(values: &Vec<f64>) -> f64 {
-    let mut clone: Vec<f64> = values.clone();
+fn find_q3(values: &[f64]) -> f64 {
+    let mut clone: Vec<f64> = values.to_vec();
     let slice: &mut [f64] = clone.as_mut_slice();
     let mut data: Data<&mut [f64]> = Data::new(slice);
     data.upper_quartile()
 }
 
-fn find_iqr(values: &Vec<f64>) -> f64 {
-    let mut clone: Vec<f64> = values.clone();
+fn find_iqr(values: &[f64]) -> f64 {
+    let mut clone: Vec<f64> = values.to_vec();
     let slice: &mut [f64] = clone.as_mut_slice();
     let mut data: Data<&mut [f64]> = Data::new(slice);
     data.interquartile_range()
 }
 
-fn gen_basic_values(algorithm_name: &String, values: &Vec<f64>, variable: &Variable) {
+fn gen_basic_values(algorithm_name: &str, values: &[f64], variable: &Variable) {
     let mean: f64 = find_mean(values);
     let median: f64 = find_median(values);
     let mode: Option<f64> = find_mode(values);

@@ -13,7 +13,7 @@ use crate::{TimeTakenTweetProcessingSpeedValuePair, TweetProcessingResult};
 
 fn gen_time_taken_or_processing_speed_series(
     time_taken: bool,
-    results: &Vec<TweetProcessingResult>,
+    results: &[TweetProcessingResult],
 ) -> Series {
     let column_title: &str = if time_taken {
         "Time taken values (seconds)"
@@ -34,14 +34,14 @@ fn gen_time_taken_or_processing_speed_series(
                     if time_taken { time_taken_tweets_per_sec_value_pair.get_processing_speed_tweets_per_second() } else { time_taken_tweets_per_sec_value_pair.get_time_taken_seconds() })
                 .map(|f64_val| f64_val.to_string())
                 .collect();
-            return format!("{}", values.join(","));
+            values.join(",")
         })
         .collect();
 
     Series::new(column_title, joined_values)
 }
 
-pub(crate) fn write_results_csv(results: &Vec<TweetProcessingResult>) {
+pub(crate) fn write_results_csv(results: &[TweetProcessingResult]) {
     // write results to csv: algorithm name, time taken values (seconds), tweet processing speed values (tweets/second)
     let algorithm_names: Vec<String> = results
         .into_par_iter()

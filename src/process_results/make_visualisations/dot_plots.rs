@@ -23,9 +23,9 @@ const DOT_PLOTS_OUTPUT_FILES_DIRECTORY: &str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/dot_plots") as &str;
 
 pub(crate) fn make_dot_plots(
-    algorithm_names: &Vec<String>,
-    time_taken_values: &Vec<Vec<f64>>,
-    processing_speed_values: &Vec<Vec<f64>>,
+    algorithm_names: &[String],
+    time_taken_values: &[Vec<f64>],
+    processing_speed_values: &[Vec<f64>],
 ) {
     if !Path::new(DOT_PLOTS_OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(DOT_PLOTS_OUTPUT_FILES_DIRECTORY)
@@ -37,16 +37,12 @@ pub(crate) fn make_dot_plots(
         (Variable::ProcessingSpeed, processing_speed_values),
     ]
     .into_par_iter()
-    .for_each(|var_values_pair: (Variable, &Vec<Vec<f64>>)| {
+    .for_each(|var_values_pair: (Variable, &[Vec<f64>])| {
         gen_dot_plot(algorithm_names, var_values_pair.1, &var_values_pair.0)
     })
 }
 
-fn gen_dot_plot(
-    algorithm_names: &Vec<String>,
-    algorithm_values: &Vec<Vec<f64>>,
-    variable: &Variable,
-) {
+fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], variable: &Variable) {
     // Define chart related sizes.
     let width: isize = CHART_WIDTH_PIXELS;
     let height: isize = CHART_HEIGHT_PIXELS;
@@ -57,7 +53,7 @@ fn gen_dot_plot(
         .map(|values: &Vec<f64>| {
             let mut_values: Vec<f64> = values.clone();
             let data: Data<Vec<f64>> = Data::new(mut_values);
-            return data.max();
+            data.max()
         })
         .reduce_with(|a: f64, b: f64| if a > b { a } else { b })
         .unwrap();
@@ -65,7 +61,7 @@ fn gen_dot_plot(
     // Create a band scale that maps ["A", "B", "C"] categories to values in the [0, availableWidth]
     // range (the width of the chart without the margins).
     let x: ScaleBand = ScaleBand::new()
-        .set_domain(algorithm_names.clone())
+        .set_domain(algorithm_names.to_vec())
         .set_range(vec![0, width - left - right]);
 
     // Create a linear scale that will interpolate values in [0, 100] range to corresponding
@@ -82,7 +78,7 @@ fn gen_dot_plot(
 
     for (algorithm_name, algorithm_values) in algorithm_names.iter().zip(algorithm_values.iter()) {
         for value in algorithm_values {
-            scatter_data.push((algorithm_name.clone(), value.clone() as f32));
+            scatter_data.push((algorithm_name.clone(), *value as f32));
         }
     }
 

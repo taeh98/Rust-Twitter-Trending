@@ -19,10 +19,10 @@ pub(crate) struct WordAndCount {
 }
 
 impl WordAndCount {
-    pub(crate) fn new(word: &str, count: i64) -> WordAndCount {
+    pub(crate) fn new(word: &str, count_in: i64) -> WordAndCount {
         WordAndCount {
             word: String::from(word),
-            count: count.clone(),
+            count: count_in,
         }
     }
     pub(crate) fn get_word(&self) -> &String {
@@ -54,7 +54,7 @@ impl PartialEq for WordAndCount {
     }
 }
 
-pub(crate) fn process_tweets(tweets: &Vec<String>, parallel: bool) -> BinaryHeap<WordAndCount> {
+pub(crate) fn process_tweets(tweets: &[String], parallel: bool) -> BinaryHeap<WordAndCount> {
     let res_hashmap: HashMap<String, WordAndCount> = if parallel {
         tweets
             .par_iter()
@@ -79,12 +79,11 @@ pub(crate) fn process_tweets(tweets: &Vec<String>, parallel: bool) -> BinaryHeap
     processed_tweets_to_priority_queue(res_hashmap, parallel)
 }
 
-fn process_tweet(tweet: &String) -> HashMap<String, WordAndCount> {
+fn process_tweet(tweet: &str) -> HashMap<String, WordAndCount> {
     let words: Vec<String> = tweet
-        .clone()
         .split_whitespace()
         .into_iter()
-        .map(|val: &str| String::from(val))
+        .map(String::from)
         .collect();
     let mut res: HashMap<String, WordAndCount> = HashMap::new();
 
@@ -109,7 +108,7 @@ fn get_hashmap_keys(a: &HashMap<String, WordAndCount>, parallel: bool) -> Vec<St
             .map(|value| value.0.clone())
             .collect::<Vec<String>>()
     } else {
-        a.into_iter()
+        a.iter()
             .map(|value| value.0.clone())
             .collect::<Vec<String>>()
     };
@@ -126,7 +125,7 @@ fn combine_processed_tweets(
         .collect();
     let hms: [&HashMap<String, WordAndCount>; 2] = [a, b];
 
-    return if parallel {
+    if parallel {
         let res: Mutex<HashMap<String, WordAndCount>> = Mutex::new(HashMap::new());
         keys.into_par_iter().for_each(|key: String| {
             let key_str: &str = key.as_str();
@@ -134,14 +133,13 @@ fn combine_processed_tweets(
             let total_count: AtomicI64 = AtomicI64::new(0);
 
             hms.into_par_iter()
-                .for_each(|hm: &HashMap<String, WordAndCount>| match hm.get(key_str) {
-                    Some(word_and_count) => {
+                .for_each(|hm: &HashMap<String, WordAndCount>| {
+                    if let Some(word_and_count) = hm.get(key_str) {
                         total_count.fetch_add(
                             word_and_count.get_count() as i64,
                             std::sync::atomic::Ordering::SeqCst,
                         );
                     }
-                    _ => {}
                 });
 
             res.lock().unwrap().insert(
@@ -159,20 +157,17 @@ fn combine_processed_tweets(
 
             let mut total_count: i64 = 0;
 
-            hms.iter().for_each(
-                |&hm: &&HashMap<String, WordAndCount>| match hm.get(key_str) {
-                    Some(word_and_count) => {
-                        total_count += word_and_count.get_count();
-                    }
-                    _ => {}
-                },
-            );
+            hms.iter().for_each(|&hm: &&HashMap<String, WordAndCount>| {
+                if let Some(word_and_count) = hm.get(key_str) {
+                    total_count += word_and_count.get_count();
+                }
+            });
 
             res.insert(key.clone(), WordAndCount::new(key_str, total_count));
         });
 
         res
-    };
+    }
 }
 
 fn processed_tweets_to_priority_queue(

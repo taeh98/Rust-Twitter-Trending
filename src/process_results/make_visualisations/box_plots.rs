@@ -21,9 +21,9 @@ const BOX_PLOTS_OUTPUT_FILES_DIRECTORY: &str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/box_plots") as &str;
 
 pub(crate) fn make_box_plots(
-    algorithm_names: &Vec<String>,
-    time_taken_values: &Vec<Vec<f64>>,
-    processing_speed_values: &Vec<Vec<f64>>,
+    algorithm_names: &[String],
+    time_taken_values: &[Vec<f64>],
+    processing_speed_values: &[Vec<f64>],
 ) {
     if !Path::new(BOX_PLOTS_OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(BOX_PLOTS_OUTPUT_FILES_DIRECTORY)
@@ -35,16 +35,12 @@ pub(crate) fn make_box_plots(
         (Variable::ProcessingSpeed, processing_speed_values),
     ]
     .into_par_iter()
-    .for_each(|var_values_pair: (Variable, &Vec<Vec<f64>>)| {
+    .for_each(|var_values_pair: (Variable, &[Vec<f64>])| {
         gen_box_plot(algorithm_names, var_values_pair.1, &var_values_pair.0)
     })
 }
 
-fn gen_box_plot(
-    algorithm_names: &Vec<String>,
-    algorithm_values: &Vec<Vec<f64>>,
-    variable: &Variable,
-) {
+fn gen_box_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], variable: &Variable) {
     let output_file_path: String = format!(
         "{}/{}.svg",
         BOX_PLOTS_OUTPUT_FILES_DIRECTORY,
@@ -74,8 +70,9 @@ fn gen_box_plot(
             .map(|quartiles: &Quartiles| quartiles.values().to_vec())
             .reduce_with(|a: Vec<f32>, b: Vec<f32>| {
                 let mut mut_a: Vec<f32> = a.clone();
-                mut_a.append(b.clone().as_mut());
-                return a;
+                let mut mut_b: Vec<f32> = b;
+                mut_a.append(mut_b.as_mut());
+                a
             })
             .unwrap()
             .as_slice(),

@@ -33,11 +33,8 @@ const ALL_AVERAGES: [Average; 3] = [Average::Mean, Average::Median, Average::Mod
 const BAR_CHART_OUTPUT_FILES_DIRECTORY: &str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/bar_charts") as &str;
 
-fn gen_value_lists_averages(
-    values_list: &Vec<Vec<f64>>,
-    average_type: Average,
-) -> Option<Vec<f64>> {
-    if values_list.len() < 1 {
+fn gen_value_lists_averages(values_list: &[Vec<f64>], average_type: Average) -> Option<Vec<f64>> {
+    if values_list.is_empty() {
         return None;
     }
 
@@ -60,17 +57,17 @@ fn gen_value_lists_averages(
         .map(|value: Option<f64>| value.unwrap())
         .collect();
 
-    return if averages.len() == values_list.len() {
+    if averages.len() == values_list.len() {
         Some(averages)
     } else {
         None
-    };
+    }
 }
 
 pub(crate) fn make_bar_charts(
-    algorithm_names: &Vec<String>,
-    time_taken_values: &Vec<Vec<f64>>,
-    processing_speed_values: &Vec<Vec<f64>>,
+    algorithm_names: &[String],
+    time_taken_values: &[Vec<f64>],
+    processing_speed_values: &[Vec<f64>],
 ) {
     if !Path::new(BAR_CHART_OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(BAR_CHART_OUTPUT_FILES_DIRECTORY)
@@ -82,35 +79,27 @@ pub(crate) fn make_bar_charts(
         (Variable::ProcessingSpeed, processing_speed_values),
     ]
     .into_par_iter()
-    .for_each(|var_name_val_pair: (Variable, &Vec<Vec<f64>>)| {
+    .for_each(|var_name_val_pair: (Variable, &[Vec<f64>])| {
         ALL_AVERAGES
             .into_par_iter()
             .for_each(|average_type: Average| {
-                let values: Option<Vec<f64>> =
+                let values_option: Option<Vec<f64>> =
                     gen_value_lists_averages(var_name_val_pair.1, average_type);
-                if values.is_some() {
+                if let Some(values_vec) = values_option {
                     match var_name_val_pair.0 {
                         Variable::ProcessingSpeed => gen_processing_speed_bar_chart(
                             algorithm_names,
-                            &values.unwrap(),
+                            &values_vec,
                             average_type,
                         ),
-                        _ => gen_time_taken_bar_chart(
-                            algorithm_names,
-                            &values.unwrap(),
-                            average_type,
-                        ),
+                        _ => gen_time_taken_bar_chart(algorithm_names, &values_vec, average_type),
                     }
                 }
             });
     });
 }
 
-fn gen_time_taken_bar_chart(
-    algorithm_names: &Vec<String>,
-    values_in: &Vec<f64>,
-    average_type: Average,
-) {
+fn gen_time_taken_bar_chart(algorithm_names: &[String], values_in: &[f64], average_type: Average) {
     let average_string: String = average_to_string(average_type);
     gen_bar_chart(
         algorithm_names,
@@ -133,8 +122,8 @@ fn gen_time_taken_bar_chart(
 }
 
 fn gen_processing_speed_bar_chart(
-    algorithm_names: &Vec<String>,
-    values_in: &Vec<f64>,
+    algorithm_names: &[String],
+    values_in: &[f64],
     average_type: Average,
 ) {
     let average_string: String = average_to_string(average_type);
@@ -159,8 +148,8 @@ fn gen_processing_speed_bar_chart(
 }
 
 fn gen_bar_chart(
-    category_names: &Vec<String>,
-    values_in: &Vec<f64>,
+    category_names: &[String],
+    values_in: &[f64],
     filepath: &str,
     title: &str,
     y_axis_label: &str,
@@ -171,7 +160,7 @@ fn gen_bar_chart(
 
     let values: Vec<f32> = values_in
         .into_par_iter()
-        .map(|val: &f64| val.clone() as f32)
+        .map(|val: &f64| *val as f32)
         .collect();
 
     assert_eq!(category_names.len(), (&values).len());
@@ -180,13 +169,12 @@ fn gen_bar_chart(
         .clone()
         .into_par_iter()
         .reduce_with(|a: f32, b: f32| if a > b { a } else { b })
-        .unwrap()
-        .clone();
+        .unwrap();
 
     // Create a band scale that maps ["A", "B", "C"] categories to values in the [0, availableWidth]
     // range (the width of the chart without the margins).
     let x = ScaleBand::new()
-        .set_domain(category_names.clone())
+        .set_domain(category_names.to_vec())
         .set_range(vec![0, CHART_WIDTH_PIXELS - left - right])
         .set_inner_padding(0.1)
         .set_outer_padding(0.1);
@@ -203,10 +191,10 @@ fn gen_bar_chart(
     // You can use your own iterable as data as long as its items implement the `BarDatum` trait.
     let data: Vec<(String, f32)> = category_names
         .iter()
-        .zip(values.clone().iter())
+        .zip(values.iter())
         .collect::<Vec<(&String, &f32)>>()
         .into_par_iter()
-        .map(|val: (&String, &f32)| (val.0.clone(), val.1.clone()))
+        .map(|val: (&String, &f32)| (val.0.clone(), *val.1))
         .collect();
 
     // Create VerticalBar view that is going to represent the data as vertical bars.

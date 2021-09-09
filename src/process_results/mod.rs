@@ -16,7 +16,7 @@ mod write_results;
 const OUTPUT_FILES_DIRECTORY: &str = "./out";
 const RAW_RESULTS_FILE_NAME: &str = "results.csv";
 
-fn gen_algorithm_names(algorithm_results: &Vec<TweetProcessingResult>) -> Vec<String> {
+fn gen_algorithm_names(algorithm_results: &[TweetProcessingResult]) -> Vec<String> {
     algorithm_results
         .into_par_iter()
         .map(|res: &TweetProcessingResult| res.get_name().clone())
@@ -24,7 +24,7 @@ fn gen_algorithm_names(algorithm_results: &Vec<TweetProcessingResult>) -> Vec<St
 }
 
 fn gen_time_taken_or_processing_speed_values(
-    algorithm_results: &Vec<TweetProcessingResult>,
+    algorithm_results: &[TweetProcessingResult],
     time_taken_not_processing_speed: bool,
 ) -> Vec<Vec<f64>> {
     algorithm_results
@@ -99,19 +99,19 @@ pub(crate) fn variable_to_axis_label(var: &Variable) -> String {
     }
 }
 
-pub(crate) fn find_mean(values: &Vec<f64>) -> f64 {
-    let mut clone: Vec<f64> = values.clone();
+pub(crate) fn find_mean(values: &[f64]) -> f64 {
+    let mut clone: Vec<f64> = values.to_vec();
     let slice: &mut [f64] = clone.as_mut_slice();
     Data::new(slice).mean().unwrap()
 }
 
-pub(crate) fn find_median(values: &Vec<f64>) -> f64 {
-    let mut clone: Vec<f64> = values.clone();
+pub(crate) fn find_median(values: &[f64]) -> f64 {
+    let mut clone: Vec<f64> = values.to_vec();
     let slice: &mut [f64] = clone.as_mut_slice();
     Data::new(slice).median()
 }
 
-pub(crate) fn find_mode(values: &Vec<f64>) -> Option<f64> {
+pub(crate) fn find_mode(values: &[f64]) -> Option<f64> {
     let counts_map_mutex: Mutex<HashMap<u64, i32>> = Mutex::new(HashMap::new());
 
     values.into_par_iter().for_each(|&value: &f64| {
@@ -125,7 +125,7 @@ pub(crate) fn find_mode(values: &Vec<f64>) -> Option<f64> {
 
     let max_count: i32 = counts_map.values().cloned().max().unwrap_or(0);
 
-    return match max_count <= 0 {
+    match max_count <= 0 {
         true => None,
         _ => {
             let values: Vec<f64> = counts_map
@@ -133,11 +133,11 @@ pub(crate) fn find_mode(values: &Vec<f64>) -> Option<f64> {
                 .filter(|&(_, count)| count == max_count)
                 .map(|(value, _)| f64::from_bits(value))
                 .collect();
-            return Some(find_median(&values));
+            Some(find_median(&values))
         }
-    };
+    }
 }
 
-fn algorithm_name_to_lowercase_underscored(algorithm_name: &String) -> String {
+fn algorithm_name_to_lowercase_underscored(algorithm_name: &str) -> String {
     algorithm_name.to_lowercase().replace(" ", "_")
 }

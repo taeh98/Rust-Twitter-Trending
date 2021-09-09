@@ -47,28 +47,22 @@ pub fn check_or_get_tweets_data() {
     }
 }
 
-fn check_file_is_present_and_intact(filepath: &String, expected_md5_digest: &str) -> bool {
-    if Path::new(filepath.as_str()).exists() {
-        let actual_md5_digest: String = gen_file_md5_digest(&filepath).unwrap();
+fn check_file_is_present_and_intact(filepath: &str, expected_md5_digest: &str) -> bool {
+    if Path::new(filepath).exists() {
+        let actual_md5_digest: String = gen_file_md5_digest(filepath).unwrap();
         return actual_md5_digest.as_str().eq(expected_md5_digest);
     }
     false
 }
 
-fn file_to_string(filepath: &String) -> Option<String> {
+fn file_to_string(filepath: &str) -> Option<String> {
     read_to_string(filepath).ok()
 }
 
-fn file_to_u8_vec(filepath: &String) -> Option<Vec<u8>> {
-    match file_to_string(filepath) {
-        Some(contents) => Some(Vec::from(contents.as_bytes())),
-        _ => None,
-    }
+fn file_to_u8_vec(filepath: &str) -> Option<Vec<u8>> {
+    file_to_string(filepath).map(|contents| Vec::from(contents.as_bytes()))
 }
 
-fn gen_file_md5_digest(filepath: &String) -> Option<String> {
-    match file_to_u8_vec(filepath) {
-        Some(bytes) => Some(format!("{:x}", compute(bytes))),
-        _ => None,
-    }
+fn gen_file_md5_digest(filepath: &str) -> Option<String> {
+    file_to_u8_vec(filepath).map(|bytes| format!("{:x}", compute(bytes)))
 }

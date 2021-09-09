@@ -23,9 +23,9 @@ mod t_tests;
 const STATS_OUTPUT_FILES_DIRECTORY: &str = "./out/stats";
 
 pub fn make_stats(
-    algorithm_names: &Vec<String>,
-    time_taken_values: &Vec<Vec<f64>>,
-    processing_speed_values: &Vec<Vec<f64>>,
+    algorithm_names: &[String],
+    time_taken_values: &[Vec<f64>],
+    processing_speed_values: &[Vec<f64>],
 ) {
     if !Path::new(STATS_OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(STATS_OUTPUT_FILES_DIRECTORY)

@@ -31,7 +31,7 @@ fn get_top_words(
 
     while res.len() < NUMBER_TO_SHOW && (!counts.is_empty()) {
         let current_wc: WordAndCount = counts.pop().unwrap();
-        if current_wc.get_word().starts_with("#") == hashtag_not_word {
+        if current_wc.get_word().starts_with('#') == hashtag_not_word {
             res.push(current_wc.clone());
         }
     }

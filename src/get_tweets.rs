@@ -21,7 +21,7 @@ fn add_df_row_to_hash_map(values: Vec<AnyValue>, hm_mutex: &Mutex<HashMap<String
 
     let mut hm: MutexGuard<HashMap<String, String>> = hm_mutex.lock().unwrap();
     if !hm.contains_key(id.as_str()) {
-        hm.insert(id.clone(), text);
+        hm.insert(id, text);
     }
 }
 
@@ -49,15 +49,12 @@ fn process_dataframe(df: DataFrame, res: &Mutex<HashMap<String, String>>, path: 
 
 fn get_tweets_from_filepath(path: &str, res: &Mutex<HashMap<String, String>>) {
     println!("Reading in the data from the dataset file {}", path);
-    match CsvReader::from_path(path) {
-        Ok(file_data) => match file_data.infer_schema(None).has_header(true).finish() {
-            Ok(df) => match df.select(("id_str", "text")).ok() {
-                Some(filtered_df) => process_dataframe(filtered_df, res, path),
-                _ => {}
-            },
-            _ => {}
-        },
-        _ => {}
+    if let Ok(file_data) = CsvReader::from_path(path) {
+        if let Ok(df) = file_data.infer_schema(None).has_header(true).finish() {
+            if let Ok(filtered_df) = df.select(("id_str", "text")) {
+                process_dataframe(filtered_df, res, path);
+            }
+        }
     }
 }
 
@@ -71,7 +68,7 @@ pub fn get_tweets() -> Option<Vec<String>> {
 
     match res_mutex.into_inner().ok() {
         Some(res) => {
-            if res.len() < 1 {
+            if res.is_empty() {
                 return None;
             }
 

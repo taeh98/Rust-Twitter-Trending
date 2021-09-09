@@ -11,9 +11,9 @@ mod dot_plots;
 mod scatter_plots;
 
 pub fn make_visualisations(
-    algorithm_names: &Vec<String>,
-    time_taken_values: &Vec<Vec<f64>>,
-    processing_speed_values: &Vec<Vec<f64>>,
+    algorithm_names: &[String],
+    time_taken_values: &[Vec<f64>],
+    processing_speed_values: &[Vec<f64>],
 ) {
     if !Path::new(OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(OUTPUT_FILES_DIRECTORY)

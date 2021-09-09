@@ -94,7 +94,7 @@ fn main() {
 }
 
 fn run_rust_tweet_processing_algorithm(
-    tweets: &Vec<String>,
+    tweets: &[String],
     num_tweets: usize,
     parallel: bool,
 ) -> TweetProcessingResult {
@@ -115,7 +115,7 @@ fn run_rust_tweet_processing_algorithm(
     for repeat in 1..=NUM_REPEATS_BEFORE_MEAN {
         println!("Starting repeat {} of {}.", repeat, NUM_REPEATS_BEFORE_MEAN);
         let start_time: Instant = Instant::now();
-        process_tweets::process_tweets(&tweets, true);
+        process_tweets::process_tweets(tweets, true);
         let time_taken_secs: f64 = (start_time.elapsed().as_millis() as f64) / 1000.0;
         let tweets_per_sec: f64 = (num_tweets as f64) / time_taken_secs;
         time_taken_tweets_per_sec_values.push(TimeTakenTweetProcessingSpeedValuePair::new(

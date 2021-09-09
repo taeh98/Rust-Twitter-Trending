@@ -20,9 +20,9 @@ const SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY: &str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/scatter_plots") as &str;
 
 pub(crate) fn make_scatter_plots(
-    algorithm_names: &Vec<String>,
-    time_taken_values_list: &Vec<Vec<f64>>,
-    processing_speed_values_list: &Vec<Vec<f64>>,
+    algorithm_names: &[String],
+    time_taken_values_list: &[Vec<f64>],
+    processing_speed_values_list: &[Vec<f64>],
 ) {
     if !Path::new(SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY)
@@ -45,7 +45,7 @@ pub(crate) fn make_scatter_plots(
         );
 }
 
-fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: &Variable) {
+fn gen_scatter_plot(algorithm_name: &str, values: &[f64], variable: &Variable) {
     // Define chart related sizes.
     let width: isize = CHART_WIDTH_PIXELS;
     let height: isize = CHART_HEIGHT_PIXELS;
@@ -70,7 +70,7 @@ fn gen_scatter_plot(algorithm_name: &String, values: &Vec<f64>, variable: &Varia
     let scatter_data: Vec<(f32, f32)> = values
         .iter()
         .enumerate()
-        .map(|(index, value)| (index as f32, value.clone() as f32))
+        .map(|(index, value)| (index as f32, *value as f32))
         .collect();
 
     // Create Scatter view that is going to represent the data as points.

@@ -27,9 +27,9 @@ const T_TESTS_OUTPUT_FILES_DIRECTORY: &str =
     concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/t_tests") as &str;
 
 pub(crate) fn make_t_tests(
-    algorithm_names: &Vec<String>,
-    time_taken_values: &Vec<Vec<f64>>,
-    processing_speed_values: &Vec<Vec<f64>>,
+    algorithm_names: &[String],
+    time_taken_values: &[Vec<f64>],
+    processing_speed_values: &[Vec<f64>],
 ) {
     if !Path::new(T_TESTS_OUTPUT_FILES_DIRECTORY).exists() {
         create_dir(T_TESTS_OUTPUT_FILES_DIRECTORY)
@@ -55,7 +55,7 @@ pub(crate) fn make_t_tests(
 
 fn run_t_tests_for_variable(
     variable: &Variable,
-    algorithm_names_variable_values: &Vec<(&String, &Vec<f64>)>,
+    algorithm_names_variable_values: &[(&String, &Vec<f64>)],
 ) {
     let res_mutex: Mutex<Vec<(&String, &String, f64, f64)>> = Mutex::new(Vec::new());
 
