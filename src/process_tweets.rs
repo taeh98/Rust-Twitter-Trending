@@ -103,10 +103,16 @@ fn process_tweet(tweet: &String) -> HashMap<String, WordAndCount> {
     res
 }
 
-fn get_hashmap_keys(a: &HashMap<String, WordAndCount>) -> Vec<String> {
-    a.into_par_iter()
-        .map(|value| value.0.clone())
-        .collect::<Vec<String>>()
+fn get_hashmap_keys(a: &HashMap<String, WordAndCount>, parallel: bool) -> Vec<String> {
+    return if parallel {
+        a.into_par_iter()
+            .map(|value| value.0.clone())
+            .collect::<Vec<String>>()
+    } else {
+        a.into_iter()
+            .map(|value| value.0.clone())
+            .collect::<Vec<String>>()
+    };
 }
 
 fn combine_processed_tweets(
@@ -114,9 +120,9 @@ fn combine_processed_tweets(
     b: &HashMap<String, WordAndCount>,
     parallel: bool,
 ) -> HashMap<String, WordAndCount> {
-    let keys: Vec<String> = get_hashmap_keys(a)
+    let keys: Vec<String> = get_hashmap_keys(a, parallel)
         .into_iter()
-        .chain(get_hashmap_keys(b).into_iter())
+        .chain(get_hashmap_keys(b, parallel).into_iter())
         .collect();
     let res: Mutex<HashMap<String, WordAndCount>> = Mutex::new(HashMap::new());
 
