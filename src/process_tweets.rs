@@ -75,7 +75,7 @@ pub(crate) fn process_tweets(tweets: &Vec<String>, parallel: bool) -> BinaryHeap
             )
             .unwrap()
     };
-    processed_tweets_to_priority_queue(res_hashmap)
+    processed_tweets_to_priority_queue(res_hashmap, parallel)
 }
 
 fn process_tweet(tweet: &String) -> HashMap<String, WordAndCount> {
@@ -149,15 +149,14 @@ fn combine_processed_tweets(
 
             let mut total_count: i64 = 0;
 
-            hms.into_iter()
-                .for_each(
-                    |&hm: &&HashMap<String, WordAndCount>| match hm.get(key_str) {
-                        Some(word_and_count) => {
-                            total_count += word_and_count.get_count();
-                        }
-                        _ => {}
-                    },
-                );
+            hms.iter().for_each(
+                |&hm: &&HashMap<String, WordAndCount>| match hm.get(key_str) {
+                    Some(word_and_count) => {
+                        total_count += word_and_count.get_count();
+                    }
+                    _ => {}
+                },
+            );
 
             res.lock()
                 .unwrap()
@@ -170,8 +169,25 @@ fn combine_processed_tweets(
 
 fn processed_tweets_to_priority_queue(
     pt: HashMap<String, WordAndCount>,
+    parallel: bool,
 ) -> BinaryHeap<WordAndCount> {
-    // BinaryHeap::from(pt.values().collect::<Vec<&WordAndCount>>())
-    //TODO: do this properly
-    BinaryHeap::new()
+    return if parallel {
+        let res_mutex: Mutex<BinaryHeap<WordAndCount>> = Mutex::new(BinaryHeap::new());
+        pt.into_par_iter().for_each(|(_, word_and_count)| {
+            res_mutex.lock().unwrap().push(WordAndCount::new(
+                word_and_count.get_word().as_str(),
+                word_and_count.get_count(),
+            ));
+        });
+        res_mutex.into_inner().unwrap()
+    } else {
+        let mut res: BinaryHeap<WordAndCount> = BinaryHeap::new();
+        pt.iter().for_each(|(_, word_and_count)| {
+            res.push(WordAndCount::new(
+                word_and_count.get_word().as_str(),
+                word_and_count.get_count(),
+            ));
+        });
+        res
+    };
 }
