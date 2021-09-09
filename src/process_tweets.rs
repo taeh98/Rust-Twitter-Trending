@@ -10,6 +10,7 @@ use rayon::prelude::*;
 //TODO: integrate the use of "if let" throughout the project
 //TODO: replace uses of unwrap() with expect() throughout the project
 //TODO: check which pub functions really need to be
+//TODO: give dot plots, scatter plots, and bar charts white (not transparent) backgrounds
 
 #[derive(Eq, Clone)]
 pub(crate) struct WordAndCount {
