@@ -16,8 +16,8 @@ use crate::process_results::{
     variable_to_lowercase_underscored_string, variable_to_string, Variable,
 };
 
-const SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
-    concatcp!(OUTPUT_FILES_DIRECTORY, "/scatter_plots") as &'static str;
+const SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY: &str =
+    concatcp!(OUTPUT_FILES_DIRECTORY, "/scatter_plots") as &str;
 
 pub(crate) fn make_scatter_plots(
     algorithm_names: &Vec<String>,

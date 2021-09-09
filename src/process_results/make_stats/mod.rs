@@ -20,7 +20,7 @@ use std::path::Path;
 mod basic_values;
 mod t_tests;
 
-const STATS_OUTPUT_FILES_DIRECTORY: &'static str = "./out/stats";
+const STATS_OUTPUT_FILES_DIRECTORY: &str = "./out/stats";
 
 pub fn make_stats(
     algorithm_names: &Vec<String>,

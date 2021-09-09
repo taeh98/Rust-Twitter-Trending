@@ -3,7 +3,7 @@ use std::path::Path;
 
 const CHART_WIDTH_PIXELS: isize = 1000;
 const CHART_HEIGHT_PIXELS: isize = 750;
-const OUTPUT_FILES_DIRECTORY: &'static str = "./out/visualisations";
+const OUTPUT_FILES_DIRECTORY: &str = "./out/visualisations";
 
 pub(crate) mod bar_charts;
 mod box_plots;

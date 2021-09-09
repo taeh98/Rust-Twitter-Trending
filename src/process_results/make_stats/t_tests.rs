@@ -23,8 +23,8 @@ use crate::process_results::{
     variable_to_lowercase_underscored_string, Variable, ALL_VARIABLE_VALUES,
 };
 
-const T_TESTS_OUTPUT_FILES_DIRECTORY: &'static str =
-    concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/t_tests") as &'static str;
+const T_TESTS_OUTPUT_FILES_DIRECTORY: &str =
+    concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/t_tests") as &str;
 
 pub(crate) fn make_t_tests(
     algorithm_names: &Vec<String>,

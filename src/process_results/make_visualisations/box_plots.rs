@@ -17,8 +17,8 @@ use crate::process_results::{
     variable_to_axis_label, variable_to_lowercase_underscored_string, variable_to_string, Variable,
 };
 
-const BOX_PLOTS_OUTPUT_FILES_DIRECTORY: &'static str =
-    concatcp!(OUTPUT_FILES_DIRECTORY, "/box_plots") as &'static str;
+const BOX_PLOTS_OUTPUT_FILES_DIRECTORY: &str =
+    concatcp!(OUTPUT_FILES_DIRECTORY, "/box_plots") as &str;
 
 pub(crate) fn make_box_plots(
     algorithm_names: &Vec<String>,

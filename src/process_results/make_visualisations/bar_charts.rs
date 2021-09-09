@@ -30,8 +30,8 @@ fn average_to_string(av: Average) -> String {
 }
 
 const ALL_AVERAGES: [Average; 3] = [Average::Mean, Average::Median, Average::Mode];
-const BAR_CHART_OUTPUT_FILES_DIRECTORY: &'static str =
-    concatcp!(OUTPUT_FILES_DIRECTORY, "/bar_charts") as &'static str;
+const BAR_CHART_OUTPUT_FILES_DIRECTORY: &str =
+    concatcp!(OUTPUT_FILES_DIRECTORY, "/bar_charts") as &str;
 
 fn gen_value_lists_averages(
     values_list: &Vec<Vec<f64>>,

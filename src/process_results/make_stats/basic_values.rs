@@ -21,8 +21,8 @@ use crate::process_results::{
     variable_to_lowercase_underscored_string, Variable,
 };
 
-const BASIC_VALUES_OUTPUT_FILES_DIRECTORY: &'static str =
-    concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/basic_values") as &'static str;
+const BASIC_VALUES_OUTPUT_FILES_DIRECTORY: &str =
+    concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/basic_values") as &str;
 
 pub(crate) fn make_basic_values(
     algorithm_names: &Vec<String>,
