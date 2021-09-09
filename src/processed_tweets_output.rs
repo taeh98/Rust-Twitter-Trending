@@ -1,31 +1,33 @@
+use std::collections::binary_heap::BinaryHeap;
 use std::fs::{create_dir, File};
 use std::io::Write;
 use std::path::Path;
 
-use priority_queue::PriorityQueue;
 use rayon::prelude::*;
+
+use crate::process_tweets::WordAndCount;
 
 const NUMBER_TO_SHOW: usize = 10;
 const TOP_WORDS_HASHTAGS_OUTPUT_FILEPATH: &str = "out/top_words_hashtags.txt";
 
-pub fn get_top_words_text_from_counts(counts: &PriorityQueue<String, i128>) -> String {
+pub fn get_top_words_text_from_counts(counts: &BinaryHeap<WordAndCount>) -> String {
     let top_hashtags: Vec<(String, i128)> = get_top_words(counts, true);
     let top_words: Vec<(String, i128)> = get_top_words(counts, false);
     get_top_words_text(top_words, top_hashtags)
 }
 
-pub fn print_top_words_text_from_counts(counts: &PriorityQueue<String, i128>) {
+pub fn print_top_words_text_from_counts(counts: &BinaryHeap<WordAndCount>) {
     let top_hashtags: Vec<(String, i128)> = get_top_words(counts, true);
     let top_words: Vec<(String, i128)> = get_top_words(counts, false);
     print_top_words_text(top_words, top_hashtags)
 }
 
 fn get_top_words(
-    counts_in: &PriorityQueue<String, i128>,
+    counts_in: &BinaryHeap<WordAndCount>,
     hashtag_not_word: bool,
 ) -> Vec<(String, i128)> {
     let mut res: Vec<(String, i128)> = Vec::new();
-    let mut counts: PriorityQueue<String, i128> = counts_in.clone();
+    let mut counts: BinaryHeap<WordAndCount> = counts_in.clone();
 
     while res.len() < NUMBER_TO_SHOW && (!counts.is_empty()) {
         let current_tc = counts.pop().unwrap();

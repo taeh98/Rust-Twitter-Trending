@@ -1,7 +1,9 @@
+use std::collections::binary_heap::BinaryHeap;
 use std::time::Instant;
 
-use priority_queue::PriorityQueue;
 use serde::{Deserialize, Serialize};
+
+use crate::process_tweets::WordAndCount;
 
 mod get_data;
 mod get_tweets;
@@ -71,7 +73,7 @@ fn main() {
     match get_tweets::get_tweets() {
         Some(tweets) => {
             println!("Getting the top words text.");
-            let counts: PriorityQueue<String, i128> = process_tweets::process_tweets(&tweets, true);
+            let counts: BinaryHeap<WordAndCount> = process_tweets::process_tweets(&tweets, true);
             let num_tweets: usize = counts.len();
 
             processed_tweets_output::print_top_words_text_from_counts(&counts);
