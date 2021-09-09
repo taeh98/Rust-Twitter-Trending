@@ -16,8 +16,6 @@ mod write_results;
 const OUTPUT_FILES_DIRECTORY: &str = "./out";
 const RAW_RESULTS_FILE_NAME: &str = "results.csv";
 
-//TODO: make this file work properly
-
 fn gen_algorithm_names(algorithm_results: &Vec<TweetProcessingResult>) -> Vec<String> {
     algorithm_results
         .into_par_iter()
