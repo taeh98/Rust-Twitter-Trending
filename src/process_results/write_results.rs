@@ -21,27 +21,27 @@ fn gen_time_taken_or_processing_speed_series(
         "Tweet processing speed values (tweets/second)"
     };
 
-    let values: Vec<Vec<f64>> = results.into_par_iter()
-        .map(|val: &TweetProcessingResult|
-            val.get_time_taken_tweets_per_sec_values()
+    /*
+    TODO: see if this can be done with a native 2D array representation rather than converting to Strings by hand
+    see: https://github.com/pola-rs/polars/issues/1273
+     */
+
+    let joined_values: Vec<String> = results.into_par_iter()
+        .map(|tpr: &TweetProcessingResult| {
+            let values: Vec<String> = tpr.get_time_taken_tweets_per_sec_values()
                 .into_par_iter()
                 .map(|time_taken_tweets_per_sec_value_pair: &TimeTakenTweetProcessingSpeedValuePair|
                     if time_taken { time_taken_tweets_per_sec_value_pair.get_processing_speed_tweets_per_second() } else { time_taken_tweets_per_sec_value_pair.get_time_taken_seconds() })
-                .collect()
-        )
+                .map(|f64_val| f64_val.to_string())
+                .collect();
+            return format!("{}", values.join(","));
+        })
         .collect();
 
-    let series_vec: Vec<Series> = values
-        .into_par_iter()
-        .map(|values: Vec<f64>| Series::new("a", values))
-        .collect();
-
-    Series::new(column_title, series_vec)
+    Series::new(column_title, joined_values)
 }
 
 pub(crate) fn write_results_csv(results: &Vec<TweetProcessingResult>) {
-    //TODO: make this work properly
-
     // write results to csv: algorithm name, time taken values (seconds), tweet processing speed values (tweets/second)
     let algorithm_names: Vec<String> = results
         .into_par_iter()
