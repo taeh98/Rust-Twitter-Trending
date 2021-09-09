@@ -1,12 +1,11 @@
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
 use priority_queue::PriorityQueue;
 use rayon::prelude::*;
-use std::cmp::Ordering;
 
 //TODO: replace PriorityQueue with std::collections::BinaryHeap
-//TODO: abstract word-count pairs to a separate data type
 //TODO: try to debug errors that came from using reduce() rather than reduce_with() throughout project
 //TODO: integrate the use of "if let" throughout the project
 //TODO: replace uses of unwrap() with expect() throughout the project
@@ -15,14 +14,14 @@ use std::cmp::Ordering;
 #[derive(Eq)]
 pub(crate) struct WordAndCount {
     word: String,
-    count: isize
+    count: isize,
 }
 
 impl WordAndCount {
     pub(crate) fn new(word: &str, count: isize) -> WordAndCount {
         WordAndCount {
             word: String::from(word),
-            count: count.clone()
+            count: count.clone(),
         }
     }
     pub(crate) fn get_word(&self) -> &String {
