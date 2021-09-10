@@ -14,7 +14,6 @@ mod make_visualisations;
 mod write_results;
 
 const OUTPUT_FILES_DIRECTORY: &str = "./out";
-const RAW_RESULTS_FILE_NAME: &str = "results.csv";
 
 fn gen_algorithm_names(algorithm_results: &[TweetProcessingResult]) -> Vec<String> {
     algorithm_results
@@ -58,7 +57,7 @@ pub fn process_results(algorithm_results: Vec<TweetProcessingResult>) {
     assert_eq!(algorithm_names.len(), time_taken_values.len());
     assert_eq!(processing_speed_values.len(), time_taken_values.len());
 
-    write_results::write_results_csv(&algorithm_results);
+    write_results::write_results_csv_files(&algorithm_results);
     make_visualisations::make_visualisations(
         &algorithm_names,
         &time_taken_values,

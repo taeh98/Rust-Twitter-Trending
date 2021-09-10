@@ -1,66 +1,64 @@
-use std::fs::File;
+use std::fs::{create_dir, File};
+use std::path::Path;
 
-use polars::frame::DataFrame;
-use polars::io::csv::CsvWriter;
-use polars::io::SerWriter;
-use polars::prelude::Series;
-use polars::series::NamedFrom;
+use const_format::concatcp;
+use csv::{Writer, WriterBuilder};
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 
-use crate::process_results::{OUTPUT_FILES_DIRECTORY, RAW_RESULTS_FILE_NAME};
+use crate::process_results::{algorithm_name_to_lowercase_underscored, OUTPUT_FILES_DIRECTORY};
 use crate::{TimeTakenTweetProcessingSpeedValuePair, TweetProcessingResult};
 
-fn gen_time_taken_or_processing_speed_series(
-    time_taken: bool,
-    results: &[TweetProcessingResult],
-) -> Series {
-    let column_title: &str = if time_taken {
-        "Time taken values (seconds)"
-    } else {
-        "Tweet processing speed values (tweets/second)"
-    };
+const RAW_RESULTS_OUTPUT_FILES_DIRECTORY: &str =
+    concatcp!(OUTPUT_FILES_DIRECTORY, "/results") as &str;
+const CSV_HEADERS: [&str; 3] = [
+    "Iteration number",
+    "Time taken values (seconds)",
+    "Tweet processing speed values (tweets/second)",
+];
 
-    /*
-    TODO: see if this can be done with a native 2D array representation rather than converting to Strings by hand
-    see: https://github.com/pola-rs/polars/issues/1273
-     */
+pub(crate) fn write_results_csv_files(results: &[TweetProcessingResult]) {
+    if !Path::new(RAW_RESULTS_OUTPUT_FILES_DIRECTORY).exists() {
+        create_dir(RAW_RESULTS_OUTPUT_FILES_DIRECTORY)
+            .expect("Couldn't create the out/stats/t_tests/ directory.");
+    }
 
-    let joined_values: Vec<String> = results.into_par_iter()
-        .map(|tpr: &TweetProcessingResult| {
-            let values: Vec<String> = tpr.get_time_taken_tweets_per_sec_values()
-                .into_par_iter()
-                .map(|time_taken_tweets_per_sec_value_pair: &TimeTakenTweetProcessingSpeedValuePair|
-                    if time_taken { time_taken_tweets_per_sec_value_pair.get_processing_speed_tweets_per_second() } else { time_taken_tweets_per_sec_value_pair.get_time_taken_seconds() })
-                .map(|f64_val| f64_val.to_string())
-                .collect();
-            values.join(",")
-        })
-        .collect();
-
-    Series::new(column_title, joined_values)
+    results
+        .into_par_iter()
+        .for_each(|res: &TweetProcessingResult| {
+            write_results_csv(res.get_name(), res.get_time_taken_tweets_per_sec_values())
+        });
 }
 
-pub(crate) fn write_results_csv(results: &[TweetProcessingResult]) {
-    // write results to csv: algorithm name, time taken values (seconds), tweet processing speed values (tweets/second)
-    let algorithm_names: Vec<String> = results
-        .into_par_iter()
-        .map(|res: &TweetProcessingResult| res.get_name().clone())
-        .collect();
-    let algorithm_names_series: Series = Series::new("Algorithm name", algorithm_names);
+fn write_results_csv(
+    algorithm_name: &str,
+    time_taken_values: &[TimeTakenTweetProcessingSpeedValuePair],
+) {
+    // write results to csv: iteration number, time taken values (seconds), tweet processing speed values (tweets/second)
 
-    let time_taken_values_series: Series = gen_time_taken_or_processing_speed_series(true, results);
-    let processing_speed_values_series: Series =
-        gen_time_taken_or_processing_speed_series(false, results);
+    let file_path: String = format!(
+        "{}/{}.csv",
+        RAW_RESULTS_OUTPUT_FILES_DIRECTORY,
+        algorithm_name_to_lowercase_underscored(algorithm_name)
+    );
 
-    let df: DataFrame = DataFrame::new(vec![algorithm_names_series, time_taken_values_series, processing_speed_values_series])
-        .expect("Failed to generate a dataframe to save the results in write_results_csv() in the process_results module");
+    let output_file: File = File::create(file_path).expect("could not create file");
 
-    let file_path: String = format!("{}/{}", OUTPUT_FILES_DIRECTORY, RAW_RESULTS_FILE_NAME);
-    let mut output_file: File = File::create(file_path).expect("could not create file");
+    let mut csv_writer: Writer<File> = WriterBuilder::new().from_writer(output_file);
 
-    CsvWriter::new(&mut output_file)
-        .has_headers(true)
-        .finish(&df)
-        .expect("Failed to write the CSV file of raw results in write_results_csv() in the process_results module");
+    csv_writer.write_record(&CSV_HEADERS).unwrap();
+    csv_writer.flush().unwrap();
+
+    time_taken_values.iter().enumerate().for_each(
+        |(index, time_taken_processing_speed_value_pair)| {
+            csv_writer
+                .serialize((
+                    index,
+                    time_taken_processing_speed_value_pair.get_time_taken_seconds(),
+                    time_taken_processing_speed_value_pair.get_processing_speed_tweets_per_second(),
+                ))
+                .unwrap();
+            csv_writer.flush().unwrap();
+        },
+    );
 }
