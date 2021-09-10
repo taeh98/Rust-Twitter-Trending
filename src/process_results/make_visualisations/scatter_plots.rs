@@ -77,7 +77,7 @@ fn gen_scatter_plot(algorithm_name: &str, values: &[f64], variable: &Variable) {
     let random_points: Vec<(f64, f64)> = values
         .into_par_iter()
         .enumerate()
-        .map(|(index, value)| (((index + 1) as f64), value.clone()))
+        .map(|(index, value)| (((index + 1) as f64), *value))
         .collect::<Vec<(f64, f64)>>();
 
     let areas = root.split_by_breakpoints([944], [80]);
