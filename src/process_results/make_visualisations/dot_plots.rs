@@ -67,15 +67,20 @@ fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], varia
 
     root.fill(&WHITE).unwrap();
 
+    let max: f64 = find_max(
+        algorithm_values
+            .into_par_iter()
+            .map(|values_vec: &Vec<f64>| find_max(values_vec.as_slice()))
+            .collect::<Vec<f64>>()
+            .as_slice(),
+    );
+
     let mut chart = ChartBuilder::on(&root)
         .x_label_area_size(35)
         .y_label_area_size(40)
         .margin(5)
         .caption(title, ("sans-serif", 30.0))
-        .build_cartesian_2d(
-            category_names.into_segmented(),
-            0f64..(1.2 * find_max(values_in)),
-        )
+        .build_cartesian_2d(algorithm_names.into_segmented(), 0f64..1.2 * max)
         .unwrap();
 
     chart
