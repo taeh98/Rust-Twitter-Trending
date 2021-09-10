@@ -9,7 +9,8 @@ use const_format::concatcp;
 use plotters::coord::Shift;
 use plotters::drawing::DrawingArea;
 use plotters::prelude::{
-    ChartBuilder, Color, Histogram, IntoDrawingArea, SVGBackend, BLACK, WHITE,
+    ChartBuilder, Color, Histogram, IntoDrawingArea, IntoSegmentedCoord, SVGBackend, BLACK, RED,
+    WHITE,
 };
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
@@ -174,7 +175,7 @@ fn gen_bar_chart(
         .y_label_area_size(40)
         .margin(5)
         .caption(title, ("sans-serif", 50.0))
-        .build_cartesian_2d(category_names, 0f64..(1.2 * find_max(values_in)) as f64)
+        .build_cartesian_2d((0u32..10u32).into_segmented(), 0u32..10u32)
         .unwrap();
 
     chart
@@ -187,11 +188,15 @@ fn gen_bar_chart(
         .draw()
         .unwrap();
 
+    let data = [
+        0u32, 1, 1, 1, 4, 2, 5, 7, 8, 6, 4, 2, 1, 8, 3, 3, 3, 4, 4, 3, 3, 3,
+    ];
+
     chart
         .draw_series(
             Histogram::vertical(&chart)
-                .style(BLACK.mix(0.5).filled())
-                .data(values_in.iter().map(|x: &f64| (*x, 1))),
+                .style(RED.mix(0.5).filled())
+                .data(data.iter().map(|x: &u32| (*x, 1))),
         )
         .unwrap();
 
