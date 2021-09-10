@@ -53,7 +53,7 @@ fn write_results_csv(
         |(index, time_taken_processing_speed_value_pair)| {
             csv_writer
                 .serialize((
-                    index,
+                    index + 1,
                     time_taken_processing_speed_value_pair.get_time_taken_seconds(),
                     time_taken_processing_speed_value_pair.get_processing_speed_tweets_per_second(),
                 ))
