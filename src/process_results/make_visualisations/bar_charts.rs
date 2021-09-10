@@ -5,14 +5,20 @@
 use std::fs::create_dir;
 use std::path::Path;
 
-use charts::{Chart, ScaleBand, ScaleLinear, VerticalBarView};
 use const_format::concatcp;
+use plotters::coord::Shift;
+use plotters::drawing::DrawingArea;
+use plotters::prelude::{
+    ChartBuilder, Color, Histogram, IntoDrawingArea, SVGBackend, BLACK, WHITE,
+};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::process_results::make_visualisations::{
     CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
-use crate::process_results::{find_mean, find_median, find_mode, variable_to_axis_label, Variable};
+use crate::process_results::{
+    find_max, find_mean, find_median, find_mode, variable_to_axis_label, Variable,
+};
 
 #[derive(Clone, Copy, PartialEq)]
 enum Average {
@@ -155,66 +161,40 @@ fn gen_bar_chart(
     y_axis_label: &str,
     x_axis_label: &str,
 ) {
-    // Define chart related sizes.
-    let (top, right, bottom, left) = (90, 40, 50, 60);
+    let root: DrawingArea<SVGBackend, Shift> = SVGBackend::new(
+        filepath,
+        (CHART_WIDTH_PIXELS as u32, CHART_HEIGHT_PIXELS as u32),
+    )
+    .into_drawing_area();
 
-    let values: Vec<f32> = values_in
-        .into_par_iter()
-        .map(|val: &f64| *val as f32)
-        .collect();
+    root.fill(&WHITE).unwrap();
 
-    assert_eq!(category_names.len(), (&values).len());
-
-    let max_value: f32 = values
-        .clone()
-        .into_par_iter()
-        .reduce_with(|a: f32, b: f32| if a > b { a } else { b })
+    let mut chart = ChartBuilder::on(&root)
+        .x_label_area_size(35)
+        .y_label_area_size(40)
+        .margin(5)
+        .caption(title, ("sans-serif", 50.0))
+        .build_cartesian_2d(category_names, 0f64..(1.2 * find_max(values_in)) as f64)
         .unwrap();
 
-    // Create a band scale that maps ["A", "B", "C"] categories to values in the [0, availableWidth]
-    // range (the width of the chart without the margins).
-    let x: ScaleBand = ScaleBand::new()
-        .set_domain(category_names.to_vec())
-        .set_range(vec![0, CHART_WIDTH_PIXELS - left - right])
-        .set_inner_padding(0.1)
-        .set_outer_padding(0.1);
-
-    // Create a linear scale that will interpolate values in [0, 100] range to corresponding
-    // values in [availableHeight, 0] range (the height of the chart without the margins).
-    // The [availableHeight, 0] range is inverted because SVGs coordinate system's origin is
-    // in top left corner, while chart's origin is in bottom left corner, hence we need to invert
-    // the range on Y axis for the chart to display as though its origin is at bottom left.
-    let y: ScaleLinear = ScaleLinear::new()
-        .set_domain(vec![0.0, (1.1 * max_value).round()])
-        .set_range(vec![CHART_HEIGHT_PIXELS - top - bottom, 0]);
-
-    // You can use your own iterable as data as long as its items implement the `BarDatum` trait.
-    let data: Vec<(String, f32)> = category_names
-        .iter()
-        .zip(values.iter())
-        .collect::<Vec<(&String, &f32)>>()
-        .into_par_iter()
-        .map(|val: (&String, &f32)| (val.0.clone(), *val.1))
-        .collect();
-
-    // Create VerticalBar view that is going to represent the data as vertical bars.
-    let view: VerticalBarView = VerticalBarView::new()
-        .set_x_scale(&x)
-        .set_y_scale(&y)
-        .load_data(&data)
+    chart
+        .configure_mesh()
+        .disable_x_mesh()
+        .bold_line_style(&WHITE.mix(0.3))
+        .y_desc(y_axis_label)
+        .x_desc(x_axis_label)
+        .axis_desc_style(("sans-serif", 15))
+        .draw()
         .unwrap();
 
-    // Generate and save the chart.
-    Chart::new()
-        .set_width(CHART_WIDTH_PIXELS)
-        .set_height(CHART_HEIGHT_PIXELS)
-        .set_margins(top, right, bottom, left)
-        .add_title(String::from(title))
-        .add_view(&view)
-        .add_axis_bottom(&x)
-        .add_axis_left(&y)
-        .add_left_axis_label(y_axis_label)
-        .add_bottom_axis_label(x_axis_label)
-        .save(filepath)
+    chart
+        .draw_series(
+            Histogram::vertical(&chart)
+                .style(BLACK.mix(0.5).filled())
+                .data(values_in.iter().map(|x: &f64| (*x, 1))),
+        )
         .unwrap();
+
+    // To avoid the IO failure being ignored silently, we manually call the present function
+    root.present().unwrap();
 }
