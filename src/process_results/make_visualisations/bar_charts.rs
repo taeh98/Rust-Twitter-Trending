@@ -9,8 +9,7 @@ use const_format::concatcp;
 use plotters::coord::Shift;
 use plotters::drawing::DrawingArea;
 use plotters::prelude::{
-    ChartBuilder, Color, Histogram, IntoDrawingArea, IntoSegmentedCoord, SVGBackend, BLACK, RED,
-    WHITE,
+    ChartBuilder, Color, Histogram, IntoDrawingArea, IntoSegmentedCoord, SVGBackend, BLACK, WHITE,
 };
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 

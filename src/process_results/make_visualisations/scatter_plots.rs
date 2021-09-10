@@ -17,7 +17,7 @@ use crate::process_results::make_visualisations::{
     CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
 use crate::process_results::{
-    algorithm_name_to_lowercase_underscored, find_max, find_min, variable_to_axis_label,
+    algorithm_name_to_lowercase_underscored, find_max, variable_to_axis_label,
     variable_to_lowercase_underscored_string, variable_to_string, Variable,
 };
 
