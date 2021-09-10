@@ -5,14 +5,19 @@
 use std::fs::create_dir;
 use std::path::Path;
 
-use charts::{Chart, MarkerType, PointLabelPosition, ScaleLinear, ScatterView};
 use const_format::concatcp;
+use plotters::coord::Shift;
+use plotters::drawing::DrawingArea;
+use plotters::prelude::{ChartBuilder, Circle, Color, IntoDrawingArea, SVGBackend, BLACK, WHITE};
+use rayon::iter::IndexedParallelIterator;
+use rayon::iter::IntoParallelIterator;
+use rayon::iter::ParallelIterator;
 
 use crate::process_results::make_visualisations::{
     CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
 };
 use crate::process_results::{
-    algorithm_name_to_lowercase_underscored, variable_to_axis_label,
+    algorithm_name_to_lowercase_underscored, find_max, find_min, variable_to_axis_label,
     variable_to_lowercase_underscored_string, variable_to_string, Variable,
 };
 
@@ -46,42 +51,6 @@ pub(crate) fn make_scatter_plots(
 }
 
 fn gen_scatter_plot(algorithm_name: &str, values: &[f64], variable: &Variable) {
-    // Define chart related sizes.
-    let width: isize = CHART_WIDTH_PIXELS;
-    let height: isize = CHART_HEIGHT_PIXELS;
-    let (top, right, bottom, left) = (90, 40, 50, 60);
-
-    // Create a band scale that will interpolate values in [0, 200] to values in the
-    // [0, availableWidth] range (the width of the chart without the margins).
-    let x: ScaleLinear = ScaleLinear::new()
-        .set_domain(vec![0.0, 200.0])
-        .set_range(vec![0, width - left - right]);
-
-    // Create a linear scale that will interpolate values in [0, 100] range to corresponding
-    // values in [availableHeight, 0] range (the height of the chart without the margins).
-    // The [availableHeight, 0] range is inverted because SVGs coordinate system's origin is
-    // in top left corner, while chart's origin is in bottom left corner, hence we need to invert
-    // the range on Y axis for the chart to display as though its origin is at bottom left.
-    let y: ScaleLinear = ScaleLinear::new()
-        .set_domain(vec![0.0, 100.0])
-        .set_range(vec![height - top - bottom, 0]);
-
-    // You can use your own iterable as data as long as its items implement the `PointDatum` trait.
-    let scatter_data: Vec<(f32, f32)> = values
-        .iter()
-        .enumerate()
-        .map(|(index, value)| (index as f32, *value as f32))
-        .collect();
-
-    // Create Scatter view that is going to represent the data as points.
-    let scatter_view = ScatterView::new()
-        .set_x_scale(&x)
-        .set_y_scale(&y)
-        .set_label_position(PointLabelPosition::E)
-        .set_marker_type(MarkerType::Circle)
-        .load_data(&scatter_data)
-        .unwrap();
-
     let file_path: String = format!(
         "{}/{}_{}.svg",
         SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY,
@@ -90,23 +59,54 @@ fn gen_scatter_plot(algorithm_name: &str, values: &[f64], variable: &Variable) {
     );
 
     let y_axis_label: String = variable_to_axis_label(variable);
+
     let title: String = format!(
         "{} values of the {} algorithm in each iteration",
         variable_to_string(variable),
         algorithm_name
     );
 
-    // Generate and save the chart.
-    Chart::new()
-        .set_width(width)
-        .set_height(height)
-        .set_margins(top, right, bottom, left)
-        .add_title(title)
-        .add_view(&scatter_view)
-        .add_axis_bottom(&x)
-        .add_axis_left(&y)
-        .add_left_axis_label(y_axis_label)
-        .add_bottom_axis_label("Iteration number")
-        .save(file_path)
+    let root: DrawingArea<SVGBackend, Shift> = SVGBackend::new(
+        &file_path,
+        (CHART_WIDTH_PIXELS as u32, CHART_HEIGHT_PIXELS as u32),
+    )
+    .into_drawing_area();
+
+    root.fill(&WHITE).unwrap();
+
+    let random_points: Vec<(f64, f64)> = values
+        .into_par_iter()
+        .enumerate()
+        .map(|(index, value)| (((index + 1) as f64), value.clone()))
+        .collect::<Vec<(f64, f64)>>();
+
+    let areas = root.split_by_breakpoints([944], [80]);
+
+    let mut scatter_ctx = ChartBuilder::on(&areas[2])
+        .x_label_area_size(40)
+        .y_label_area_size(40)
+        .caption(title, ("sans-serif", 20))
+        .build_cartesian_2d(
+            0f64..(values.len() as f64) * 1.2,
+            0f64..find_max(values) * 1.2,
+        )
         .unwrap();
+    scatter_ctx
+        .configure_mesh()
+        .x_desc("Iteration number")
+        .y_desc(y_axis_label)
+        .disable_x_mesh()
+        .disable_y_mesh()
+        .draw()
+        .unwrap();
+    scatter_ctx
+        .draw_series(
+            random_points
+                .iter()
+                .map(|(x, y)| Circle::new((*x, *y), 2, BLACK.filled())),
+        )
+        .unwrap();
+
+    // To avoid the IO failure being ignored silently, we manually call the present function
+    root.present().unwrap();
 }
