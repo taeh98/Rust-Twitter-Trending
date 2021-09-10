@@ -174,28 +174,30 @@ fn gen_bar_chart(
         .y_label_area_size(40)
         .margin(5)
         .caption(title, ("sans-serif", 30.0))
-        .build_cartesian_2d((0u32..10u32).into_segmented(), 0u32..10u32)
+        .build_cartesian_2d(
+            category_names.into_segmented(),
+            0f64..(1.2 * find_max(values_in)),
+        )
         .unwrap();
 
     chart
         .configure_mesh()
-        .disable_x_mesh()
-        .bold_line_style(&WHITE.mix(0.3))
+        // .disable_x_mesh()
+        // .bold_line_style(&WHITE.mix(0.3))
         .y_desc(y_axis_label)
         .x_desc(x_axis_label)
         .axis_desc_style(("sans-serif", 15))
         .draw()
         .unwrap();
 
-    let data = [
-        0u32, 1, 1, 1, 4, 2, 5, 7, 8, 6, 4, 2, 1, 8, 3, 3, 3, 4, 4, 3, 3, 3,
-    ];
-
     chart
         .draw_series(
-            Histogram::vertical(&chart)
-                .style(BLACK.filled())
-                .data(data.iter().map(|x: &u32| (*x, 1))),
+            Histogram::vertical(&chart).style(BLACK.filled()).data(
+                values_in
+                    .iter()
+                    .zip(category_names.iter())
+                    .map(|(value, category)| (category, *value)),
+            ),
         )
         .unwrap();
 
