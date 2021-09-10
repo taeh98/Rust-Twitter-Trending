@@ -5,7 +5,7 @@ use std::sync::{Mutex, MutexGuard};
 
 use rayon::iter::ParallelIterator;
 use rayon::prelude::IntoParallelIterator;
-use statrs::statistics::{Data, Distribution, OrderStatistics};
+use statrs::statistics::{Data, Distribution, OrderStatistics, Statistics};
 
 use crate::{TimeTakenTweetProcessingSpeedValuePair, TweetProcessingResult};
 
@@ -108,6 +108,14 @@ pub(crate) fn find_median(values: &[f64]) -> f64 {
     let mut clone: Vec<f64> = values.to_vec();
     let slice: &mut [f64] = clone.as_mut_slice();
     Data::new(slice).median()
+}
+
+fn find_max(values: &[f64]) -> f64 {
+    values.max()
+}
+
+fn find_min(values: &[f64]) -> f64 {
+    values.min()
 }
 
 pub(crate) fn find_mode(values: &[f64]) -> Option<f64> {

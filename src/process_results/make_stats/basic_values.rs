@@ -17,7 +17,7 @@ use statrs::statistics::{OrderStatistics, Statistics};
 
 use crate::process_results::make_stats::STATS_OUTPUT_FILES_DIRECTORY;
 use crate::process_results::{
-    algorithm_name_to_lowercase_underscored, find_mean, find_median, find_mode,
+    algorithm_name_to_lowercase_underscored, find_max, find_mean, find_median, find_min, find_mode,
     variable_to_lowercase_underscored_string, Variable,
 };
 
@@ -55,14 +55,6 @@ pub(crate) fn make_basic_values(
             gen_basic_values(algorithm_name, processing_speed_values, &processing_speed);
         },
     );
-}
-
-fn find_max(values: &[f64]) -> f64 {
-    values.max()
-}
-
-fn find_min(values: &[f64]) -> f64 {
-    values.min()
 }
 
 fn find_std_dev(values: &[f64]) -> f64 {
