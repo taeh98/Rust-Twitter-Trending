@@ -58,10 +58,9 @@ fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], varia
         "{} values of different algorithms",
         variable_to_string(variable)
     );
-    // x axis: "Algorithm"
 
     let root: DrawingArea<SVGBackend, Shift> = SVGBackend::new(
-        filepath,
+        &file_path,
         (CHART_WIDTH_PIXELS as u32, CHART_HEIGHT_PIXELS as u32),
     )
     .into_drawing_area();
@@ -84,7 +83,7 @@ fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], varia
         // .disable_x_mesh()
         // .bold_line_style(&WHITE.mix(0.3))
         .y_desc(y_axis_label)
-        .x_desc(x_axis_label)
+        .x_desc("Algorithm")
         .axis_desc_style(("sans-serif", 15))
         .draw()
         .unwrap();
