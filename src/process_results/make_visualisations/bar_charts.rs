@@ -174,7 +174,7 @@ fn gen_bar_chart(
         .x_label_area_size(35)
         .y_label_area_size(40)
         .margin(5)
-        .caption(title, ("sans-serif", 50.0))
+        .caption(title, ("sans-serif", 30.0))
         .build_cartesian_2d((0u32..10u32).into_segmented(), 0u32..10u32)
         .unwrap();
 
@@ -195,7 +195,7 @@ fn gen_bar_chart(
     chart
         .draw_series(
             Histogram::vertical(&chart)
-                .style(RED.mix(0.5).filled())
+                .style(BLACK.filled())
                 .data(data.iter().map(|x: &u32| (*x, 1))),
         )
         .unwrap();
