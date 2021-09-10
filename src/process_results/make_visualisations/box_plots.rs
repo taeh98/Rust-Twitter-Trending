@@ -5,6 +5,7 @@ use std::fs::create_dir;
 use std::path::Path;
 
 use const_format::concatcp;
+use plotters::coord::Shift;
 use plotters::data::fitting_range;
 use plotters::prelude::*;
 use rayon::iter::IntoParallelIterator;
@@ -47,7 +48,7 @@ fn gen_box_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], varia
         variable_to_lowercase_underscored_string(variable)
     );
 
-    let root = SVGBackend::new(
+    let root: DrawingArea<SVGBackend, Shift> = SVGBackend::new(
         output_file_path.as_str(),
         (CHART_WIDTH_PIXELS as u32, CHART_HEIGHT_PIXELS as u32),
     )

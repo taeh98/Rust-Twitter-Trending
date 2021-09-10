@@ -173,7 +173,7 @@ fn gen_bar_chart(
 
     // Create a band scale that maps ["A", "B", "C"] categories to values in the [0, availableWidth]
     // range (the width of the chart without the margins).
-    let x = ScaleBand::new()
+    let x: ScaleBand = ScaleBand::new()
         .set_domain(category_names.to_vec())
         .set_range(vec![0, CHART_WIDTH_PIXELS - left - right])
         .set_inner_padding(0.1)
@@ -184,7 +184,7 @@ fn gen_bar_chart(
     // The [availableHeight, 0] range is inverted because SVGs coordinate system's origin is
     // in top left corner, while chart's origin is in bottom left corner, hence we need to invert
     // the range on Y axis for the chart to display as though its origin is at bottom left.
-    let y = ScaleLinear::new()
+    let y: ScaleLinear = ScaleLinear::new()
         .set_domain(vec![0.0, (1.1 * max_value).round()])
         .set_range(vec![CHART_HEIGHT_PIXELS - top - bottom, 0]);
 
@@ -198,7 +198,7 @@ fn gen_bar_chart(
         .collect();
 
     // Create VerticalBar view that is going to represent the data as vertical bars.
-    let view = VerticalBarView::new()
+    let view: VerticalBarView = VerticalBarView::new()
         .set_x_scale(&x)
         .set_y_scale(&y)
         .load_data(&data)
