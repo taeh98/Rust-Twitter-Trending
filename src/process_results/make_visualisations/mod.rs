@@ -5,6 +5,8 @@ const CHART_WIDTH_PIXELS: isize = 1000;
 const CHART_HEIGHT_PIXELS: isize = 750;
 const OUTPUT_FILES_DIRECTORY: &str = "./out/visualisations";
 
+//TODO: for each algorithm, make histograms showing distribution of time taken and processing speed values
+
 pub(crate) mod bar_charts;
 mod box_plots;
 mod dot_plots;
