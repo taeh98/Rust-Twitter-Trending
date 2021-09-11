@@ -9,7 +9,7 @@ use const_format::concatcp;
 use plotters::coord::Shift;
 use plotters::drawing::DrawingArea;
 use plotters::prelude::{
-    BuildNestedCoord, ChartBuilder, Circle, Color, IntoDrawingArea, SVGBackend, BLACK, WHITE,
+    BuildNestedCoord, ChartBuilder, Color, Cross, IntoDrawingArea, SVGBackend, BLACK, WHITE,
 };
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
@@ -93,7 +93,7 @@ fn gen_dot_plot(
         .draw_series(
             (0..10)
                 .map(|x| x as f64 / 1.0)
-                .map(|x| Circle::new(((&"Linear", x).into(), x), 2, BLACK.filled())),
+                .map(|x| Cross::new(((&"Linear", x).into(), x), 2, BLACK.filled())),
         )
         .unwrap();
 
@@ -101,7 +101,7 @@ fn gen_dot_plot(
         .draw_series(
             (0..10)
                 .map(|x| x as f64 / 1.0)
-                .map(|x| Circle::new(((&"Quadratic", x).into(), x), 2, BLACK.filled())),
+                .map(|x| Cross::new(((&"Quadratic", x).into(), x), 2, BLACK.filled())),
         )
         .unwrap();
 

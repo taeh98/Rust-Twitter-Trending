@@ -8,7 +8,7 @@ use std::path::Path;
 use const_format::concatcp;
 use plotters::coord::Shift;
 use plotters::drawing::DrawingArea;
-use plotters::prelude::{ChartBuilder, Circle, Color, IntoDrawingArea, SVGBackend, BLACK, WHITE};
+use plotters::prelude::{ChartBuilder, Color, Cross, IntoDrawingArea, SVGBackend, BLACK, WHITE};
 use rayon::iter::IndexedParallelIterator;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
@@ -103,7 +103,7 @@ fn gen_scatter_plot(algorithm_name: &str, values: &[f64], variable: &Variable) {
         .draw_series(
             random_points
                 .iter()
-                .map(|(x, y)| Circle::new((*x, *y), 2, BLACK.filled())),
+                .map(|(x, y)| Cross::new((*x, *y), 2, BLACK.filled())),
         )
         .unwrap();
 
