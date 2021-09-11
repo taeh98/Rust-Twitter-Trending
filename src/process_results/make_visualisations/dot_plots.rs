@@ -14,7 +14,9 @@ use plotters::prelude::{
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 
-use crate::process_results::make_visualisations::OUTPUT_FILES_DIRECTORY;
+use crate::process_results::make_visualisations::{
+    CHART_HEIGHT_PIXELS, CHART_WIDTH_PIXELS, OUTPUT_FILES_DIRECTORY,
+};
 use crate::process_results::{
     variable_to_axis_label, variable_to_lowercase_underscored_string, variable_to_string, Variable,
 };
@@ -42,7 +44,11 @@ pub(crate) fn make_dot_plots(
     })
 }
 
-fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], variable: &Variable) {
+fn gen_dot_plot(
+    algorithm_names: &[String],
+    algorithm_values_list: &[Vec<f64>],
+    variable: &Variable,
+) {
     let file_path: String = format!(
         "{}/{}.svg",
         DOT_PLOTS_OUTPUT_FILES_DIRECTORY,
@@ -55,8 +61,11 @@ fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], varia
         variable_to_string(variable)
     );
 
-    let root: DrawingArea<SVGBackend, Shift> =
-        SVGBackend::new(&file_path, (640, 480)).into_drawing_area();
+    let root: DrawingArea<SVGBackend, Shift> = SVGBackend::new(
+        &file_path,
+        (CHART_WIDTH_PIXELS as u32, CHART_HEIGHT_PIXELS as u32),
+    )
+    .into_drawing_area();
 
     root.fill(&WHITE).unwrap();
 
