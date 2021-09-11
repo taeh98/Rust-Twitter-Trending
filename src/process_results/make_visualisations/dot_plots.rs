@@ -7,7 +7,8 @@ use std::path::Path;
 
 use const_format::concatcp;
 use plotters::prelude::{
-    BitMapBackend, BuildNestedCoord, ChartBuilder, IntoDrawingArea, LineSeries, RED, WHITE,
+    BitMapBackend, BuildNestedCoord, ChartBuilder, Circle, Color, IntoDrawingArea, LineSeries,
+    BLACK, RED, WHITE,
 };
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
@@ -64,21 +65,19 @@ fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], varia
         .unwrap();
 
     chart
-        .draw_series(LineSeries::new(
+        .draw_series(
             (0..10)
                 .map(|x| x as f64 / 1.0)
-                .map(|x| ((&"Linear", x).into(), x)),
-            &RED,
-        ))
+                .map(|x| Circle::new(((&"Linear", x).into(), x), 2, BLACK.filled())),
+        )
         .unwrap();
 
     chart
-        .draw_series(LineSeries::new(
+        .draw_series(
             (0..10)
                 .map(|x| x as f64 / 1.0)
-                .map(|x| ((&"Quadratic", x).into(), x * x / 10.0)),
-            &RED,
-        ))
+                .map(|x| Circle::new(((&"Quadratic", x).into(), x), 2, BLACK.filled())),
+        )
         .unwrap();
 
     // To avoid the IO failure being ignored silently, we manually call the present function
