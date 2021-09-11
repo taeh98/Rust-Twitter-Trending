@@ -93,7 +93,7 @@ fn gen_dot_plot(
         .draw_series(
             (0..10)
                 .map(|x| x as f64 / 1.0)
-                .map(|x| Cross::new(((&"Linear", x).into(), x), 2, BLACK.filled())),
+                .map(|x| Cross::new(((&"Linear").into(), x), 2, BLACK.filled())),
         )
         .unwrap();
 
@@ -101,7 +101,7 @@ fn gen_dot_plot(
         .draw_series(
             (0..10)
                 .map(|x| x as f64 / 1.0)
-                .map(|x| Cross::new(((&"Quadratic", x).into(), x), 2, BLACK.filled())),
+                .map(|x| Cross::new(((&"Quadratic").into(), x), 2, BLACK.filled())),
         )
         .unwrap();
 
