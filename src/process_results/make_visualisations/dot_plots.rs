@@ -6,15 +6,18 @@ use std::fs::create_dir;
 use std::path::Path;
 
 use const_format::concatcp;
+use plotters::coord::Shift;
+use plotters::drawing::DrawingArea;
 use plotters::prelude::{
-    BitMapBackend, BuildNestedCoord, ChartBuilder, Circle, Color, IntoDrawingArea, LineSeries,
-    BLACK, RED, WHITE,
+    BuildNestedCoord, ChartBuilder, Circle, Color, IntoDrawingArea, SVGBackend, BLACK, WHITE,
 };
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 
 use crate::process_results::make_visualisations::OUTPUT_FILES_DIRECTORY;
-use crate::process_results::Variable;
+use crate::process_results::{
+    variable_to_axis_label, variable_to_lowercase_underscored_string, variable_to_string, Variable,
+};
 
 const DOT_PLOTS_OUTPUT_FILES_DIRECTORY: &str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/dot_plots") as &str;
@@ -39,10 +42,21 @@ pub(crate) fn make_dot_plots(
     })
 }
 
-const OUT_FILE_NAME: &'static str = "nested_coord.png";
-
 fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], variable: &Variable) {
-    let root = BitMapBackend::new(OUT_FILE_NAME, (640, 480)).into_drawing_area();
+    let file_path: String = format!(
+        "{}/{}.svg",
+        DOT_PLOTS_OUTPUT_FILES_DIRECTORY,
+        variable_to_lowercase_underscored_string(variable)
+    );
+
+    let y_axis_label: String = variable_to_axis_label(variable);
+    let title: String = format!(
+        "{} values of different algorithms",
+        variable_to_string(variable)
+    );
+
+    let root: DrawingArea<SVGBackend, Shift> =
+        SVGBackend::new(&file_path, (640, 480)).into_drawing_area();
 
     root.fill(&WHITE).unwrap();
 
@@ -50,7 +64,7 @@ fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], varia
         .x_label_area_size(35)
         .y_label_area_size(40)
         .margin(5)
-        .caption("Nested Coord", ("sans-serif", 50.0))
+        .caption(&title, ("sans-serif", 30.0))
         .build_cartesian_2d(
             ["Linear", "Quadratic"].nested_coord(|_| 0.0..10.0),
             0.0..10.0,
@@ -61,6 +75,8 @@ fn gen_dot_plot(algorithm_names: &[String], algorithm_values: &[Vec<f64>], varia
         .configure_mesh()
         .disable_mesh()
         .axis_desc_style(("sans-serif", 15))
+        .y_desc(y_axis_label)
+        .x_desc("Algorithm")
         .draw()
         .unwrap();
 
