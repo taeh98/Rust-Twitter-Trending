@@ -11,6 +11,7 @@ use rayon::prelude::*;
 //TODO: replace uses of unwrap() with expect() throughout the project
 //TODO: check which pub functions really need to be
 //TODO: give dot plots, scatter plots, and bar charts white (not transparent) backgrounds
+//TODO: make all plots making "dots" use crosses rather than circles for better precision
 
 #[derive(Eq, Clone)]
 pub(crate) struct WordAndCount {
