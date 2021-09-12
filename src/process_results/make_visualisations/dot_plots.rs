@@ -74,10 +74,7 @@ fn gen_dot_plot(
         .y_label_area_size(40)
         .margin(5)
         .caption(&title, ("sans-serif", 30.0))
-        .build_cartesian_2d(
-            ["Linear", "Quadratic"].nested_coord(|_| 0.0..10.0),
-            0.0..10.0,
-        )
+        .build_cartesian_2d(algorithm_names.nested_coord(|_| 0.0..10.0), 0.0..10.0)
         .unwrap();
 
     chart
@@ -89,21 +86,13 @@ fn gen_dot_plot(
         .draw()
         .unwrap();
 
-    chart
-        .draw_series(
-            (0..10)
-                .map(|x| x as f64 / 1.0)
-                .map(|x| Cross::new(((&"Linear").into(), x), 2, BLACK.filled())),
-        )
-        .unwrap();
-
-    chart
-        .draw_series(
-            (0..10)
-                .map(|x| x as f64 / 1.0)
-                .map(|x| Cross::new(((&"Quadratic").into(), x), 2, BLACK.filled())),
-        )
-        .unwrap();
+    for (algorithm_name, values) in algorithm_names.iter().zip(algorithm_values_list.iter()) {
+        chart
+            .draw_series(values.iter().map(|value: &f64| {
+                Cross::new(((algorithm_name).into(), *value), 2, BLACK.filled())
+            }))
+            .unwrap();
+    }
 
     // To avoid the IO failure being ignored silently, we manually call the present function
     root.present().unwrap();
