@@ -9,7 +9,6 @@ const OUTPUT_FILES_DIRECTORY: &str = "./out/visualisations";
 
 pub(crate) mod bar_charts;
 mod box_plots;
-mod dot_plots;
 mod scatter_plots;
 
 pub fn make_visualisations(
@@ -23,6 +22,5 @@ pub fn make_visualisations(
     }
     bar_charts::make_bar_charts(algorithm_names, time_taken_values, processing_speed_values);
     box_plots::make_box_plots(algorithm_names, time_taken_values, processing_speed_values);
-    dot_plots::make_dot_plots(algorithm_names, time_taken_values, processing_speed_values);
     scatter_plots::make_scatter_plots(algorithm_names, time_taken_values, processing_speed_values);
 }
