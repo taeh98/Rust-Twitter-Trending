@@ -130,6 +130,17 @@ fn gen_dot_plot_chart(
         .draw()
         .unwrap();
 
+    draw_series_on_chart(algorithm_names, algorithm_values_list, &mut chart);
+}
+
+fn draw_series_on_chart(
+    algorithm_names: &[String],
+    algorithm_values_list: &[Vec<f64>],
+    chart: &mut ChartContext<
+        SVGBackend,
+        Cartesian2d<NestedRange<RangedSlice<String>, RangedCoordf64>, RangedCoordf64>,
+    >,
+) {
     for (algorithm_name, values) in algorithm_names.iter().zip(algorithm_values_list.iter()) {
         chart
             .draw_series(values.iter().map(|value: &f64| {
