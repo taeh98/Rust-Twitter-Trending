@@ -6,10 +6,12 @@ use std::fs::create_dir;
 use std::path::Path;
 
 use const_format::concatcp;
+use plotters::coord::types::{RangedCoordf64, RangedSlice};
 use plotters::coord::Shift;
 use plotters::drawing::DrawingArea;
 use plotters::prelude::{
-    BuildNestedCoord, ChartBuilder, Color, Cross, IntoDrawingArea, SVGBackend, BLACK, WHITE,
+    BuildNestedCoord, Cartesian2d, ChartBuilder, ChartContext, Color, Cross, IntoDrawingArea,
+    NestedRange, SVGBackend, BLACK, WHITE,
 };
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
@@ -87,7 +89,31 @@ fn gen_dot_plot(
 
     root.fill(&WHITE).unwrap();
 
-    let mut chart = ChartBuilder::on(&root)
+    gen_dot_plot_chart(
+        algorithm_names,
+        algorithm_values_list,
+        &root,
+        title,
+        y_axis_label,
+        x_axis_label,
+    );
+
+    // To avoid the IO failure being ignored silently, we manually call the present function
+    root.present().unwrap();
+}
+
+fn gen_dot_plot_chart(
+    algorithm_names: &[String],
+    algorithm_values_list: &[Vec<f64>],
+    root: &DrawingArea<SVGBackend, Shift>,
+    title: &str,
+    y_axis_label: &str,
+    x_axis_label: &str,
+) {
+    let mut chart: ChartContext<
+        SVGBackend,
+        Cartesian2d<NestedRange<RangedSlice<String>, RangedCoordf64>, RangedCoordf64>,
+    > = ChartBuilder::on(root)
         .x_label_area_size(35)
         .y_label_area_size(40)
         .margin(5)
@@ -111,7 +137,4 @@ fn gen_dot_plot(
             }))
             .unwrap();
     }
-
-    // To avoid the IO failure being ignored silently, we manually call the present function
-    root.present().unwrap();
 }
