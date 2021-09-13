@@ -40,11 +40,11 @@ pub(crate) fn make_dot_plots(
     ]
     .into_par_iter()
     .for_each(|var_values_pair: (Variable, &[Vec<f64>])| {
-        gen_dot_plot(algorithm_names, var_values_pair.1, &var_values_pair.0)
+        make_dot_plot(algorithm_names, var_values_pair.1, &var_values_pair.0)
     })
 }
 
-fn gen_dot_plot(
+fn make_dot_plot(
     algorithm_names: &[String],
     algorithm_values_list: &[Vec<f64>],
     variable: &Variable,
@@ -61,6 +61,24 @@ fn gen_dot_plot(
         variable_to_string(variable)
     );
 
+    gen_dot_plot(
+        algorithm_names,
+        algorithm_values_list,
+        file_path.as_str(),
+        title.as_str(),
+        y_axis_label.as_str(),
+        "Algorithm",
+    );
+}
+
+fn gen_dot_plot(
+    algorithm_names: &[String],
+    algorithm_values_list: &[Vec<f64>],
+    file_path: &str,
+    title: &str,
+    y_axis_label: &str,
+    x_axis_label: &str,
+) {
     let root: DrawingArea<SVGBackend, Shift> = SVGBackend::new(
         &file_path,
         (CHART_WIDTH_PIXELS as u32, CHART_HEIGHT_PIXELS as u32),
@@ -73,7 +91,7 @@ fn gen_dot_plot(
         .x_label_area_size(35)
         .y_label_area_size(40)
         .margin(5)
-        .caption(&title, ("sans-serif", 30.0))
+        .caption(title, ("sans-serif", 30.0))
         .build_cartesian_2d(algorithm_names.nested_coord(|_| 0.0..10.0), 0.0..10.0)
         .unwrap();
 
@@ -82,7 +100,7 @@ fn gen_dot_plot(
         .disable_mesh()
         .axis_desc_style(("sans-serif", 15))
         .y_desc(y_axis_label)
-        .x_desc("Algorithm")
+        .x_desc(x_axis_label)
         .draw()
         .unwrap();
 
