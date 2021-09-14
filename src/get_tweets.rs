@@ -1,12 +1,15 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 
-use crate::get_data::DATA_FILES_INFO;
 use polars::datatypes::AnyValue;
 use polars::frame::DataFrame;
 use polars::io::SerReader;
 use polars::prelude::CsvReader;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
+
+use crate::get_data::DATA_FILES_INFO;
+
+const DATA_DIRECTORY_PATH: &str = "data";
 
 fn add_df_row_to_hash_map(values: Vec<AnyValue>, hm_mutex: &Mutex<HashMap<String, String>>) {
     assert_eq!(values.len(), 2);
@@ -53,17 +56,21 @@ fn get_tweets_from_filepath(path: &str, res: &Mutex<HashMap<String, String>>) {
     }
 }
 
+pub(crate) fn file_name_to_filepath(name: &str) -> String {
+    format!("{}/{}", DATA_DIRECTORY_PATH, name)
+}
+
 pub fn get_tweets() -> Option<Vec<String>> {
     let res_mutex: Mutex<HashMap<String, String>> = Mutex::new(HashMap::new());
 
-    let data_file_paths: Vec<&str> = DATA_FILES_INFO
+    let data_file_paths: Vec<String> = DATA_FILES_INFO
         .iter()
-        .map(|(filename, _md5digest, _url)| *filename) //TODO: convert filename to file path
+        .map(|(filename, _md5digest, _url)| file_name_to_filepath(*filename))
         .collect();
 
     data_file_paths
         .into_par_iter()
-        .for_each(|path: &str| get_tweets_from_filepath(path, &res_mutex));
+        .for_each(|path: String| get_tweets_from_filepath(&path, &res_mutex));
 
     match res_mutex.into_inner().ok() {
         Some(res) => {

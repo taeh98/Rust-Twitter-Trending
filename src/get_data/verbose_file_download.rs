@@ -18,7 +18,7 @@ use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 use reqwest::blocking::{get, Response};
 
-const DATA_DIRECTORY_PATH: &str = "data";
+use crate::get_tweets::file_name_to_filepath;
 
 #[derive(Clone, Debug)]
 pub struct DataFileMetaData<'a> {
@@ -47,10 +47,6 @@ impl<'a> DataFileMetaData<'a> {
     pub fn get_url(&self) -> &str {
         self.url
     }
-}
-
-pub fn file_name_to_filepath(name: &str) -> String {
-    format!("{}/{}", DATA_DIRECTORY_PATH, name)
 }
 
 pub fn download_data_files(dfs: &[DataFileMetaData]) {

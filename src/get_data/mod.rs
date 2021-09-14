@@ -4,7 +4,9 @@ use std::path::Path;
 use md5::compute;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use verbose_file_download::{download_data_files, file_name_to_filepath, DataFileMetaData};
+use verbose_file_download::{download_data_files, DataFileMetaData};
+
+use crate::get_tweets::file_name_to_filepath;
 
 mod verbose_file_download;
 
