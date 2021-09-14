@@ -8,24 +8,29 @@ use verbose_file_download::{download_data_files, file_name_to_filepath, DataFile
 
 mod verbose_file_download;
 
+pub const DATA_FILES_INFO: [(&str, &str, &str); 3] = [
+    (
+        "full_who_dataset1.csv",
+        "259389f2f6c1b232fe248c91107eeccd",
+        "https://zenodo.org/record/3928240/files/full_who_dataset1.csv?download=1",
+    ),
+    (
+        "full_who_dataset2.csv",
+        "ea266ada5b1b817638ab89388138d95e",
+        "https://zenodo.org/record/3928240/files/full_who_dataset2.csv?download=1",
+    ),
+    (
+        "full_who_dataset3.csv",
+        "fc4b898f8d7c81293a776bf116668bab",
+        "https://zenodo.org/record/3928240/files/full_who_dataset3.csv?download=1",
+    ),
+];
+
 pub fn check_or_get_tweets_data() {
-    let data_files: [DataFileMetaData; 3] = [
-        DataFileMetaData::new(
-            "full_who_dataset1.csv",
-            "259389f2f6c1b232fe248c91107eeccd",
-            "https://zenodo.org/record/3928240/files/full_who_dataset1.csv?download=1",
-        ),
-        DataFileMetaData::new(
-            "full_who_dataset2.csv",
-            "ea266ada5b1b817638ab89388138d95e",
-            "https://zenodo.org/record/3928240/files/full_who_dataset2.csv?download=1",
-        ),
-        DataFileMetaData::new(
-            "full_who_dataset3.csv",
-            "fc4b898f8d7c81293a776bf116668bab",
-            "https://zenodo.org/record/3928240/files/full_who_dataset3.csv?download=1",
-        ),
-    ];
+    let data_files: Vec<DataFileMetaData> = DATA_FILES_INFO
+        .iter()
+        .map(|(filename, md5digest, url)| DataFileMetaData::new(*filename, *md5digest, *url))
+        .collect();
 
     let dfs_to_get: Vec<DataFileMetaData> = data_files
         .into_par_iter()
