@@ -61,8 +61,9 @@ fn get_tweets_from_filepath(path: &str, res: &Mutex<HashMap<String, String>>) {
 pub fn get_tweets() -> Option<Vec<String>> {
     let res_mutex: Mutex<HashMap<String, String>> = Mutex::new(HashMap::new());
 
-    DATAFILE_PATHS
-        .to_vec()
+    let data_file_paths: Vec<&str> = DATAFILE_PATHS.to_vec();
+
+    data_file_paths
         .into_par_iter()
         .for_each(|path: &str| get_tweets_from_filepath(path, &res_mutex));
 
