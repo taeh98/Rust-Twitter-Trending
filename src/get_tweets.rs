@@ -7,9 +7,26 @@ use polars::io::SerReader;
 use polars::prelude::CsvReader;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use crate::get_data::DATA_FILES_INFO;
-
-const DATA_DIRECTORY_PATH: &str = "data";
+const DATA_FILE_PATHS: [&str; 18] = [
+    "data/out-0.csv",
+    "data/out-1.csv",
+    "data/out-2.csv",
+    "data/out-3.csv",
+    "data/out-4.csv",
+    "data/out-5.csv",
+    "data/out-6.csv",
+    "data/out-7.csv",
+    "data/out-8.csv",
+    "data/out-9.csv",
+    "data/out-10.csv",
+    "data/out-11.csv",
+    "data/out-12.csv",
+    "data/out-13.csv",
+    "data/out-14.csv",
+    "data/out-15.csv",
+    "data/out-16.csv",
+    "data/out-17.csv",
+];
 
 fn add_df_row_to_hash_map(values: Vec<AnyValue>, hm_mutex: &Mutex<HashMap<String, String>>) {
     assert_eq!(values.len(), 2);
@@ -56,21 +73,12 @@ fn get_tweets_from_filepath(path: &str, res: &Mutex<HashMap<String, String>>) {
     }
 }
 
-pub(crate) fn file_name_to_filepath(name: &str) -> String {
-    format!("{}/{}", DATA_DIRECTORY_PATH, name)
-}
-
 pub fn get_tweets() -> Option<Vec<String>> {
     let res_mutex: Mutex<HashMap<String, String>> = Mutex::new(HashMap::new());
 
-    let data_file_paths: Vec<String> = DATA_FILES_INFO
-        .iter()
-        .map(|(filename, _md5digest, _url)| file_name_to_filepath(*filename))
-        .collect();
-
-    data_file_paths
+    DATA_FILE_PATHS
         .into_par_iter()
-        .for_each(|path: String| get_tweets_from_filepath(&path, &res_mutex));
+        .for_each(|path: &str| get_tweets_from_filepath(path, &res_mutex));
 
     match res_mutex.into_inner().ok() {
         Some(res) => {
