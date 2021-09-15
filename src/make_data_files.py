@@ -56,7 +56,9 @@ def file_name_to_file_path(file_name):
 
 
 def get_original_data_files():
+    print("get_original_data_files()")
     for [file_name, expected_md5_digest, url] in DATA_FILES_INFO:
+        print("file_name = " + file_name)
         file_path = file_name_to_file_path(file_name)
 
         if not does_file_exist(file_path):
@@ -93,10 +95,15 @@ def write_tweets_to_output_file(tweets, index):
 
 
 def gen_processed_data_files():
+    print("gen_processed_data_files()")
+
     tweet_ids_tweet_texts = get_tweet_ids_tweet_texts()
     random.shuffle(tweet_ids_tweet_texts)
 
+    print("tweet_ids_tweet_texts = " + str(tweet_ids_tweet_texts))
+
     for index in range(NUM_OUTPUT_DATA_FILES_TO_MAKE):
+        print("writing file " + str((index + 1)) + " of " + str(NUM_OUTPUT_DATA_FILES_TO_MAKE))
         tweets = tweet_ids_tweet_texts[:LINES_PER_OUTPUT_DATA_FILE]
         del tweet_ids_tweet_texts[:LINES_PER_OUTPUT_DATA_FILE]
         write_tweets_to_output_file(tweets, index)
