@@ -90,9 +90,18 @@ def get_original_data_files():
             raise
 
 
+def get_df_from_data_file_info(data_file_info):
+    file_name = data_file_info[0]
+    file_path = file_name_to_file_path(file_name)
+    print("in get_df_from_data_file_info(), file_name = " + file_name + ", and file_path = " + file_path)
+    return pandas.read_csv(file_path)[["id_str", "text"]]
+
+
 def get_tweet_ids_tweet_texts():
-    dfs = map(lambda data_file_info: pandas.read_csv(file_name_to_file_path(data_file_info[0]))["id_str", "text"],
+    dfs = map(lambda data_file_info: get_df_from_data_file_info(data_file_info),
               DATA_FILES_INFO)
+
+    print("done getting dfs in get_tweet_ids_tweet_texts()")
 
     tweet_ids_tweet_texts = dict()
 
