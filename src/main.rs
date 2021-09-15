@@ -71,9 +71,15 @@ fn main() {
             let time_taken_secs: f64 = (start_time.elapsed().as_millis() as f64) / 1000.0;
             let num_tweets: usize = counts.len();
 
+            let est_time_completion_secs: f64 = time_taken_secs
+                * 2.0 // number of algorithms tested
+                * (NUM_REPEATS_BEFORE_MEAN as f64);
+
             println!(
-                "Finished getting the top words text. It took {} seconds.",
-                time_taken_secs
+                "Finished getting the top words text. It took {} seconds. ETA: {} seconds or {} hours.",
+                time_taken_secs,
+                est_time_completion_secs,
+                est_time_completion_secs / (3600 as f64)
             );
 
             processed_tweets_output::print_top_words_text_from_counts(&counts);
