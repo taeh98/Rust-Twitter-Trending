@@ -39,7 +39,10 @@ def does_file_exist(file_path):
 
 def is_downloaded_file_intact(file_path, expected_md5_digest):
     downloaded_file_bytes = open(file_path, "rb").read()
-    actual_md5_digest = hashlib.md5(downloaded_file_bytes)
+    actual_md5_digest = str(hashlib.md5(downloaded_file_bytes).digest().hex())
+    print(
+        "in is_downloaded_file_intact() for file_path = " + file_path + ", expected_md5_digest = " + expected_md5_digest
+        + ", and actual_md5_digest = " + actual_md5_digest)
     return expected_md5_digest == actual_md5_digest
 
 
@@ -80,7 +83,7 @@ def get_original_data_files():
 
         success = is_downloaded_file_intact(file_path, expected_md5_digest)
 
-        print("Final result for the file " + file_path + " was: " + success)
+        print("Final result for the file " + file_path + " was: " + str(success))
 
         if not success:
             print("Failed to get the data file " + file_name)
