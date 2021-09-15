@@ -27,6 +27,8 @@ const DATA_FILE_PATHS: [&str; 18] = [
     "data/out-17.csv",
 ];
 
+const NUM_DATA_FILES_TO_USE: usize = 18; // 1 to 18
+
 fn add_df_row_to_hash_map(values: Vec<AnyValue>, hm_mutex: &Mutex<Vec<String>>) {
     assert_eq!(values.len(), 1);
 
@@ -72,9 +74,12 @@ fn get_tweets_from_filepath(path: &str, res: &Mutex<Vec<String>>) {
 pub fn get_tweets() -> Option<Vec<String>> {
     let res_mutex: Mutex<Vec<String>> = Mutex::new(Vec::new());
 
-    DATA_FILE_PATHS
+    assert!(NUM_DATA_FILES_TO_USE >= 1 as usize);
+    assert!(NUM_DATA_FILES_TO_USE <= 18 as usize);
+
+    DATA_FILE_PATHS[0..NUM_DATA_FILES_TO_USE]
         .into_par_iter()
-        .for_each(|path: &str| get_tweets_from_filepath(path, &res_mutex));
+        .for_each(|path: &&str| get_tweets_from_filepath(*path, &res_mutex));
 
     res_mutex.into_inner().ok()
 }
