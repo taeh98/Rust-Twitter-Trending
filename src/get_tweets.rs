@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 
 use polars::datatypes::AnyValue;
@@ -28,20 +27,17 @@ const DATA_FILE_PATHS: [&str; 18] = [
     "data/out-17.csv",
 ];
 
-fn add_df_row_to_hash_map(values: Vec<AnyValue>, hm_mutex: &Mutex<HashMap<String, String>>) {
-    assert_eq!(values.len(), 2);
+fn add_df_row_to_hash_map(values: Vec<AnyValue>, hm_mutex: &Mutex<Vec<String>>) {
+    assert_eq!(values.len(), 1);
 
-    let id: String = values.get(0).unwrap().to_string();
-    let text: String = values.get(1).unwrap().to_string();
+    let text: String = values.get(0).unwrap().to_string();
 
-    let mut hm: MutexGuard<HashMap<String, String>> = hm_mutex.lock().unwrap();
-    if !hm.contains_key(id.as_str()) {
-        hm.insert(id, text);
-    }
+    let mut hm: MutexGuard<Vec<String>> = hm_mutex.lock().unwrap();
+    hm.push(text);
 }
 
-fn process_dataframe(df: DataFrame, res: &Mutex<HashMap<String, String>>, path: &str) {
-    assert_eq!(df.width(), 2);
+fn process_dataframe(df: DataFrame, res: &Mutex<Vec<String>>, path: &str) {
+    assert_eq!(df.width(), 1);
 
     let indices: Vec<usize> = (0..df.height()).collect();
 
@@ -62,11 +58,11 @@ fn process_dataframe(df: DataFrame, res: &Mutex<HashMap<String, String>>, path: 
     );
 }
 
-fn get_tweets_from_filepath(path: &str, res: &Mutex<HashMap<String, String>>) {
+fn get_tweets_from_filepath(path: &str, res: &Mutex<Vec<String>>) {
     println!("Reading in the data from the dataset file {}", path);
     if let Ok(file_data) = CsvReader::from_path(path) {
         if let Ok(df) = file_data.infer_schema(None).has_header(true).finish() {
-            if let Ok(filtered_df) = df.select(("id_str", "text")) {
+            if let Ok(filtered_df) = df.select("text") {
                 process_dataframe(filtered_df, res, path);
             }
         }
@@ -74,26 +70,11 @@ fn get_tweets_from_filepath(path: &str, res: &Mutex<HashMap<String, String>>) {
 }
 
 pub fn get_tweets() -> Option<Vec<String>> {
-    let res_mutex: Mutex<HashMap<String, String>> = Mutex::new(HashMap::new());
+    let res_mutex: Mutex<Vec<String>> = Mutex::new(Vec::new());
 
     DATA_FILE_PATHS
         .into_par_iter()
         .for_each(|path: &str| get_tweets_from_filepath(path, &res_mutex));
 
-    match res_mutex.into_inner().ok() {
-        Some(res) => {
-            if res.is_empty() {
-                return None;
-            }
-
-            let tweets: Vec<&String> = res.values().collect::<Vec<&String>>();
-            Some(
-                tweets
-                    .into_par_iter()
-                    .map(|str: &String| str.clone())
-                    .collect::<Vec<String>>(),
-            )
-        }
-        _ => None,
-    }
+    res_mutex.into_inner().ok()
 }
