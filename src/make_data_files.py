@@ -6,9 +6,9 @@ import random
 import pandas as pandas
 import requests
 
-LINES_PER_BYTE = 0.011955422
+ALPHA = 0.003863  # ratio to get desired file size
 OUTPUT_DATA_FILE_FILE_SIZE = 95000000  # 95MB in bytes, to stay below github's max push size
-LINES_PER_OUTPUT_DATA_FILE = int(round(LINES_PER_BYTE * 0.95 * OUTPUT_DATA_FILE_FILE_SIZE))
+LINES_PER_OUTPUT_DATA_FILE = int(round(ALPHA * OUTPUT_DATA_FILE_FILE_SIZE))
 
 DATA_FILES_INFO = [
     [
