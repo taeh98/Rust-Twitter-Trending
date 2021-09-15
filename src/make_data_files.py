@@ -106,8 +106,8 @@ def get_tweet_ids_tweet_texts():
     tweet_ids_tweet_texts = dict()
 
     for df in dfs:
-        for row in df.itertuples():
-            tweet_ids_tweet_texts[row["id_str"]] = row["text"]
+        for row in df.itertuples(index=False):
+            tweet_ids_tweet_texts[str(row[0])] = row[1]
 
     return tweet_ids_tweet_texts.values()
 
@@ -124,7 +124,7 @@ def gen_processed_data_files():
     tweet_ids_tweet_texts = get_tweet_ids_tweet_texts()
     random.shuffle(tweet_ids_tweet_texts)
 
-    print("tweet_ids_tweet_texts = " + str(tweet_ids_tweet_texts))
+    print("ready to write output files")
 
     for index in range(NUM_OUTPUT_DATA_FILES_TO_MAKE):
         print("writing file " + str((index + 1)) + " of " + str(NUM_OUTPUT_DATA_FILES_TO_MAKE))
