@@ -10,7 +10,7 @@ mod process_results;
 mod process_tweets;
 mod processed_tweets_output;
 
-const NUM_REPEATS_BEFORE_MEAN: usize = 20; // aim for 200
+const NUM_REPEATS_BEFORE_MEAN: usize = 60; // aim for 200
 
 #[derive(Serialize, Deserialize)]
 pub struct TimeTakenTweetProcessingSpeedValuePair {
