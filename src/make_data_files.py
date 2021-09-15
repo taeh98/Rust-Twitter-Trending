@@ -30,6 +30,8 @@ DATA_FILES_INFO = [
     ],
 ]
 
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+
 
 def does_file_exist(file_path):
     return os.path.isfile(file_path)
@@ -52,7 +54,7 @@ def delete_file(file_path):
 
 
 def file_name_to_file_path(file_name):
-    return './data/' + file_name
+    return DIR_PATH.split("/src")[0] + '/data/' + file_name
 
 
 def get_original_data_files():
@@ -62,13 +64,23 @@ def get_original_data_files():
         file_path = file_name_to_file_path(file_name)
 
         if not does_file_exist(file_path):
+            print("Need to download the file " + file_path + " which wasn't present")
             download_file(url, file_path)
 
+        else:
+            print("The file " + file_path + " was already present, not needed to download")
+
         if not is_downloaded_file_intact(file_path, expected_md5_digest):
+            print("Need to download the file " + file_path + " which wasn't intact")
             delete_file(file_path)
             download_file(url, file_path)
 
+        else:
+            print("The file " + file_path + " was already present and intact")
+
         success = is_downloaded_file_intact(file_path, expected_md5_digest)
+
+        print("Final result for the file " + file_path + " was: " + success)
 
         if not success:
             print("Failed to get the data file " + file_name)
@@ -110,6 +122,9 @@ def gen_processed_data_files():
 
 
 def main():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+
+    print("dir_path = " + dir_path)
     get_original_data_files()
     gen_processed_data_files()
 
