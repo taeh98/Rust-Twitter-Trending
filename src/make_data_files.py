@@ -10,7 +10,7 @@ LINES_PER_BYTE = 1 / BYTES_PER_LINE
 OUTPUT_DATA_FILE_FILE_SIZE = 9.75e+7  # 95MB in bytes, to stay below github's max push size
 OUTPUT_DATA_FILES_TOTAL_SIZE = 2e+9  # 2GB in bytes
 NUM_OUTPUT_DATA_FILES_TO_MAKE = round(OUTPUT_DATA_FILES_TOTAL_SIZE / OUTPUT_DATA_FILE_FILE_SIZE)
-LINES_PER_OUTPUT_DATA_FILE = LINES_PER_BYTE * OUTPUT_DATA_FILE_FILE_SIZE
+LINES_PER_OUTPUT_DATA_FILE = int(round(LINES_PER_BYTE * OUTPUT_DATA_FILE_FILE_SIZE))
 
 DATA_FILES_INFO = [
     [
@@ -109,11 +109,11 @@ def get_tweet_ids_tweet_texts():
         for row in df.itertuples(index=False):
             tweet_ids_tweet_texts[str(row[0])] = row[1]
 
-    return tweet_ids_tweet_texts.values()
+    return list(tweet_ids_tweet_texts.values())
 
 
 def write_tweets_to_output_file(tweets, index):
-    file_path = './data/out-' + index + ".csv"
+    file_path = './data/out-' + str(index) + ".csv"
     df = pandas.DataFrame(tweets, columns=["text"])
     df.to_csv(file_path, index=False)
 
