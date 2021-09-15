@@ -66,8 +66,15 @@ fn main() {
     match get_tweets::get_tweets() {
         Some(tweets) => {
             println!("Getting the top words text.");
+            let start_time: Instant = Instant::now();
             let counts: BinaryHeap<WordAndCount> = process_tweets::process_tweets(&tweets, true);
+            let time_taken_secs: f64 = (start_time.elapsed().as_millis() as f64) / 1000.0;
             let num_tweets: usize = counts.len();
+
+            println!(
+                "Finished getting the top words text. It took {} seconds.",
+                time_taken_secs
+            );
 
             processed_tweets_output::print_top_words_text_from_counts(&counts);
 
