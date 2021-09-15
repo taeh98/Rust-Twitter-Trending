@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::process_tweets::WordAndCount;
 
-mod get_data;
 mod get_tweets;
 mod process_results;
 mod process_tweets;
@@ -64,12 +63,6 @@ impl TweetProcessingResult {
 }
 
 fn main() {
-    println!("Getting the tweets data files or checking they are already saved.");
-    get_data::check_or_get_tweets_data();
-    println!(
-        "The tweets data files are all present and intact. Proceeding to extract tweets data from them."
-    );
-
     match get_tweets::get_tweets() {
         Some(tweets) => {
             println!("Getting the top words text.");
