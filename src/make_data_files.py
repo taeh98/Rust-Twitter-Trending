@@ -1,16 +1,14 @@
 import hashlib
+import math
 import os
 import random
 
 import pandas as pandas
 import requests
 
-BYTES_PER_LINE = 172
-LINES_PER_BYTE = 1 / BYTES_PER_LINE
-OUTPUT_DATA_FILE_FILE_SIZE = 9.75e+7  # 95MB in bytes, to stay below github's max push size
-OUTPUT_DATA_FILES_TOTAL_SIZE = 2e+9  # 2GB in bytes
-NUM_OUTPUT_DATA_FILES_TO_MAKE = round(OUTPUT_DATA_FILES_TOTAL_SIZE / OUTPUT_DATA_FILE_FILE_SIZE)
-LINES_PER_OUTPUT_DATA_FILE = int(round(LINES_PER_BYTE * OUTPUT_DATA_FILE_FILE_SIZE))
+LINES_PER_BYTE = 0.011955422
+OUTPUT_DATA_FILE_FILE_SIZE = 95000000  # 95MB in bytes, to stay below github's max push size
+LINES_PER_OUTPUT_DATA_FILE = int(round(LINES_PER_BYTE * 0.95 * OUTPUT_DATA_FILE_FILE_SIZE))
 
 DATA_FILES_INFO = [
     [
@@ -124,13 +122,17 @@ def gen_processed_data_files():
     tweet_ids_tweet_texts = get_tweet_ids_tweet_texts()
     random.shuffle(tweet_ids_tweet_texts)
 
-    print("ready to write output files")
+    print("ready to write output files, str(len(tweet_ids_tweet_texts)) = " + str(len(tweet_ids_tweet_texts)))
 
-    for index in range(NUM_OUTPUT_DATA_FILES_TO_MAKE):
-        print("writing file " + str((index + 1)) + " of " + str(NUM_OUTPUT_DATA_FILES_TO_MAKE))
+    index = 0
+    num_files = str(math.ceil(len(tweet_ids_tweet_texts) / LINES_PER_OUTPUT_DATA_FILE))
+
+    while len(tweet_ids_tweet_texts) > 0:
+        print("writing file " + str((index + 1)) + " of " + num_files)
         tweets = tweet_ids_tweet_texts[:LINES_PER_OUTPUT_DATA_FILE]
         del tweet_ids_tweet_texts[:LINES_PER_OUTPUT_DATA_FILE]
         write_tweets_to_output_file(tweets, index)
+        index += 1
 
 
 def main():
