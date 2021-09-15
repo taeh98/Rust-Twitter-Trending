@@ -27,7 +27,7 @@ const DATA_FILE_PATHS: [&str; 18] = [
     "data/out-17.csv",
 ];
 
-const NUM_DATA_FILES_TO_USE: usize = 18; // 1 to 18
+const NUM_DATA_FILES_TO_USE: usize = 3; // 1 to 18, aim for all 18
 
 fn add_df_row_to_hash_map(values: Vec<AnyValue>, hm_mutex: &Mutex<Vec<String>>) {
     assert_eq!(values.len(), 1);
