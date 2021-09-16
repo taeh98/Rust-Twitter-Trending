@@ -7,4 +7,4 @@ Build and run it as with any cargo project. Output will apeear in the /out direc
 
 The source file src/make_data_files.py was used to generate the data files.
 
-Adjust the parameters NUM_REPEATS_BEFORE_MEAN (in src/main.rs) and NUM_DATA_FILES_TO_USE (in src/get_tweets.rs) to optimise the tradeoff between time taken and the effect of chance/less representative samples.
+Adjust the parameters NUM_REPEATS (in src/main.rs) and NUM_DATA_FILES_TO_USE (in src/get_tweets.rs) to optimise the tradeoff between time taken and the effect of chance/less representative samples.
