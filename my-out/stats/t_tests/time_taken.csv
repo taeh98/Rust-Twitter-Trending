@@ -1,0 +1,2 @@
+Name of first algorithm,Name of second algorithm,P-value of Student's t-test,P-value of Welch's t-test
+Rust parallelised map-reduce,Rust non-parallelised map-reduce,0.0,0.2436566214381436

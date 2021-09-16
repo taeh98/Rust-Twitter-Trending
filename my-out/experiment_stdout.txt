@@ -1,0 +1,238 @@
+Reading in the data from the dataset file data/out-0.csv
+Reading in the data from the dataset file data/out-1.csv
+Reading in the data from the dataset file data/out-2.csv
+Started processing the data from the dataset file data/out-1.csv
+Finished processing the data from the dataset file data/out-1.csv
+Started processing the data from the dataset file data/out-2.csv
+Started processing the data from the dataset file data/out-0.csv
+Finished processing the data from the dataset file data/out-0.csv
+Finished processing the data from the dataset file data/out-2.csv
+Getting the top words text.
+Finished getting the top words text. It took 188.819 seconds. ETA: 37763.799999999996 seconds or 10.489944444444443 hours.
+Top words:
+"RT 659004
+the 581754
+to 515603
+de 405668
+of 385869
+a 362896
+in 319380
+and 269933
+la 211085
+for 194432
+
+Top hashtags:
+#COVID19 545053
+#Covid19 80802
+#coronavirus 73720
+#COVID19. 61032
+#covid19 57274
+#COVID19" 41895
+#Coronavirus 25328
+#COVID19, 20865
+#StayHome 8804
+#Covid19. 8643
+Running tweet processing algorithms.
+Running the Rust parallelised map-reduce algorithm.
+Starting repeat 1 of 100.
+Starting repeat 2 of 100.
+Starting repeat 3 of 100.
+Starting repeat 4 of 100.
+Starting repeat 5 of 100.
+Starting repeat 6 of 100.
+Starting repeat 7 of 100.
+Starting repeat 8 of 100.
+Starting repeat 9 of 100.
+Starting repeat 10 of 100.
+Starting repeat 11 of 100.
+Starting repeat 12 of 100.
+Starting repeat 13 of 100.
+Starting repeat 14 of 100.
+Starting repeat 15 of 100.
+Starting repeat 16 of 100.
+Starting repeat 17 of 100.
+Starting repeat 18 of 100.
+Starting repeat 19 of 100.
+Starting repeat 20 of 100.
+Starting repeat 21 of 100.
+Starting repeat 22 of 100.
+Starting repeat 23 of 100.
+Starting repeat 24 of 100.
+Starting repeat 25 of 100.
+Starting repeat 26 of 100.
+Starting repeat 27 of 100.
+Starting repeat 28 of 100.
+Starting repeat 29 of 100.
+Starting repeat 30 of 100.
+Starting repeat 31 of 100.
+Starting repeat 32 of 100.
+Starting repeat 33 of 100.
+Starting repeat 34 of 100.
+Starting repeat 35 of 100.
+Starting repeat 36 of 100.
+Starting repeat 37 of 100.
+Starting repeat 38 of 100.
+Starting repeat 39 of 100.
+Starting repeat 40 of 100.
+Starting repeat 41 of 100.
+Starting repeat 42 of 100.
+Starting repeat 43 of 100.
+Starting repeat 44 of 100.
+Starting repeat 45 of 100.
+Starting repeat 46 of 100.
+Starting repeat 47 of 100.
+Starting repeat 48 of 100.
+Starting repeat 49 of 100.
+Starting repeat 50 of 100.
+Starting repeat 51 of 100.
+Starting repeat 52 of 100.
+Starting repeat 53 of 100.
+Starting repeat 54 of 100.
+Starting repeat 55 of 100.
+Starting repeat 56 of 100.
+Starting repeat 57 of 100.
+Starting repeat 58 of 100.
+Starting repeat 59 of 100.
+Starting repeat 60 of 100.
+Starting repeat 61 of 100.
+Starting repeat 62 of 100.
+Starting repeat 63 of 100.
+Starting repeat 64 of 100.
+Starting repeat 65 of 100.
+Starting repeat 66 of 100.
+Starting repeat 67 of 100.
+Starting repeat 68 of 100.
+Starting repeat 69 of 100.
+Starting repeat 70 of 100.
+Starting repeat 71 of 100.
+Starting repeat 72 of 100.
+Starting repeat 73 of 100.
+Starting repeat 74 of 100.
+Starting repeat 75 of 100.
+Starting repeat 76 of 100.
+Starting repeat 77 of 100.
+Starting repeat 78 of 100.
+Starting repeat 79 of 100.
+Starting repeat 80 of 100.
+Starting repeat 81 of 100.
+Starting repeat 82 of 100.
+Starting repeat 83 of 100.
+Starting repeat 84 of 100.
+Starting repeat 85 of 100.
+Starting repeat 86 of 100.
+Starting repeat 87 of 100.
+Starting repeat 88 of 100.
+Starting repeat 89 of 100.
+Starting repeat 90 of 100.
+Starting repeat 91 of 100.
+Starting repeat 92 of 100.
+Starting repeat 93 of 100.
+Starting repeat 94 of 100.
+Starting repeat 95 of 100.
+Starting repeat 96 of 100.
+Starting repeat 97 of 100.
+Starting repeat 98 of 100.
+Starting repeat 99 of 100.
+Starting repeat 100 of 100.
+Running the Rust non-parallelised map-reduce algorithm.
+Starting repeat 1 of 100.
+Starting repeat 2 of 100.
+Starting repeat 3 of 100.
+Starting repeat 4 of 100.
+Starting repeat 5 of 100.
+Starting repeat 6 of 100.
+Starting repeat 7 of 100.
+Starting repeat 8 of 100.
+Starting repeat 9 of 100.
+Starting repeat 10 of 100.
+Starting repeat 11 of 100.
+Starting repeat 12 of 100.
+Starting repeat 13 of 100.
+Starting repeat 14 of 100.
+Starting repeat 15 of 100.
+Starting repeat 16 of 100.
+Starting repeat 17 of 100.
+Starting repeat 18 of 100.
+Starting repeat 19 of 100.
+Starting repeat 20 of 100.
+Starting repeat 21 of 100.
+Starting repeat 22 of 100.
+Starting repeat 23 of 100.
+Starting repeat 24 of 100.
+Starting repeat 25 of 100.
+Starting repeat 26 of 100.
+Starting repeat 27 of 100.
+Starting repeat 28 of 100.
+Starting repeat 29 of 100.
+Starting repeat 30 of 100.
+Starting repeat 31 of 100.
+Starting repeat 32 of 100.
+Starting repeat 33 of 100.
+Starting repeat 34 of 100.
+Starting repeat 35 of 100.
+Starting repeat 36 of 100.
+Starting repeat 37 of 100.
+Starting repeat 38 of 100.
+Starting repeat 39 of 100.
+Starting repeat 40 of 100.
+Starting repeat 41 of 100.
+Starting repeat 42 of 100.
+Starting repeat 43 of 100.
+Starting repeat 44 of 100.
+Starting repeat 45 of 100.
+Starting repeat 46 of 100.
+Starting repeat 47 of 100.
+Starting repeat 48 of 100.
+Starting repeat 49 of 100.
+Starting repeat 50 of 100.
+Starting repeat 51 of 100.
+Starting repeat 52 of 100.
+Starting repeat 53 of 100.
+Starting repeat 54 of 100.
+Starting repeat 55 of 100.
+Starting repeat 56 of 100.
+Starting repeat 57 of 100.
+Starting repeat 58 of 100.
+Starting repeat 59 of 100.
+Starting repeat 60 of 100.
+Starting repeat 61 of 100.
+Starting repeat 62 of 100.
+Starting repeat 63 of 100.
+Starting repeat 64 of 100.
+Starting repeat 65 of 100.
+Starting repeat 66 of 100.
+Starting repeat 67 of 100.
+Starting repeat 68 of 100.
+Starting repeat 69 of 100.
+Starting repeat 70 of 100.
+Starting repeat 71 of 100.
+Starting repeat 72 of 100.
+Starting repeat 73 of 100.
+Starting repeat 74 of 100.
+Starting repeat 75 of 100.
+Starting repeat 76 of 100.
+Starting repeat 77 of 100.
+Starting repeat 78 of 100.
+Starting repeat 79 of 100.
+Starting repeat 80 of 100.
+Starting repeat 81 of 100.
+Starting repeat 82 of 100.
+Starting repeat 83 of 100.
+Starting repeat 84 of 100.
+Starting repeat 85 of 100.
+Starting repeat 86 of 100.
+Starting repeat 87 of 100.
+Starting repeat 88 of 100.
+Starting repeat 89 of 100.
+Starting repeat 90 of 100.
+Starting repeat 91 of 100.
+Starting repeat 92 of 100.
+Starting repeat 93 of 100.
+Starting repeat 94 of 100.
+Starting repeat 95 of 100.
+Starting repeat 96 of 100.
+Starting repeat 97 of 100.
+Starting repeat 98 of 100.
+Starting repeat 99 of 100.
+Starting repeat 100 of 100.
+Done running tweet processing algorithms.
