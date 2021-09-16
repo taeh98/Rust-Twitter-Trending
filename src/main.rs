@@ -10,7 +10,7 @@ mod process_results;
 mod process_tweets;
 mod processed_tweets_output;
 
-const NUM_REPEATS_BEFORE_MEAN: usize = 100; // aim for 200
+const NUM_REPEATS: usize = 100; // aim for 200
 
 #[derive(Serialize, Deserialize)]
 pub struct TimeTakenTweetProcessingSpeedValuePair {
@@ -73,7 +73,7 @@ fn main() {
 
             let est_time_completion_secs: f64 = time_taken_secs
                 * 2.0 // number of algorithms tested
-                * (NUM_REPEATS_BEFORE_MEAN as f64);
+                * (NUM_REPEATS as f64);
 
             println!(
                 "Finished getting the top words text. It took {} seconds. ETA: {} seconds or {} hours.",
@@ -118,8 +118,8 @@ fn run_rust_tweet_processing_algorithm(
 
     println!("Running the {} algorithm.", algorithm_name);
 
-    for repeat in 1..=NUM_REPEATS_BEFORE_MEAN {
-        println!("Starting repeat {} of {}.", repeat, NUM_REPEATS_BEFORE_MEAN);
+    for repeat in 1..=NUM_REPEATS {
+        println!("Starting repeat {} of {}.", repeat, NUM_REPEATS);
         let start_time: Instant = Instant::now();
         process_tweets::process_tweets(tweets, true);
         let time_taken_secs: f64 = (start_time.elapsed().as_millis() as f64) / 1000.0;
