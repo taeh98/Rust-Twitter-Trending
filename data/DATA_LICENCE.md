@@ -1,2 +1,3 @@
-The datafiles used are obtained from https://zenodo.org/record/3928240. They were made by Fedor Vitiugin and are unchanged.
-They are licenced under the Creative Commons Attribution 4.0 International licence, which you can read at https://creativecommons.org/licenses/by/4.0/legalcode.
+The datafiles used were generated from the files full_who_dataset1.csv, full_who_dataset2.csv, and full_who_dataset3.csv from https://zenodo.org/record/3928240.
+The original files were made by Fedor Vitiugin. The source file src/make_data_files.py was used to generate the out-n.csv data files from the original source files. It essentially takes unique tweets from them, shuffles them into a random order, and then puts them into the out-n.csv output data files.
+The original data files are licenced under the Creative Commons Attribution 4.0 International licence, which you can read at https://creativecommons.org/licenses/by/4.0/legalcode.
