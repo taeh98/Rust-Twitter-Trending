@@ -21,6 +21,8 @@ use crate::process_results::{
     variable_to_lowercase_underscored_string, variable_to_string, Variable,
 };
 
+//TODO: add greater margins between axis labels and axis values
+
 const SCATTER_PLOTS_OUTPUT_FILES_DIRECTORY: &str =
     concatcp!(OUTPUT_FILES_DIRECTORY, "/scatter_plots") as &str;
 

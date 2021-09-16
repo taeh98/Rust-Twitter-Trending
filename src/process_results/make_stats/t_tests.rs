@@ -26,6 +26,8 @@ use crate::process_results::{
 const T_TESTS_OUTPUT_FILES_DIRECTORY: &str =
     concatcp!(STATS_OUTPUT_FILES_DIRECTORY, "/t_tests") as &str;
 
+//TODO: check that t test results are mathematically correct - seems weird that 1 t-test shows 0% of diff being due to chance and other only ~25% in my-out
+
 pub(crate) fn make_t_tests(
     algorithm_names: &[String],
     time_taken_values: &[Vec<f64>],

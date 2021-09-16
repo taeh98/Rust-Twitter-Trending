@@ -20,6 +20,8 @@ use crate::process_results::{
     find_max, find_mean, find_median, find_mode, variable_to_axis_label, Variable,
 };
 
+//TODO: add greater margins between axis labels and axis values
+
 #[derive(Clone, Copy, PartialEq)]
 enum Average {
     Mean,
